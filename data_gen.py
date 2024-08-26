@@ -207,9 +207,9 @@ for b in range(n_exper):
         print(f"ARMA data generation: {b+1} / {n_exper}")
 
 
-np.savetxt("ARMA_original.csv", res_original, delimiter = ",")
-np.savetxt("ARMA_miss1.csv", res_miss1, delimiter = ",")
-np.savetxt("ARMA_miss2.csv", res_miss2, delimiter = ",")
+np.savetxt("./sim_data/ARMA_original.csv", res_original, delimiter = ",")
+np.savetxt("./sim_data/ARMA_miss1.csv", res_miss1, delimiter = ",")
+np.savetxt("./sim_data/ARMA_miss2.csv", res_miss2, delimiter = ",")
 
 #%%
 
@@ -234,9 +234,9 @@ for b in range(n_exper):
         print(f"TAR data generation: {b+1} / {n_exper}")
 
 
-np.savetxt("TAR_original.csv", res_original, delimiter = ",")
-np.savetxt("TAR_miss1.csv", res_miss1, delimiter = ",")
-np.savetxt("TAR_miss2.csv", res_miss2, delimiter = ",")
+np.savetxt("./sim_data/TAR_original.csv", res_original, delimiter = ",")
+np.savetxt("./sim_data/TAR_miss1.csv", res_miss1, delimiter = ",")
+np.savetxt("./sim_data/TAR_miss2.csv", res_miss2, delimiter = ",")
 
 
 #%%
@@ -266,9 +266,9 @@ for b in range(n_exper):
     if (b+1) % 100 == 0 and b > 98:
         print(f"Nonlinear VAR data generation: {b+1} / {n_exper}")
 
-np.savetxt("NLVAR_original.csv", res_original, delimiter = ",")
-np.savetxt("NLVAR_miss1.csv", res_miss1, delimiter = ",")
-np.savetxt("NLVAR_miss2.csv", res_miss2, delimiter = ",")
+np.savetxt("./sim_data/NLVAR_original.csv", res_original, delimiter = ",")
+np.savetxt("./sim_data/NLVAR_miss1.csv", res_miss1, delimiter = ",")
+np.savetxt("./sim_data/NLVAR_miss2.csv", res_miss2, delimiter = ",")
 
 
 #%%
@@ -294,9 +294,9 @@ for b in range(n_exper):
         print(f"GARCH data generation: {b+1} / {n_exper}")
 
 
-np.savetxt("GARCH_original.csv", res_original, delimiter = ",")
-np.savetxt("GARCH_miss1.csv", res_miss1, delimiter = ",")
-np.savetxt("GARCH_miss2.csv", res_miss2, delimiter = ",")
+np.savetxt("./sim_data/GARCH_original.csv", res_original, delimiter = ",")
+np.savetxt("./sim_data/GARCH_miss1.csv", res_miss1, delimiter = ",")
+np.savetxt("./sim_data/GARCH_miss2.csv", res_miss2, delimiter = ",")
 
 #%%
 
@@ -328,9 +328,9 @@ for b in range(n_exper):
     if (b+1) % 100 == 0 and b > 98:
         print(f"ALR data generation: {b+1} / {n_exper}")
 
-np.savetxt("ALR_original.csv", res_original, delimiter = ",")
-np.savetxt("ALR_miss1.csv", res_miss1, delimiter = ",")
-np.savetxt("ALR_miss2.csv", res_miss2, delimiter = ",")
+np.savetxt("./sim_data/ALR_original.csv", res_original, delimiter = ",")
+np.savetxt("./sim_data/ALR_miss1.csv", res_miss1, delimiter = ",")
+np.savetxt("./sim_data/ALR_miss2.csv", res_miss2, delimiter = ",")
 
 #%%
 
@@ -355,9 +355,9 @@ for b in range(n_exper):
     if (b+1) % 100 == 0 and b > 98:
         print(f"ARI data generation: {b+1} / {n_exper}")
 
-np.savetxt("ARI_original.csv", res_original, delimiter = ",")
-np.savetxt("ARI_miss1.csv", res_miss1, delimiter = ",")
-np.savetxt("ARI_miss2.csv", res_miss2, delimiter = ",")
+np.savetxt("./sim_data/ARI_original.csv", res_original, delimiter = ",")
+np.savetxt("./sim_data/ARI_miss1.csv", res_miss1, delimiter = ",")
+np.savetxt("./sim_data/ARI_miss2.csv", res_miss2, delimiter = ",")
 
 
 #%%
@@ -383,13 +383,9 @@ for b in range(n_exper):
     if (b+1) % 100 == 0 and b > 98:
         print(f"Cyclic data generation: {b+1} / {n_exper}")
 
-np.savetxt("Cyc_original.csv", res_original, delimiter = ",")
-np.savetxt("Cyc_miss1.csv", res_miss1, delimiter = ",")
-np.savetxt("Cyc_miss2.csv", res_miss2, delimiter = ",")
-
-
-
-#%% 
+np.savetxt("./sim_data/Cyc_original.csv", res_original, delimiter = ",")
+np.savetxt("./sim_data/Cyc_miss1.csv", res_miss1, delimiter = ",")
+np.savetxt("./sim_data/Cyc_miss2.csv", res_miss2, delimiter = ",")
 
 
 
