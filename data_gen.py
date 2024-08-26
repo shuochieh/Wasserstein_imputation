@@ -180,9 +180,9 @@ for b in range(n_exper):
         print(f"AR data generation: {b+1} / {n_exper}")
 
 
-np.savetxt("AR_original.csv", res_original, delimiter = ",")
-np.savetxt("AR_miss1.csv", res_miss1, delimiter = ",")
-np.savetxt("AR_miss2.csv", res_miss2, delimiter = ",")
+np.savetxt("./sim_data/AR_original.csv", res_original, delimiter = ",")
+np.savetxt("./sim_data/AR_miss1.csv", res_miss1, delimiter = ",")
+np.savetxt("./sim_data/AR_miss2.csv", res_miss2, delimiter = ",")
 
 #%%
 
