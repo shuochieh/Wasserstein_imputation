@@ -1,5 +1,5 @@
-model_names = c("NLVAR", "AR", "ARMA", "TAR", "GARCH", "ALR", "ARI", "Cyc")
-ds = c(2, 1, 1, 1, 1, 3, 1, 1)
+model_names = c("AR", "ARMA", "TAR", "GARCH", "ALR", "ARI", "Cyc", "NLVAR")
+ds = c(1, 1, 1, 1, 3, 1, 1, 2)
 
 for (i in 1:length(model_names)) {
   model_name = model_names[i]

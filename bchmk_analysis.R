@@ -52,20 +52,24 @@ s_filter = function (x, ar_order = 2, lambda = 0.001) {
                  family = "mgaussian",
                  lambda = lambda)
   
-  est_imp = matrix(0, nrow = length(miss_idx), ncol = k)
-  for (i in 1:length(miss_idx)) {
-    for (j in 1:k) {
-      if (j == 1) {
-        temp = c(as.matrix(model$beta[[j]]))[(ar_order * k) + i]
-      } else {
-        temp = c(temp, c(as.matrix(model$beta[[j]]))[(ar_order * k) + i])
+  if (k > 1) {
+    est_imp = matrix(0, nrow = length(miss_idx), ncol = k)
+    for (i in 1:length(miss_idx)) {
+      for (j in 1:k) {
+        if (j == 1) {
+          temp = c(as.matrix(model$beta[[j]]))[(ar_order * k) + i]
+        } else {
+          temp = c(temp, c(as.matrix(model$beta[[j]]))[(ar_order * k) + i])
+        }
       }
+      est_imp[i,] = -temp
     }
-    est_imp[i,] = -temp
+    xmis[miss_idx,] = est_imp
+  } else {
+    xmis[miss_idx,] = -c(model$beta[(ar_order + 1):length(model$beta)])
   }
-  
-  xmis[miss_idx,] = est_imp
-  
+
+
   return (xmis)
 }
 
