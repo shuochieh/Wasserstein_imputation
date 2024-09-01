@@ -8,6 +8,7 @@ library(glmnet)
 # model_name = "ARMA"
 # d = 1 (dimension of the target series)
 # n_exper = 1000 (# of monte carlo simulations)
+# show_plot = FALSE (whether to plot some marginal distributions)
 
 
 # Some utilities
@@ -74,21 +75,23 @@ s_filter = function (x, ar_order = 2, lambda = 0.001) {
 }
 
 ### Missing pattern 1
-dta_com = read.csv(paste0("./sim_data/", model_name, "/", model_name, "_original.csv"), header = F)
 dta = read.csv(paste0("./sim_data/", model_name, "/", model_name, "_miss1.csv"), header = F)
 
 # Exploratory
-df = data.frame(x = c(dta_com[1:(nrow(dta_com) - 1),1]), 
-                y = c(dta_com[2:nrow(dta_com),1]))
-p1 = ggplot(df, aes(x = x, y = y)) + 
-  geom_point(color = "steelblue", size = 1) +
-  theme_minimal() +
-  labs(title = "Scatterplot of original data",
-       x = "x_{t-1}",
-       y = "x_t")
-
-plot_range = range(dta_com[,1])
-plot_range = c(floor(plot_range[1]), ceiling(plot_range[2]))
+if (show_plot) {
+  dta_com = read.csv(paste0("./sim_data/", model_name, "/", model_name, "_original.csv"), header = F)
+  df = data.frame(x = c(dta_com[1:(nrow(dta_com) - 1),1]), 
+                  y = c(dta_com[2:nrow(dta_com),1]))
+  p1 = ggplot(df, aes(x = x, y = y)) + 
+    geom_point(color = "steelblue", size = 1) +
+    theme_minimal() +
+    labs(title = "Scatterplot of original data",
+         x = "x_{t-1}",
+         y = "x_t")
+  
+  plot_range = range(dta_com[,1])
+  plot_range = c(floor(plot_range[1]), ceiling(plot_range[2]))
+}
 
 # linear interpolation
 cat("\n======= Linear interpolation ==========================\n")
@@ -130,59 +133,63 @@ for (sim in 1:n_exper) {
   }
 }
 
-temp = na_lag_pairs(lin_imp[,1], which(is.na(dta[,1])))
-temp = data.frame(x = temp[,1],
-                  y = temp[,2])
-p2 = ggplot(temp, aes(x = x, y = y)) + 
-  geom_point(color = "steelblue1", size = 1) +
-  coord_cartesian(xlim = plot_range, ylim = plot_range) +
-  theme_minimal() +
-  labs(title = "Scatterplot of linear imputation",
-       x = "x_{t-1}",
-       y = "x_t")
+if (show_plot) {
+  temp = na_lag_pairs(lin_imp[,1], which(is.na(dta[,1])))
+  temp = data.frame(x = temp[,1],
+                    y = temp[,2])
+  p2 = ggplot(temp, aes(x = x, y = y)) + 
+    geom_point(color = "steelblue1", size = 1) +
+    coord_cartesian(xlim = plot_range, ylim = plot_range) +
+    theme_minimal() +
+    labs(title = "Scatterplot of linear imputation",
+         x = "x_{t-1}",
+         y = "x_t")
+  
+  temp = na_lag_pairs(spl_imp[,1], which(is.na(dta[,1])))
+  temp = data.frame(x = temp[,1],
+                    y = temp[,2])
+  p3 = ggplot(temp, aes(x = x, y = y)) + 
+    geom_point(color = "steelblue1", size = 1) +
+    coord_cartesian(xlim = plot_range, ylim = plot_range) +
+    theme_minimal() +
+    labs(title = "Scatterplot of spline imputation",
+         x = "x_{t-1}",
+         y = "x_t")
+  
+  temp = na_lag_pairs(KS_imp[,1], which(is.na(dta[,1])))
+  temp = data.frame(x = temp[,1],
+                    y = temp[,2])
+  p4 = ggplot(temp, aes(x = x, y = y)) + 
+    geom_point(color = "steelblue1", size = 1) +
+    coord_cartesian(xlim = plot_range, ylim = plot_range) +
+    theme_minimal() +
+    labs(title = "Scatterplot of Kalman smoothing",
+         x = "x_{t-1}",
+         y = "x_t")
+  
+  temp = na_lag_pairs(SF_imp[,1], which(is.na(dta[,1])))
+  temp = data.frame(x = temp[,1],
+                    y = temp[,2])
+  p5 = ggplot(temp, aes(x = x, y = y)) + 
+    geom_point(color = "steelblue1", size = 1) +
+    coord_cartesian(xlim = plot_range, ylim = plot_range) +
+    theme_minimal() +
+    labs(title = "Scatterplot of PT filter",
+         x = "x_{t-1}",
+         y = "x_t")
+  
+  grid.arrange(p1, p2, p3, p4, p5, nrow = 3, ncol = 3)
 
-temp = na_lag_pairs(spl_imp[,1], which(is.na(dta[,1])))
-temp = data.frame(x = temp[,1],
-                  y = temp[,2])
-p3 = ggplot(temp, aes(x = x, y = y)) + 
-  geom_point(color = "steelblue1", size = 1) +
-  coord_cartesian(xlim = plot_range, ylim = plot_range) +
-  theme_minimal() +
-  labs(title = "Scatterplot of spline imputation",
-       x = "x_{t-1}",
-       y = "x_t")
-
-temp = na_lag_pairs(KS_imp[,1], which(is.na(dta[,1])))
-temp = data.frame(x = temp[,1],
-                  y = temp[,2])
-p4 = ggplot(temp, aes(x = x, y = y)) + 
-  geom_point(color = "steelblue1", size = 1) +
-  coord_cartesian(xlim = plot_range, ylim = plot_range) +
-  theme_minimal() +
-  labs(title = "Scatterplot of Kalman smoothing",
-       x = "x_{t-1}",
-       y = "x_t")
-
-temp = na_lag_pairs(SF_imp[,1], which(is.na(dta[,1])))
-temp = data.frame(x = temp[,1],
-                  y = temp[,2])
-p5 = ggplot(temp, aes(x = x, y = y)) + 
-  geom_point(color = "steelblue1", size = 1) +
-  coord_cartesian(xlim = plot_range, ylim = plot_range) +
-  theme_minimal() +
-  labs(title = "Scatterplot of PT filter",
-       x = "x_{t-1}",
-       y = "x_t")
-
-grid.arrange(p1, p2, p3, p4, p5, nrow = 3, ncol = 3)
+  par(mfrow = c(1,3))
+  plot(spl_imp[1:300,1], type = "l")
+  plot(KS_imp[1:300,1], type = "l")
+  plot(SF_imp[1:300,1], type = "l")
+}
 
 output = cbind(lin_imp, spl_imp, KS_imp, SF_imp)
 write.csv(output, paste0("./sim_data/", model_name, "/benchmarks_miss1.csv"), row.names = F)
 
-par(mfrow = c(1,3))
-plot(spl_imp[1:300,1], type = "l")
-plot(KS_imp[1:300,1], type = "l")
-plot(SF_imp[1:300,1], type = "l")
+
 
 
 
@@ -191,18 +198,20 @@ plot(SF_imp[1:300,1], type = "l")
 
 
 ### Missing pattern 2
-dta_com = read.csv(paste0("./sim_data/", model_name, "/", model_name, "_original.csv"), header = F)
 dta = read.csv(paste0("./sim_data/", model_name, "/", model_name, "_miss2.csv"), header = F)
 
 # Exploratory
-df = data.frame(x = c(dta_com[1:(nrow(dta_com) - 1),1]), 
-                y = c(dta_com[2:nrow(dta_com),1]))
-p1 = ggplot(df, aes(x = x, y = y)) + 
-  geom_point(color = "steelblue", size = 1) +
-  theme_minimal() +
-  labs(title = "Scatterplot of original data",
-       x = "x_{t-1}",
-       y = "x_t")
+if (show_plot) {
+  dta_com = read.csv(paste0("./sim_data/", model_name, "/", model_name, "_original.csv"), header = F)
+  df = data.frame(x = c(dta_com[1:(nrow(dta_com) - 1),1]), 
+                  y = c(dta_com[2:nrow(dta_com),1]))
+  p1 = ggplot(df, aes(x = x, y = y)) + 
+    geom_point(color = "steelblue", size = 1) +
+    theme_minimal() +
+    labs(title = "Scatterplot of original data",
+         x = "x_{t-1}",
+         y = "x_t")
+}
 
 # linear interpolation
 cat("\n======= Linear interpolation ==========================\n")
@@ -244,56 +253,58 @@ for (sim in 1:n_exper) {
   }
 }
 
-temp = na_lag_pairs(lin_imp[,1], which(is.na(dta[,1])))
-temp = data.frame(x = temp[,1],
-                  y = temp[,2])
-p2 = ggplot(temp, aes(x = x, y = y)) + 
-  geom_point(color = "steelblue1", size = 1) +
-  coord_cartesian(xlim = plot_range, ylim = plot_range) +
-  theme_minimal() +
-  labs(title = "Scatterplot of linear imputation",
-       x = "x_{t-1}",
-       y = "x_t")
-
-temp = na_lag_pairs(spl_imp[,1], which(is.na(dta[,1])))
-temp = data.frame(x = temp[,1],
-                  y = temp[,2])
-p3 = ggplot(temp, aes(x = x, y = y)) + 
-  geom_point(color = "steelblue1", size = 1) +
-  coord_cartesian(xlim = plot_range, ylim = plot_range) +
-  theme_minimal() +
-  labs(title = "Scatterplot of spline imputation",
-       x = "x_{t-1}",
-       y = "x_t")
-
-temp = na_lag_pairs(KS_imp[,1], which(is.na(dta[,1])))
-temp = data.frame(x = temp[,1],
-                  y = temp[,2])
-p4 = ggplot(temp, aes(x = x, y = y)) + 
-  geom_point(color = "steelblue1", size = 1) +
-  coord_cartesian(xlim = plot_range, ylim = plot_range) +
-  theme_minimal() +
-  labs(title = "Scatterplot of Kalman smoothing",
-       x = "x_{t-1}",
-       y = "x_t")
-
-temp = na_lag_pairs(SF_imp[,1], which(is.na(dta[,1])))
-temp = data.frame(x = temp[,1],
-                  y = temp[,2])
-p5 = ggplot(temp, aes(x = x, y = y)) + 
-  geom_point(color = "steelblue1", size = 1) +
-  coord_cartesian(xlim = plot_range, ylim = plot_range) +
-  theme_minimal() +
-  labs(title = "Scatterplot of PT filter",
-       x = "x_{t-1}",
-       y = "x_t")
-
-grid.arrange(p1, p2, p3, p4, p5, nrow = 3, ncol = 3)
-
-par(mfrow = c(1,3))
-plot(spl_imp[,1], type = "l")
-plot(KS_imp[,1], type = "l")
-plot(SF_imp[,1], type = "l")
+if (show_plot) {
+  temp = na_lag_pairs(lin_imp[,1], which(is.na(dta[,1])))
+  temp = data.frame(x = temp[,1],
+                    y = temp[,2])
+  p2 = ggplot(temp, aes(x = x, y = y)) + 
+    geom_point(color = "steelblue1", size = 1) +
+    coord_cartesian(xlim = plot_range, ylim = plot_range) +
+    theme_minimal() +
+    labs(title = "Scatterplot of linear imputation",
+         x = "x_{t-1}",
+         y = "x_t")
+  
+  temp = na_lag_pairs(spl_imp[,1], which(is.na(dta[,1])))
+  temp = data.frame(x = temp[,1],
+                    y = temp[,2])
+  p3 = ggplot(temp, aes(x = x, y = y)) + 
+    geom_point(color = "steelblue1", size = 1) +
+    coord_cartesian(xlim = plot_range, ylim = plot_range) +
+    theme_minimal() +
+    labs(title = "Scatterplot of spline imputation",
+         x = "x_{t-1}",
+         y = "x_t")
+  
+  temp = na_lag_pairs(KS_imp[,1], which(is.na(dta[,1])))
+  temp = data.frame(x = temp[,1],
+                    y = temp[,2])
+  p4 = ggplot(temp, aes(x = x, y = y)) + 
+    geom_point(color = "steelblue1", size = 1) +
+    coord_cartesian(xlim = plot_range, ylim = plot_range) +
+    theme_minimal() +
+    labs(title = "Scatterplot of Kalman smoothing",
+         x = "x_{t-1}",
+         y = "x_t")
+  
+  temp = na_lag_pairs(SF_imp[,1], which(is.na(dta[,1])))
+  temp = data.frame(x = temp[,1],
+                    y = temp[,2])
+  p5 = ggplot(temp, aes(x = x, y = y)) + 
+    geom_point(color = "steelblue1", size = 1) +
+    coord_cartesian(xlim = plot_range, ylim = plot_range) +
+    theme_minimal() +
+    labs(title = "Scatterplot of PT filter",
+         x = "x_{t-1}",
+         y = "x_t")
+  
+  grid.arrange(p1, p2, p3, p4, p5, nrow = 3, ncol = 3)
+  
+  par(mfrow = c(1,3))
+  plot(spl_imp[,1], type = "l")
+  plot(KS_imp[,1], type = "l")
+  plot(SF_imp[,1], type = "l")
+}
 
 output = cbind(lin_imp, spl_imp, KS_imp, SF_imp)
 write.csv(output, paste0("./sim_data/", model_name, "/benchmarks_miss2.csv"), row.names = F)
