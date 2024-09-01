@@ -6,6 +6,8 @@ library(glmnet)
 
 # Remember to specify model_name
 # model_name = "ARMA"
+# d = 1 (dimension of the target series)
+# n_exper = 1000 (# of monte carlo simulations)
 
 
 # Some utilities
@@ -54,12 +56,12 @@ s_filter = function (x, ar_order = 2, lambda = 0.001) {
   for (i in 1:length(miss_idx)) {
     for (j in 1:k) {
       if (j == 1) {
-        temp = c(as.matrix(model$beta[ar_order + j]))[i]
+        temp = c(as.matrix(model$beta[[j]]))[(ar_order * k) + i]
       } else {
-        temp = c(temp, c(as.matrix(model$beta[ar_order + j]))[i])
+        temp = c(temp, c(as.matrix(model$beta[[j]]))[(ar_order * k) + i])
       }
     }
-    est_imp[i,] = c(model$a0) - temp
+    est_imp[i,] = -temp
   }
   
   xmis[miss_idx,] = est_imp
@@ -85,36 +87,40 @@ plot_range = range(dta_com[,1])
 plot_range = c(floor(plot_range[1]), ceiling(plot_range[2]))
 
 # linear interpolation
+cat("\n======= Linear interpolation ==========================\n")
 lin_imp = matrix(NA, nrow = nrow(dta), ncol = ncol(dta))
-for (sim in 1:ncol(dta)) {
-  lin_imp[,sim] = na_interpolation(dta[,sim], "linear")
+for (sim in 1:n_exper) {
+  lin_imp[,((sim - 1) * d + 1):(sim * d)] = as.matrix(na_interpolation(dta[,((sim - 1) * d + 1):(sim * d)], "linear"))
   if (sim %% 100 == 0 && sim > 99) {
     cat("Iteration", sim, "\n")
   }
 }
 
 # spline interpolation
+cat("\n======= Spline interpolation ==========================\n")
 spl_imp = matrix(NA, nrow = nrow(dta), ncol = ncol(dta))
-for (sim in 1:ncol(dta)) {
-  spl_imp[,sim] = na_interpolation(dta[,sim], "spline")
+for (sim in 1:n_exper) {
+  spl_imp[,((sim - 1) * d + 1):(sim * d)] = as.matrix(na_interpolation(dta[,((sim - 1) * d + 1):(sim * d)], "spline"))
   if (sim %% 100 == 0 && sim > 99) {
     cat("Iteration", sim, "\n")
   }
 }
 
 # Kalman smoothing (auto.arima)
+cat("\n======= Kalman smoothing ==========================\n")
 KS_imp = matrix(NA, nrow = nrow(dta), ncol = ncol(dta))
-for (sim in 1:ncol(dta)) {
-  KS_imp[,sim] = na_kalman(dta[,sim], "auto.arima")
+for (sim in 1:n_exper) {
+  KS_imp[,((sim - 1) * d + 1):(sim * d)] = as.matrix(na_kalman(dta[,((sim - 1) * d + 1):(sim * d)], "auto.arima"))
   if (sim %% 100 == 0 && sim > 99) {
     cat("Iteration", sim, "\n")
   }
 }
 
 # scalar filtering
+cat("\n======= Pena-Tsay filter ==========================\n")
 SF_imp = matrix(NA, nrow = nrow(dta), ncol = ncol(dta))
-for (sim in 1:ncol(dta)) {
-  SF_imp[,sim] = s_filter(dta[,sim], 6, lambda = 0.001) # AR order may not be too big
+for (sim in 1:n_exper) {
+  SF_imp[,((sim - 1) * d + 1):(sim * d)] = s_filter(dta[,((sim - 1) * d + 1):(sim * d)], 6, lambda = 0.0001) 
   if (sim %% 100 == 0 && sim > 99) {
     cat("Iteration", sim, "\n")
   }
@@ -195,42 +201,44 @@ p1 = ggplot(df, aes(x = x, y = y)) +
        y = "x_t")
 
 # linear interpolation
+cat("\n======= Linear interpolation ==========================\n")
 lin_imp = matrix(NA, nrow = nrow(dta), ncol = ncol(dta))
-for (sim in 1:ncol(dta)) {
-  lin_imp[,sim] = na_interpolation(dta[,sim], "linear")
+for (sim in 1:n_exper) {
+  lin_imp[,((sim - 1) * d + 1):(sim * d)] = as.matrix(na_interpolation(dta[,((sim - 1) * d + 1):(sim * d)], "linear"))
   if (sim %% 100 == 0 && sim > 99) {
     cat("Iteration", sim, "\n")
   }
 }
 
 # spline interpolation
+cat("\n======= Spline interpolation ==========================\n")
 spl_imp = matrix(NA, nrow = nrow(dta), ncol = ncol(dta))
-for (sim in 1:ncol(dta)) {
-  spl_imp[,sim] = na_interpolation(dta[,sim], "spline")
+for (sim in 1:n_exper) {
+  spl_imp[,((sim - 1) * d + 1):(sim * d)] = as.matrix(na_interpolation(dta[,((sim - 1) * d + 1):(sim * d)], "spline"))
   if (sim %% 100 == 0 && sim > 99) {
     cat("Iteration", sim, "\n")
   }
 }
 
 # Kalman smoothing (auto.arima)
+cat("\n======= Kalman smoothing ==========================\n")
 KS_imp = matrix(NA, nrow = nrow(dta), ncol = ncol(dta))
-for (sim in 1:ncol(dta)) {
-  KS_imp[,sim] = na_kalman(dta[,sim], "auto.arima")
+for (sim in 1:n_exper) {
+  KS_imp[,((sim - 1) * d + 1):(sim * d)] = as.matrix(na_kalman(dta[,((sim - 1) * d + 1):(sim * d)], "auto.arima"))
   if (sim %% 100 == 0 && sim > 99) {
     cat("Iteration", sim, "\n")
   }
 }
 
 # scalar filtering
+cat("\n======= Pena-Tsay filter ==========================\n")
 SF_imp = matrix(NA, nrow = nrow(dta), ncol = ncol(dta))
-for (sim in 1:ncol(dta)) {
-  SF_imp[,sim] = s_filter(dta[,sim], 6, lambda = 0.001) # AR order may not be too big
+for (sim in 1:n_exper) {
+  SF_imp[,((sim - 1) * d + 1):(sim * d)] = s_filter(dta[,((sim - 1) * d + 1):(sim * d)], 6, lambda = 0.001) # AR order may not be too big
   if (sim %% 100 == 0 && sim > 99) {
     cat("Iteration", sim, "\n")
   }
 }
-
-plot_range = c(-4, 4)
 
 temp = na_lag_pairs(lin_imp[,1], which(is.na(dta[,1])))
 temp = data.frame(x = temp[,1],
