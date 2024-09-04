@@ -242,27 +242,8 @@ def kWI(x, core_solver, n1s, **kwargs):
     n1: 
         a list of n1 values
     """        
-    for n1 in n1s:
-        x = core_solver(x = x, n1 = n1, **kwargs)
+    for i in range(len(n1s)):
+        print(f"kWI: {i} run")
+        x = core_solver(x = x, n1 = n1s[i], **kwargs)
         
     return x
-#%%
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
