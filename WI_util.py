@@ -13,6 +13,25 @@ import numpy as np
 
 #%%
 
+#def ts2stack(x, p = 2):
+#    """
+#    stride trick is too low-level; can be dangerous.
+#    Return an numpy array consisting of lagged realizations of x
+#    
+#    Parameters
+#    ----------
+#    x : (n, 1) numpy array of time series
+#    p : dimension of the lagged time series; must be >= 2
+#
+#    Returns
+#    -------
+#    A numpy array of size (n - p + 1, p)
+#    """
+    
+#    n = len(x) - p + 1
+#    return np.lib.stride_tricks.as_strided(x, shape = (n, p), 
+#                                           strides = (x.itemsize, x.itemsize))
+
 def ts2stack(x, p = 2):
     """
     Return an numpy array consisting of lagged realizations of x
@@ -26,10 +45,14 @@ def ts2stack(x, p = 2):
     -------
     A numpy array of size (n - p + 1, p)
     """
+    n = x.shape[0]
     
-    n = len(x) - p + 1
-    return np.lib.stride_tricks.as_strided(x, shape = (n, p), 
-                                           strides = (x.itemsize, x.itemsize))
+    res = np.empty((n - p + 1, p), dtype = x.dtype)
+    for i in range(n - p + 1):
+        res[i,:] = x[i:(i + p),0]
+        
+    return res
+    
 
 def slide_sum(A, d):
     """
@@ -135,9 +158,9 @@ def WI_core_ordinary(x, n1, p, idx_obs, solver, Lambda = 0, WI_max_iter = 1000,
     for i in range(WI_max_iter):
         for j in range(d):
             if j == 0:
-                x_lags = ts2stack(x[:,j], p)
+                x_lags = ts2stack(x[:,j].reshape(-1,1), p)
             else: 
-                x_lags = np.column_stack((x_lags, ts2stack(x[:,j], p)))
+                x_lags = np.column_stack((x_lags, ts2stack(x[:,j].reshape(-1,1), p)))
         
         x_pre = x_lags[:(n1 - p + 2),:]
         x_post = x_lags[(n1 - p + 2):,:]
@@ -202,9 +225,9 @@ def WI_core_exact(x, n1, p, K, b, Lambda = 0.01, WI_max_iter = 1000, WI_tol = 1e
     for i in range(WI_max_iter):
         for j in range(d):
             if j == 0:
-                x_lags = ts2stack(x[:,j], p)
+                x_lags = ts2stack(x[:,j].reshape(-1,1), p)
             else:
-                x_lags = np.column_stack((x_lags, ts2stack(x[:,j], p)))
+                x_lags = np.column_stack((x_lags, ts2stack(x[:,j].reshape(-1,1), p)))
                 
         x_pre = x_lags[:(n1 - p + 2),:]
         x_post = x_lags[(n1 - p + 2):,:]
@@ -247,3 +270,36 @@ def kWI(x, core_solver, n1s, **kwargs):
         x = core_solver(x = x, n1 = n1s[i], **kwargs)
         
     return x
+
+
+#%% Test code: Do not run
+#import matplotlib.pyplot as plt
+
+#dta = np.loadtxt("./sim_data/AR/AR_miss2.csv", delimiter = ",")
+#benchmarks = np.loadtxt("./sim_data/AR/benchmarks_miss2.csv", delimiter = ",", skiprows = 1)
+#dta_lin = benchmarks[:,:1000]
+
+#n = 3000
+#p = 12
+#for sim in range(1):
+#    idx_obs = [[i for i in range(n) if ~np.isnan(dta[i, sim])]]
+#    alpha = n / (4 * p) # learning rate
+    
+#    x_obs = dta_lin[:,sim].reshape(-1, 1)
+#    temp = kWI(np.copy(x_obs), WI_core_ordinary, [1500, 750, 2250], p = p, idx_obs = idx_obs, solver = solver_ordinary, alpha = alpha, WI_max_iter = 20, WI_tol = 1e-4, verbose = True)
+    
+#    plt.plot(np.linspace(0,3000,3000), x_obs, 'c-')
+#    plt.show()
+    
+#    plt.plot(np.linspace(0,3000,3000), dta_lin[:,0], 'c-')
+#    plt.show()
+    
+#    plt.plot(np.linspace(0,3000,3000), temp, 'c-')
+#    plt.show()
+    
+    
+    
+    
+    
+    
+    
