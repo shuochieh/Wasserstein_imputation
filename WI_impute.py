@@ -17,7 +17,7 @@ import matplotlib.pyplot as plt
 #%%
 
 p = 6 # dimension of marginal distribution
-n = 3000 # sample size (for our simulation)
+n = 1000 # sample size (for our simulation)
 
 #%% 
 
@@ -27,12 +27,9 @@ n = 3000 # sample size (for our simulation)
 dta = np.loadtxt("./sim_data/AR/AR_miss1.csv", delimiter = ",")
 benchmarks = np.loadtxt("./sim_data/AR/benchmarks_miss1.csv", delimiter = ",", skiprows = 1)
 dta_lin = benchmarks[:,:1000]
-dta_Kalman = benchmarks[:,2000:3000]
 
 res_ord_lin = np.zeros(shape = (n, 1000))
-res_ord_Kalman = np.zeros(shape = (n, 1000))
 res_kWI_lin = np.zeros(shape = (n, 1000))
-res_kWI_Kalman = np.zeros(shape = (n, 1000))
 
 for sim in range(1000):
     idx_obs = [[i for i in range(n) if ~np.isnan(dta[i, sim])]]
@@ -42,22 +39,12 @@ for sim in range(1000):
     x_obs = np.copy(dta_lin[:,sim]).reshape(-1, 1)
     temp = WI.WI_core_ordinary(x_obs, 1200, p, idx_obs, WI.solver_ordinary, alpha = alpha, WI_max_iter = 30, verbose = True)
     res_ord_lin[:,sim] = temp.squeeze()
-    
-    print("\n === WI from Kalman interpolation ===\n")
-    x_obs = np.copy(dta_Kalman[:,sim]).reshape(-1, 1)
-    temp = WI.WI_core_ordinary(x_obs, 1200, p, idx_obs, WI.solver_ordinary, alpha = alpha, WI_max_iter = 30, verbose = True)
-    res_ord_Kalman[:,sim] = temp.squeeze()
-    
+        
     print("\n === kWI from linear interpolation ===\n")
     x_obs = np.copy(dta_lin[:,sim]).reshape(-1, 1)
     temp = WI.kWI(x_obs, WI.WI_core_ordinary, [1500, 750, 2250], p = p, idx_obs = idx_obs, solver = WI.solver_ordinary, alpha = alpha, WI_max_iter = 30, verbose = True)
     res_kWI_lin[:,sim] = temp.squeeze()
-    
-    print("\n === kWI from Kalman interpolation ===\n")
-    x_obs = np.copy(dta_Kalman[:,sim]).reshape(-1, 1)
-    temp = WI.kWI(x_obs, WI.WI_core_ordinary, [1500, 750, 2250], p = p, idx_obs = idx_obs, solver = WI.solver_ordinary, alpha = alpha, WI_max_iter = 30, verbose = True)
-    res_kWI_Kalman[:,sim] = temp.squeeze()
-    
+        
     
 np.savetxt("./sim_data/AR/AR_WI_miss1.csv", np.column_stack((res_ord_lin, res_ord_Kalman, res_kWI_lin, res_kWI_Kalman)), delimiter = ",")    
 
@@ -143,13 +130,334 @@ for sim in range(1000):
     
 np.savetxt("./sim_data/ARMA/ARMA_WI_miss1.csv", np.column_stack((res_ord_lin, res_ord_Kalman, res_kWI_lin)), delimiter = ",")    
 
+#%%
 
+# ARMA(1,1) imputation: Missing pattern II
 
+dta = np.loadtxt("./sim_data/ARMA/ARMA_miss2.csv", delimiter = ",")
+benchmarks = np.loadtxt("./sim_data/ARMA/benchmarks_miss2.csv", delimiter = ",", skiprows = 1)
+dta_lin = benchmarks[:,:1000]
+dta_Kalman = benchmarks[:,2000:3000]
 
+res_ord_lin = np.zeros(shape = (n, 1000))
+res_ord_Kalman = np.zeros(shape = (n, 1000))
+res_kWI_lin = np.zeros(shape = (n, 1000))
+#res_kWI_Kalman = np.zeros(shape = (n, 1000))
+
+for sim in range(1000):
+    idx_obs = [[i for i in range(n) if ~np.isnan(dta[i, sim])]]
+    alpha = n / (4 * p) # learning rate
+    
+    print(f"\n === Simulation {sim}: WI from linear interpolation ===\n")
+    x_obs = np.copy(dta_lin[:,sim]).reshape(-1, 1)
+    temp = WI.WI_core_ordinary(x_obs, 1200, p, idx_obs, WI.solver_ordinary, alpha = alpha, WI_max_iter = 15, WI_tol = 1e-3, max_iter = 50, verbose = True)
+    res_ord_lin[:,sim] = temp.squeeze()
+    
+    print("\n === WI from Kalman interpolation ===\n")
+    x_obs = np.copy(dta_Kalman[:,sim]).reshape(-1, 1)
+    temp = WI.WI_core_ordinary(x_obs, 1200, p, idx_obs, WI.solver_ordinary, alpha = alpha, WI_max_iter = 15, WI_tol = 1e-3, max_iter = 50, verbose = True)
+    res_ord_Kalman[:,sim] = temp.squeeze()
+    
+    print("\n === kWI from linear interpolation ===\n")
+    x_obs = np.copy(dta_lin[:,sim]).reshape(-1, 1)
+    temp = WI.kWI(x_obs, WI.WI_core_ordinary, [1500, 750, 2250], p = p, idx_obs = idx_obs, solver = WI.solver_ordinary, alpha = alpha, WI_max_iter = 15, WI_tol = 1e-3, max_iter = 30, verbose = True)
+    res_kWI_lin[:,sim] = temp.squeeze()
+    
+#    print("\n === kWI from Kalman interpolation ===\n")
+#    x_obs = np.copy(dta_Kalman[:,sim]).reshape(-1, 1)
+#    temp = WI.kWI(x_obs, WI.WI_core_ordinary, [1500, 750, 2250], p = p, idx_obs = idx_obs, solver = WI.solver_ordinary, alpha = alpha, WI_max_iter = 15, WI_tol = 1e-3, max_iter = 30, verbose = True)
+#    res_kWI_Kalman[:,sim] = temp.squeeze()
+    
+    
+np.savetxt("./sim_data/ARMA/ARMA_WI_miss2.csv", np.column_stack((res_ord_lin, res_ord_Kalman, res_kWI_lin)), delimiter = ",")    
+
+# TAR imputation: Missing pattern I
+
+dta = np.loadtxt("./sim_data/TAR/TAR_miss1.csv", delimiter = ",")
+benchmarks = np.loadtxt("./sim_data/TAR/benchmarks_miss1.csv", delimiter = ",", skiprows = 1)
+dta_lin = benchmarks[:,:1000]
+dta_Kalman = benchmarks[:,2000:3000]
+
+res_ord_lin = np.zeros(shape = (n, 1000))
+res_ord_Kalman = np.zeros(shape = (n, 1000))
+res_kWI_lin = np.zeros(shape = (n, 1000))
+#res_kWI_Kalman = np.zeros(shape = (n, 1000))
+
+for sim in range(1000):
+    idx_obs = [[i for i in range(n) if ~np.isnan(dta[i, sim])]]
+    alpha = n / (4 * p) # learning rate
+    
+    print(f"\n === Simulation {sim}: WI from linear interpolation ===\n")
+    x_obs = np.copy(dta_lin[:,sim]).reshape(-1, 1)
+    temp = WI.WI_core_ordinary(x_obs, 1200, p, idx_obs, WI.solver_ordinary, alpha = alpha, WI_max_iter = 15, WI_tol = 1e-3, max_iter = 50, verbose = True)
+    res_ord_lin[:,sim] = temp.squeeze()
+    
+    print("\n === WI from Kalman interpolation ===\n")
+    x_obs = np.copy(dta_Kalman[:,sim]).reshape(-1, 1)
+    temp = WI.WI_core_ordinary(x_obs, 1200, p, idx_obs, WI.solver_ordinary, alpha = alpha, WI_max_iter = 15, WI_tol = 1e-3, max_iter = 50, verbose = True)
+    res_ord_Kalman[:,sim] = temp.squeeze()
+    
+    print("\n === kWI from linear interpolation ===\n")
+    x_obs = np.copy(dta_lin[:,sim]).reshape(-1, 1)
+    temp = WI.kWI(x_obs, WI.WI_core_ordinary, [1500, 750, 2250], p = p, idx_obs = idx_obs, solver = WI.solver_ordinary, alpha = alpha, WI_max_iter = 15, WI_tol = 1e-3, max_iter = 30, verbose = True)
+    res_kWI_lin[:,sim] = temp.squeeze()
+    
+#    print("\n === kWI from Kalman interpolation ===\n")
+#    x_obs = np.copy(dta_Kalman[:,sim]).reshape(-1, 1)
+#    temp = WI.kWI(x_obs, WI.WI_core_ordinary, [1500, 750, 2250], p = p, idx_obs = idx_obs, solver = WI.solver_ordinary, alpha = alpha, WI_max_iter = 15, WI_tol = 1e-3, max_iter = 30, verbose = True)
+#    res_kWI_Kalman[:,sim] = temp.squeeze()
+    
+    
+np.savetxt("./sim_data/TAR/TAR_WI_miss1.csv", np.column_stack((res_ord_lin, res_ord_Kalman, res_kWI_lin)), delimiter = ",")    
+
+# TAR imputation: Missing pattern II
+
+dta = np.loadtxt("./sim_data/TAR/TAR_miss2.csv", delimiter = ",")
+benchmarks = np.loadtxt("./sim_data/TAR/benchmarks_miss2.csv", delimiter = ",", skiprows = 1)
+dta_lin = benchmarks[:,:1000]
+dta_Kalman = benchmarks[:,2000:3000]
+
+res_ord_lin = np.zeros(shape = (n, 1000))
+res_ord_Kalman = np.zeros(shape = (n, 1000))
+res_kWI_lin = np.zeros(shape = (n, 1000))
+#res_kWI_Kalman = np.zeros(shape = (n, 1000))
+
+for sim in range(1000):
+    idx_obs = [[i for i in range(n) if ~np.isnan(dta[i, sim])]]
+    alpha = n / (4 * p) # learning rate
+    
+    print(f"\n === Simulation {sim}: WI from linear interpolation ===\n")
+    x_obs = np.copy(dta_lin[:,sim]).reshape(-1, 1)
+    temp = WI.WI_core_ordinary(x_obs, 1200, p, idx_obs, WI.solver_ordinary, alpha = alpha, WI_max_iter = 15, WI_tol = 1e-3, max_iter = 50, verbose = True)
+    res_ord_lin[:,sim] = temp.squeeze()
+    
+    print("\n === WI from Kalman interpolation ===\n")
+    x_obs = np.copy(dta_Kalman[:,sim]).reshape(-1, 1)
+    temp = WI.WI_core_ordinary(x_obs, 1200, p, idx_obs, WI.solver_ordinary, alpha = alpha, WI_max_iter = 15, WI_tol = 1e-3, max_iter = 50, verbose = True)
+    res_ord_Kalman[:,sim] = temp.squeeze()
+    
+    print("\n === kWI from linear interpolation ===\n")
+    x_obs = np.copy(dta_lin[:,sim]).reshape(-1, 1)
+    temp = WI.kWI(x_obs, WI.WI_core_ordinary, [1500, 750, 2250], p = p, idx_obs = idx_obs, solver = WI.solver_ordinary, alpha = alpha, WI_max_iter = 15, WI_tol = 1e-3, max_iter = 30, verbose = True)
+    res_kWI_lin[:,sim] = temp.squeeze()
+    
+#    print("\n === kWI from Kalman interpolation ===\n")
+#    x_obs = np.copy(dta_Kalman[:,sim]).reshape(-1, 1)
+#    temp = WI.kWI(x_obs, WI.WI_core_ordinary, [1500, 750, 2250], p = p, idx_obs = idx_obs, solver = WI.solver_ordinary, alpha = alpha, WI_max_iter = 15, WI_tol = 1e-3, max_iter = 30, verbose = True)
+#    res_kWI_Kalman[:,sim] = temp.squeeze()
+    
+    
+np.savetxt("./sim_data/TAR/TAR_WI_miss2.csv", np.column_stack((res_ord_lin, res_ord_Kalman, res_kWI_lin)), delimiter = ",")    
+    
+# GARCH imputation: Missing pattern I
+
+dta = np.loadtxt("./sim_data/GARCH/GARCH_miss1.csv", delimiter = ",")
+benchmarks = np.loadtxt("./sim_data/GARCH/benchmarks_miss1.csv", delimiter = ",", skiprows = 1)
+dta_lin = benchmarks[:,:1000]
+dta_Kalman = benchmarks[:,2000:3000]
+
+res_ord_lin = np.zeros(shape = (n, 1000))
+res_ord_Kalman = np.zeros(shape = (n, 1000))
+res_kWI_lin = np.zeros(shape = (n, 1000))
+#res_kWI_Kalman = np.zeros(shape = (n, 1000))
+
+for sim in range(1000):
+    idx_obs = [[i for i in range(n) if ~np.isnan(dta[i, sim])]]
+    alpha = n / (4 * p) # learning rate
+    
+    print(f"\n === Simulation {sim}: WI from linear interpolation ===\n")
+    x_obs = np.copy(dta_lin[:,sim]).reshape(-1, 1)
+    temp = WI.WI_core_ordinary(x_obs, 1200, p, idx_obs, WI.solver_ordinary, alpha = alpha, WI_max_iter = 15, WI_tol = 1e-3, max_iter = 50, verbose = True)
+    res_ord_lin[:,sim] = temp.squeeze()
+    
+    print("\n === WI from Kalman interpolation ===\n")
+    x_obs = np.copy(dta_Kalman[:,sim]).reshape(-1, 1)
+    temp = WI.WI_core_ordinary(x_obs, 1200, p, idx_obs, WI.solver_ordinary, alpha = alpha, WI_max_iter = 15, WI_tol = 1e-3, max_iter = 50, verbose = True)
+    res_ord_Kalman[:,sim] = temp.squeeze()
+    
+    print("\n === kWI from linear interpolation ===\n")
+    x_obs = np.copy(dta_lin[:,sim]).reshape(-1, 1)
+    temp = WI.kWI(x_obs, WI.WI_core_ordinary, [1500, 750, 2250], p = p, idx_obs = idx_obs, solver = WI.solver_ordinary, alpha = alpha, WI_max_iter = 15, WI_tol = 1e-3, max_iter = 30, verbose = True)
+    res_kWI_lin[:,sim] = temp.squeeze()
+    
+#    print("\n === kWI from Kalman interpolation ===\n")
+#    x_obs = np.copy(dta_Kalman[:,sim]).reshape(-1, 1)
+#    temp = WI.kWI(x_obs, WI.WI_core_ordinary, [1500, 750, 2250], p = p, idx_obs = idx_obs, solver = WI.solver_ordinary, alpha = alpha, WI_max_iter = 15, WI_tol = 1e-3, max_iter = 30, verbose = True)
+#    res_kWI_Kalman[:,sim] = temp.squeeze()
+    
+    
+np.savetxt("./sim_data/GARCH/GARCH_WI_miss1.csv", np.column_stack((res_ord_lin, res_ord_Kalman, res_kWI_lin)), delimiter = ",")    
+
+# GARCH imputation: Missing pattern II
+
+dta = np.loadtxt("./sim_data/GARCH/GARCH_miss2.csv", delimiter = ",")
+benchmarks = np.loadtxt("./sim_data/GARCH/benchmarks_miss2.csv", delimiter = ",", skiprows = 1)
+dta_lin = benchmarks[:,:1000]
+dta_Kalman = benchmarks[:,2000:3000]
+
+res_ord_lin = np.zeros(shape = (n, 1000))
+res_ord_Kalman = np.zeros(shape = (n, 1000))
+res_kWI_lin = np.zeros(shape = (n, 1000))
+#res_kWI_Kalman = np.zeros(shape = (n, 1000))
+
+for sim in range(1000):
+    idx_obs = [[i for i in range(n) if ~np.isnan(dta[i, sim])]]
+    alpha = n / (4 * p) # learning rate
+    
+    print(f"\n === Simulation {sim}: WI from linear interpolation ===\n")
+    x_obs = np.copy(dta_lin[:,sim]).reshape(-1, 1)
+    temp = WI.WI_core_ordinary(x_obs, 1200, p, idx_obs, WI.solver_ordinary, alpha = alpha, WI_max_iter = 15, WI_tol = 1e-3, max_iter = 50, verbose = True)
+    res_ord_lin[:,sim] = temp.squeeze()
+    
+    print("\n === WI from Kalman interpolation ===\n")
+    x_obs = np.copy(dta_Kalman[:,sim]).reshape(-1, 1)
+    temp = WI.WI_core_ordinary(x_obs, 1200, p, idx_obs, WI.solver_ordinary, alpha = alpha, WI_max_iter = 15, WI_tol = 1e-3, max_iter = 50, verbose = True)
+    res_ord_Kalman[:,sim] = temp.squeeze()
+    
+    print("\n === kWI from linear interpolation ===\n")
+    x_obs = np.copy(dta_lin[:,sim]).reshape(-1, 1)
+    temp = WI.kWI(x_obs, WI.WI_core_ordinary, [1500, 750, 2250], p = p, idx_obs = idx_obs, solver = WI.solver_ordinary, alpha = alpha, WI_max_iter = 15, WI_tol = 1e-3, max_iter = 30, verbose = True)
+    res_kWI_lin[:,sim] = temp.squeeze()
+    
+#    print("\n === kWI from Kalman interpolation ===\n")
+#    x_obs = np.copy(dta_Kalman[:,sim]).reshape(-1, 1)
+#    temp = WI.kWI(x_obs, WI.WI_core_ordinary, [1500, 750, 2250], p = p, idx_obs = idx_obs, solver = WI.solver_ordinary, alpha = alpha, WI_max_iter = 15, WI_tol = 1e-3, max_iter = 30, verbose = True)
+#    res_kWI_Kalman[:,sim] = temp.squeeze()
+    
+    
+np.savetxt("./sim_data/GARCH/GARCH_WI_miss2.csv", np.column_stack((res_ord_lin, res_ord_Kalman, res_kWI_lin)), delimiter = ",")    
+
+# Cyc imputation: Missing pattern I
+
+dta = np.loadtxt("./sim_data/Cyc/Cyc_miss1.csv", delimiter = ",")
+benchmarks = np.loadtxt("./sim_data/Cyc/benchmarks_miss1.csv", delimiter = ",", skiprows = 1)
+dta_lin = benchmarks[:,:1000]
+dta_Kalman = benchmarks[:,2000:3000]
+
+res_ord_lin = np.zeros(shape = (n, 1000))
+res_ord_Kalman = np.zeros(shape = (n, 1000))
+res_kWI_lin = np.zeros(shape = (n, 1000))
+#res_kWI_Kalman = np.zeros(shape = (n, 1000))
+
+for sim in range(1000):
+    idx_obs = [[i for i in range(n) if ~np.isnan(dta[i, sim])]]
+    alpha = n / (4 * p) # learning rate
+    
+    print(f"\n === Simulation {sim}: WI from linear interpolation ===\n")
+    x_obs = np.copy(dta_lin[:,sim]).reshape(-1, 1)
+    temp = WI.WI_core_ordinary(x_obs, 1200, p, idx_obs, WI.solver_ordinary, alpha = alpha, WI_max_iter = 15, WI_tol = 1e-3, max_iter = 50, verbose = True)
+    res_ord_lin[:,sim] = temp.squeeze()
+    
+    print("\n === WI from Kalman interpolation ===\n")
+    x_obs = np.copy(dta_Kalman[:,sim]).reshape(-1, 1)
+    temp = WI.WI_core_ordinary(x_obs, 1200, p, idx_obs, WI.solver_ordinary, alpha = alpha, WI_max_iter = 15, WI_tol = 1e-3, max_iter = 50, verbose = True)
+    res_ord_Kalman[:,sim] = temp.squeeze()
+    
+    print("\n === kWI from linear interpolation ===\n")
+    x_obs = np.copy(dta_lin[:,sim]).reshape(-1, 1)
+    temp = WI.kWI(x_obs, WI.WI_core_ordinary, [1500, 750, 2250], p = p, idx_obs = idx_obs, solver = WI.solver_ordinary, alpha = alpha, WI_max_iter = 15, WI_tol = 1e-3, max_iter = 30, verbose = True)
+    res_kWI_lin[:,sim] = temp.squeeze()
+    
+#    print("\n === kWI from Kalman interpolation ===\n")
+#    x_obs = np.copy(dta_Kalman[:,sim]).reshape(-1, 1)
+#    temp = WI.kWI(x_obs, WI.WI_core_ordinary, [1500, 750, 2250], p = p, idx_obs = idx_obs, solver = WI.solver_ordinary, alpha = alpha, WI_max_iter = 15, WI_tol = 1e-3, max_iter = 30, verbose = True)
+#    res_kWI_Kalman[:,sim] = temp.squeeze()
+    
+    
+np.savetxt("./sim_data/Cyc/Cyc_WI_miss1.csv", np.column_stack((res_ord_lin, res_ord_Kalman, res_kWI_lin)), delimiter = ",")    
+
+# Cyc imputation: Missing pattern II
+
+dta = np.loadtxt("./sim_data/Cyc/Cyc_miss2.csv", delimiter = ",")
+benchmarks = np.loadtxt("./sim_data/Cyc/benchmarks_miss2.csv", delimiter = ",", skiprows = 1)
+dta_lin = benchmarks[:,:1000]
+dta_Kalman = benchmarks[:,2000:3000]
+
+res_ord_lin = np.zeros(shape = (n, 1000))
+res_ord_Kalman = np.zeros(shape = (n, 1000))
+res_kWI_lin = np.zeros(shape = (n, 1000))
+#res_kWI_Kalman = np.zeros(shape = (n, 1000))
+
+for sim in range(1000):
+    idx_obs = [[i for i in range(n) if ~np.isnan(dta[i, sim])]]
+    alpha = n / (4 * p) # learning rate
+    
+    print(f"\n === Simulation {sim}: WI from linear interpolation ===\n")
+    x_obs = np.copy(dta_lin[:,sim]).reshape(-1, 1)
+    temp = WI.WI_core_ordinary(x_obs, 1200, p, idx_obs, WI.solver_ordinary, alpha = alpha, WI_max_iter = 15, WI_tol = 1e-3, max_iter = 50, verbose = True)
+    res_ord_lin[:,sim] = temp.squeeze()
+    
+    print("\n === WI from Kalman interpolation ===\n")
+    x_obs = np.copy(dta_Kalman[:,sim]).reshape(-1, 1)
+    temp = WI.WI_core_ordinary(x_obs, 1200, p, idx_obs, WI.solver_ordinary, alpha = alpha, WI_max_iter = 15, WI_tol = 1e-3, max_iter = 50, verbose = True)
+    res_ord_Kalman[:,sim] = temp.squeeze()
+    
+    print("\n === kWI from linear interpolation ===\n")
+    x_obs = np.copy(dta_lin[:,sim]).reshape(-1, 1)
+    temp = WI.kWI(x_obs, WI.WI_core_ordinary, [1500, 750, 2250], p = p, idx_obs = idx_obs, solver = WI.solver_ordinary, alpha = alpha, WI_max_iter = 15, WI_tol = 1e-3, max_iter = 30, verbose = True)
+    res_kWI_lin[:,sim] = temp.squeeze()
+    
+#    print("\n === kWI from Kalman interpolation ===\n")
+#    x_obs = np.copy(dta_Kalman[:,sim]).reshape(-1, 1)
+#    temp = WI.kWI(x_obs, WI.WI_core_ordinary, [1500, 750, 2250], p = p, idx_obs = idx_obs, solver = WI.solver_ordinary, alpha = alpha, WI_max_iter = 15, WI_tol = 1e-3, max_iter = 30, verbose = True)
+#    res_kWI_Kalman[:,sim] = temp.squeeze()
+    
+    
+np.savetxt("./sim_data/Cyc/Cyc_WI_miss2.csv", np.column_stack((res_ord_lin, res_ord_Kalman, res_kWI_lin)), delimiter = ",")    
 
 #%%
 
+# ALR imputation: Missing pattern I
+
+dta = np.loadtxt("./sim_data/ALR/ALR_miss1.csv", delimiter = ",")
+benchmarks = np.loadtxt("./sim_data/ALR/benchmarks_miss1.csv", delimiter = ",", skiprows = 1)
+dta_lin = benchmarks[:,:3000]
+dta_Kalman = benchmarks[:,6000:9000]
+
+res_ord_lin = np.zeros(shape = (n, 3000))
+res_ord_Kalman = np.zeros(shape = (n, 3000))
+res_kWI_lin = np.zeros(shape = (n, 3000))
+
+
+for sim in range(1000):
+    sub_dta = dta[:n,(3 * sim):(3 * (sim + 1))]
+    idx_obs = [[i for i in range(n) if ~np.isnan(sub_dta[i, 0])]] 
     
+    # Constructing linear equations that delineates the admissible set
+    K = np.zeros((len(idx_obs[0]) * 3 + (n - len(idx_obs[0])), 3 * n))
+    b = np.zeros((len(idx_obs[0]) * 3 + (n - len(idx_obs[0])), 1))
+    counter = 0
+    for i in range(n):
+        if i in idx_obs[0]:
+            for j in range(3):
+                K[counter, i + j * n] = 1
+                b[counter, 0] = sub_dta[i,j]
+                counter += 1
+        else:
+            for j in range(3):
+                K[counter, i + (j * n)] = 1
+            b[counter, 0] = 1
+            counter += 1            
+    
+    print(f"\n === Simulation {sim}: WI from linear interpolation ===\n")
+    x_obs = np.copy(dta_lin[:,(sim * 3):((sim + 1) * 3)])
+    temp = WI.WI_core_exact(x_obs, 1200, p, K, b, Lambda = 1e-4, WI_max_iter = 5, WI_tol = 1e-3, verbose = True)
+    res_ord_lin[:,(sim * 3):((sim + 1) * 3)] = temp
+    
+    print("\n === WI from Kalman interpolation ===\n")
+    x_obs = np.copy(dta_Kalman[:,(sim * 3):((sim + 1) * 3)])
+    temp = WI.WI_core_exact(x_obs, 1200, p, K, b, Lambda = 1e-4, WI_max_iter = 5, WI_tol = 1e-3, verbose = True)
+    res_ord_Kalman[:,(sim * 3):((sim + 1) * 3)] = temp
+    
+    print("\n === kWI from linear interpolation ===\n")
+    x_obs = np.copy(dta_lin[:,(sim * 3):((sim + 1) * 3)])
+    temp = WI.kWI(x_obs, WI.WI_core_exact, [1500, 750, 2250], p = p, K = K, b = b, Lambda = 1e-5, WI_max_iter = 5, WI_tol = 1e-3, verbose = True)
+    res_kWI_lin[:,(sim * 3):((sim + 1) * 3)] = temp
+        
+    
+np.savetxt("./sim_data/ALR/ALR_WI_miss1.csv", np.column_stack((res_ord_lin, res_ord_Kalman, res_kWI_lin)), delimiter = ",")    
+
+
 #%% Test codes
 
 dta = np.loadtxt("./sim_data/TAR/TAR_miss2.csv", delimiter = ",")
