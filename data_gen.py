@@ -159,6 +159,11 @@ plt.show()
 n = 1000 # Sample size
 n_exper = 1000 # Number of Monte Carlo experiment
 
+temp = np.linspace(19, 950, num = 50)
+m2 = []
+for i in temp:
+    m2.extend(list(int(i) + np.array([1,2,3,4,5,6])))
+
 # AR(1) Model
 res_original = np.zeros((n, n_exper))
 res_miss1 = np.zeros((n, n_exper))
@@ -168,7 +173,7 @@ for b in range(n_exper):
     temp = arma_sim(n, 0.8, 0).squeeze()
     res_original[:,b] = temp
     m1 = random.sample(range(1, n - 1), k = math.floor(n * 0.3))
-    m2 = list(range(math.floor(0.2 * n), math.ceil(0.3 * n))) + list(range(math.floor(0.7 * n), math.ceil(0.9 * n)))
+    # m2 = list(range(math.floor(0.2 * n), math.ceil(0.3 * n))) + list(range(math.floor(0.7 * n), math.ceil(0.9 * n)))
     miss1 = np.copy(temp)
     miss1[m1] = np.nan
     res_miss1[:,b] = miss1
@@ -195,7 +200,7 @@ for b in range(n_exper):
     temp = arma_sim(n, 0.8, 0.6).squeeze()
     res_original[:,b] = temp
     m1 = random.sample(range(1, n - 1), k = math.floor(n * 0.3))
-    m2 = list(range(math.floor(0.2 * n), math.ceil(0.3 * n))) + list(range(math.floor(0.7 * n), math.ceil(0.9 * n)))
+    # m2 = list(range(math.floor(0.2 * n), math.ceil(0.3 * n))) + list(range(math.floor(0.7 * n), math.ceil(0.9 * n)))
     miss1 = np.copy(temp)
     miss1[m1] = np.nan
     res_miss1[:,b] = miss1
@@ -222,7 +227,7 @@ for b in range(n_exper):
     temp = TAR_sim(n, -2, 0.7, 1, 1, 0.5).squeeze()
     res_original[:,b] = temp
     m1 = random.sample(range(1, n - 1), k = math.floor(n * 0.3))
-    m2 = list(range(math.floor(0.2 * n), math.ceil(0.3 * n))) + list(range(math.floor(0.7 * n), math.ceil(0.9 * n)))
+    # m2 = list(range(math.floor(0.2 * n), math.ceil(0.3 * n))) + list(range(math.floor(0.7 * n), math.ceil(0.9 * n)))
     miss1 = np.copy(temp)
     miss1[m1] = np.nan
     res_miss1[:,b] = miss1
@@ -253,7 +258,7 @@ for b in range(n_exper):
     res_original[:,2 * b] = temp[:,0]
     res_original[:,2 * b + 1] = temp[:,1]
     m1 = random.sample(range(1, n - 1), k = math.floor(n * 0.3))
-    m2 = list(range(math.floor(0.2 * n), math.ceil(0.3 * n))) + list(range(math.floor(0.7 * n), math.ceil(0.9 * n)))
+    # m2 = list(range(math.floor(0.2 * n), math.ceil(0.3 * n))) + list(range(math.floor(0.7 * n), math.ceil(0.9 * n)))
     miss1 = np.copy(temp)
     miss1[m1] = np.nan
     res_miss1[:,2 * b] = miss1[:,0]
@@ -282,7 +287,7 @@ for b in range(n_exper):
     temp = garch_sim(n, 0.5, 0.8, 0.1).squeeze()
     res_original[:,b] = temp
     m1 = random.sample(range(1, n - 1), k = math.floor(n * 0.3))
-    m2 = list(range(math.floor(0.2 * n), math.ceil(0.3 * n))) + list(range(math.floor(0.7 * n), math.ceil(0.9 * n)))
+    # m2 = list(range(math.floor(0.2 * n), math.ceil(0.3 * n))) + list(range(math.floor(0.7 * n), math.ceil(0.9 * n)))
     miss1 = np.copy(temp)
     miss1[m1] = np.nan
     res_miss1[:,b] = miss1
@@ -314,7 +319,7 @@ for b in range(n_exper):
     res_original[:,3 * b + 1] = temp[:,1]
     res_original[:,3 * b + 2] = temp[:,2]
     m1 = random.sample(range(1, n - 1), k = math.floor(n * 0.3))
-    m2 = list(range(math.floor(0.2 * n), math.ceil(0.3 * n))) + list(range(math.floor(0.7 * n), math.ceil(0.9 * n)))
+    # m2 = list(range(math.floor(0.2 * n), math.ceil(0.3 * n))) + list(range(math.floor(0.7 * n), math.ceil(0.9 * n)))
     miss1 = np.copy(temp)
     miss1[m1] = np.nan
     res_miss1[:,3 * b] = miss1[:,0]
@@ -345,7 +350,7 @@ for b in range(n_exper):
     temp, _ = ARI_sim(n, -0.7)
     res_original[:,b] = temp.squeeze()
     m1 = random.sample(range(1, n - 1), k = math.floor(n * 0.3))
-    m2 = list(range(math.floor(0.2 * n), math.ceil(0.3 * n))) + list(range(math.floor(0.7 * n), math.ceil(0.9 * n)))
+    # m2 = list(range(math.floor(0.2 * n), math.ceil(0.3 * n))) + list(range(math.floor(0.7 * n), math.ceil(0.9 * n)))
     miss1 = np.copy(temp)
     miss1[m1] = np.nan
     res_miss1[:,b] = miss1.squeeze()
@@ -373,7 +378,7 @@ for b in range(n_exper):
     temp = cyc_sim(n).squeeze()
     res_original[:,b] = temp
     m1 = random.sample(range(1, n - 1), k = math.floor(n * 0.3))
-    m2 = list(range(math.floor(0.2 * n), math.ceil(0.3 * n))) + list(range(math.floor(0.7 * n), math.ceil(0.9 * n)))
+    # m2 = list(range(math.floor(0.2 * n), math.ceil(0.3 * n))) + list(range(math.floor(0.7 * n), math.ceil(0.9 * n)))
     miss1 = np.copy(temp)
     miss1[m1] = np.nan
     res_miss1[:,b] = miss1
