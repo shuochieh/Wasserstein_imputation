@@ -325,6 +325,7 @@ for sim in range(1000):
     
 np.savetxt("./sim_data/Cyc/Cyc_WI_" + INIT + "_miss2.csv", np.column_stack((res_ord, res_kWI)), delimiter = ",")    
 
+#%%
 # ALR imputation: Missing pattern I
 
 dta = np.loadtxt("./sim_data/ALR/ALR_miss1.csv", delimiter = ",")
@@ -366,11 +367,11 @@ for sim in range(1000):
         
     print("\n === kWI from linear interpolation ===\n")
     x_obs = np.copy(dta_bmk[:,(sim * 3):((sim + 1) * 3)])
-    temp = WI.kWI(x_obs, WI.WI_core_exact, [500, 250, 750], p = p, K = K, b = b, Lambda = 1e-5, WI_max_iter = 10, WI_tol = 1e-4, verbose = True)
+    temp = WI.kWI(x_obs, WI.WI_core_exact, [500, 250, 750], p = p, K = K, b = b, Lambda = 1e-4, WI_max_iter = 10, WI_tol = 1e-4, verbose = True)
     res_kWI[:,(sim * 3):((sim + 1) * 3)] = temp
         
     
-np.savetxt("./sim_data/ALR/ALR_WI_" + INIT + "Kalman_miss1.csv", np.column_stack((res_ord, res_kWI)), delimiter = ",")    
+np.savetxt("./sim_data/ALR/ALR_WI_" + INIT + "_miss1.csv", np.column_stack((res_ord, res_kWI)), delimiter = ",")    
 
 # ALR imputation: Missing pattern II
 
@@ -413,12 +414,13 @@ for sim in range(1000):
         
     print("\n === kWI from linear interpolation ===\n")
     x_obs = np.copy(dta_bmk[:,(sim * 3):((sim + 1) * 3)])
-    temp = WI.kWI(x_obs, WI.WI_core_exact, [500, 250, 750], p = p, K = K, b = b, Lambda = 1e-5, WI_max_iter = 10, WI_tol = 1e-4, verbose = True)
+    temp = WI.kWI(x_obs, WI.WI_core_exact, [500, 250, 750], p = p, K = K, b = b, Lambda = 1e-4, WI_max_iter = 10, WI_tol = 1e-4, verbose = True)
     res_kWI[:,(sim * 3):((sim + 1) * 3)] = temp
         
     
 np.savetxt("./sim_data/ALR/ALR_WI_" + INIT + "_miss2.csv", np.column_stack((res_ord, res_kWI)), delimiter = ",")    
 
+#%%
 # NLVAR imputation: Missing pattern I
 
 dta = np.loadtxt("./sim_data/NLVAR/NLVAR_miss1.csv", delimiter = ",")

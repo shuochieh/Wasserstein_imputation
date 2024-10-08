@@ -173,6 +173,14 @@ imp_plot = function (imp, x_obs, method) {
   
 }
 
+enlarge = function (ran) {
+  res = c(0, 0)
+  res[1] = ran[1] * 0.9
+  res[2] = ran[2] * 1.1
+  
+  return (res)
+}
+
 # ALR: I
 
 model_name = "ALR"
@@ -234,318 +242,374 @@ for (sim in 1:1000) {
   ccf_loss[,8] = ccf_loss[,8] + apply((ccf_summary(kwass_Kalman) - ccf_gt)^2, MARGIN = 3, FUN = sum)
   
   if (sim == 1) {
-    df1 = data.frame(x = dta[,1], y = dta[,2])
-    temp = data.frame(x = lin[which(is.na(x_obs[,1])),1],
-                      y = lin[which(is.na(x_obs[,2])),2])
+    col_gt = "steelblue"
+    col_imp = "red3"
+    range1 = enlarge(range(c(dta[,1], lin[,1], wass[,1], kwass[,1],
+                             wass_Kalman[,1], kwass_Kalman[,1])))
+    range2 = enlarge(range(c(dta[,2], lin[,2], wass[,2], kwass[,2],
+                             wass_Kalman[,2], kwass_Kalman[,2])))
+    range3 = enlarge(range(c(dta[,3], lin[,3], wass[,3], kwass[,3],
+                             wass_Kalman[,3], kwass_Kalman[,3])))
+    
+    df1 = data.frame(x = dta[1:(nrow(dta) - 1),1], y = dta[2:nrow(dta),2])
+    temp = data.frame(x = na_lag_pairs(lin[,1], which(is.na(x_obs[,1])))[,1],
+                      y = na_lag_pairs(lin[,2], which(is.na(x_obs[,1])))[,2])
     p1 = ggplot() +
-      geom_point(data = df1, aes(x = x, y = y), color = "steelblue", size = 1) + 
-      geom_point(data = temp, aes(x = x, y = y), color = "red3", size = 1, shape = 17) +
-      coord_cartesian(xlim = range(c(dta[,1], lin[,1])), 
-                      ylim = range(c(dta[,2], lin[,2]))) +
+      geom_point(data = df1, aes(x = x, y = y), color = col_gt, size = 1) + 
+      geom_point(data = temp, aes(x = x, y = y), color = col_imp, size = 1, shape = 17) +
+      # coord_cartesian(xlim = range(c(dta[,1], lin[,1])), 
+      #                 ylim = range(c(dta[,2], lin[,2]))) +
+      coord_cartesian(xlim = range1, 
+                      ylim = range2) +
       theme_minimal() +
       labs(title = "Ground truth vs linear",
-           x = "Component 1",
-           y = "Component 2")
-    
-    df1 = data.frame(x = dta[,1], y = dta[,3])
-    temp = data.frame(x = lin[which(is.na(x_obs[,1])),1],
-                      y = lin[which(is.na(x_obs[,3])),3])
-    p2 = ggplot() +
-      geom_point(data = df1, aes(x = x, y = y), color = "steelblue", size = 1) + 
-      geom_point(data = temp, aes(x = x, y = y), color = "red3", size = 1, shape = 17) +
-      coord_cartesian(xlim = range(c(dta[,1], lin[,1])), 
-                      ylim = range(c(dta[,3], lin[,3]))) +
-      theme_minimal() +
-      labs(title = "Ground truth vs linear",
-           x = "Component 1",
-           y = "Component 3")
+           x = "x_{t-1, 1}",
+           y = "x_{t, 2}")
 
-    df1 = data.frame(x = dta[,2], y = dta[,3])
-    temp = data.frame(x = lin[which(is.na(x_obs[,2])),2],
-                      y = lin[which(is.na(x_obs[,3])),3])
-    p3 = ggplot() +
-      geom_point(data = df1, aes(x = x, y = y), color = "steelblue", size = 1) + 
-      geom_point(data = temp, aes(x = x, y = y), color = "red3", size = 1, shape = 17) +
-      coord_cartesian(xlim = range(c(dta[,2], lin[,2])), 
-                      ylim = range(c(dta[,3], lin[,3]))) +
+    df1 = data.frame(x = dta[1:(nrow(dta) - 1),1], y = dta[2:nrow(dta),3])
+    temp = data.frame(x = na_lag_pairs(lin[,1], which(is.na(x_obs[,1])))[,1],
+                      y = na_lag_pairs(lin[,3], which(is.na(x_obs[,1])))[,2])
+    p2 = ggplot() +
+      geom_point(data = df1, aes(x = x, y = y), color = col_gt, size = 1) + 
+      geom_point(data = temp, aes(x = x, y = y), color = col_imp, size = 1, shape = 17) +
+      # coord_cartesian(xlim = range(c(dta[,1], lin[,1])), 
+      #                 ylim = range(c(dta[,3], lin[,3]))) +
+      coord_cartesian(xlim = range1, 
+                      ylim = range3) +
       theme_minimal() +
       labs(title = "Ground truth vs linear",
-           x = "Component 2",
-           y = "Component 3")
+           x = "x_{t-1, 1}",
+           y = "x_{t, 3}")
     
-    df1 = data.frame(x = dta[,1], y = dta[,2])
-    temp = data.frame(x = spl[which(is.na(x_obs[,1])),1],
-                      y = spl[which(is.na(x_obs[,2])),2])
+    df1 = data.frame(x = dta[1:(nrow(dta) - 1),2], y = dta[2:nrow(dta),3])
+    temp = data.frame(x = na_lag_pairs(lin[,2], which(is.na(x_obs[,1])))[,1],
+                      y = na_lag_pairs(lin[,3], which(is.na(x_obs[,1])))[,2])
+    p3 = ggplot() +
+      geom_point(data = df1, aes(x = x, y = y), color = col_gt, size = 1) + 
+      geom_point(data = temp, aes(x = x, y = y), color = col_imp, size = 1, shape = 17) +
+      # coord_cartesian(xlim = range(c(dta[,2], lin[,2])), 
+      #                 ylim = range(c(dta[,3], lin[,3]))) +
+      coord_cartesian(xlim = range2, 
+                      ylim = range3) +
+      theme_minimal() +
+      labs(title = "Ground truth vs linear",
+           x = "x_{t-1, 2}",
+           y = "x_{t, 3}")
+    
+    df1 = data.frame(x = dta[1:(nrow(dta) - 1),1], y = dta[2:nrow(dta),2])
+    temp = data.frame(x = na_lag_pairs(spl[,1], which(is.na(x_obs[,1])))[,1],
+                      y = na_lag_pairs(spl[,2], which(is.na(x_obs[,1])))[,2])
     p4 = ggplot() +
-      geom_point(data = df1, aes(x = x, y = y), color = "steelblue", size = 1) + 
-      geom_point(data = temp, aes(x = x, y = y), color = "red3", size = 1, shape = 17) +
-      coord_cartesian(xlim = range(c(dta[,1], lin[,1])), 
-                      ylim = range(c(dta[,2], lin[,2]))) +
+      geom_point(data = df1, aes(x = x, y = y), color = col_gt, size = 1) + 
+      geom_point(data = temp, aes(x = x, y = y), color = col_imp, size = 1, shape = 17) +
+      # coord_cartesian(xlim = range(c(dta[,1], spl[,1])),
+      #                 ylim = range(c(dta[,2], spl[,2]))) +
+      coord_cartesian(xlim = range1,
+                      ylim = range2) +
       theme_minimal() +
       labs(title = "Ground truth vs spline",
-           x = "Component 1",
-           y = "Component 2")
+           x = "x_{t-1, 1}",
+           y = "x_{t, 2}")
     
-    df1 = data.frame(x = dta[,1], y = dta[,3])
-    temp = data.frame(x = spl[which(is.na(x_obs[,1])),1],
-                      y = spl[which(is.na(x_obs[,3])),3])
+    df1 = data.frame(x = dta[1:(nrow(dta) - 1),1], y = dta[2:nrow(dta),3])
+    temp = data.frame(x = na_lag_pairs(spl[,1], which(is.na(x_obs[,1])))[,1],
+                      y = na_lag_pairs(spl[,3], which(is.na(x_obs[,1])))[,2])
     p5 = ggplot() +
-      geom_point(data = df1, aes(x = x, y = y), color = "steelblue", size = 1) + 
-      geom_point(data = temp, aes(x = x, y = y), color = "red3", size = 1, shape = 17) +
-      coord_cartesian(xlim = range(c(dta[,1], spl[,1])), 
-                      ylim = range(c(dta[,3], spl[,3]))) +
+      geom_point(data = df1, aes(x = x, y = y), color = col_gt, size = 1) + 
+      geom_point(data = temp, aes(x = x, y = y), color = col_imp, size = 1, shape = 17) +
+      # coord_cartesian(xlim = range(c(dta[,1], spl[,1])), 
+      #                 ylim = range(c(dta[,3], spl[,3]))) +
+      coord_cartesian(xlim = range1, 
+                      ylim = range3) +
       theme_minimal() +
       labs(title = "Ground truth vs spline",
-           x = "Component 1",
-           y = "Component 3")
+           x = "x_{t-1, 1}",
+           y = "x_{t, 3}")
     
-    df1 = data.frame(x = dta[,2], y = dta[,3])
-    temp = data.frame(x = spl[which(is.na(x_obs[,2])),2],
-                      y = spl[which(is.na(x_obs[,3])),3])
+    df1 = data.frame(x = dta[1:(nrow(dta) - 1),2], y = dta[2:nrow(dta),3])
+    temp = data.frame(x = na_lag_pairs(spl[,2], which(is.na(x_obs[,1])))[,1],
+                      y = na_lag_pairs(spl[,3], which(is.na(x_obs[,1])))[,2])
     p6 = ggplot() +
-      geom_point(data = df1, aes(x = x, y = y), color = "steelblue", size = 1) + 
-      geom_point(data = temp, aes(x = x, y = y), color = "red3", size = 1, shape = 17) +
-      coord_cartesian(xlim = range(c(dta[,2], spl[,2])), 
-                      ylim = range(c(dta[,3], spl[,3]))) +
+      geom_point(data = df1, aes(x = x, y = y), color = col_gt, size = 1) + 
+      geom_point(data = temp, aes(x = x, y = y), color = col_imp, size = 1, shape = 17) +
+      # coord_cartesian(xlim = range(c(dta[,2], spl[,2])), 
+      #                 ylim = range(c(dta[,3], spl[,3]))) +
+      coord_cartesian(xlim = range2, 
+                      ylim = range3) +
       theme_minimal() +
       labs(title = "Ground truth vs spline",
-           x = "Component 2",
-           y = "Component 3")
+           x = "x_{t-1, 2}",
+           y = "x_{t, 3}")
     
-    df1 = data.frame(x = dta[,1], y = dta[,2])
-    temp = data.frame(x = Kalman[which(is.na(x_obs[,1])),1],
-                      y = Kalman[which(is.na(x_obs[,2])),2])
+    df1 = data.frame(x = dta[1:(nrow(dta) - 1),1], y = dta[2:nrow(dta),2])
+    temp = data.frame(x = na_lag_pairs(Kalman[,1], which(is.na(x_obs[,1])))[,1],
+                      y = na_lag_pairs(Kalman[,2], which(is.na(x_obs[,1])))[,2])
     p7 = ggplot() +
-      geom_point(data = df1, aes(x = x, y = y), color = "steelblue", size = 1) + 
-      geom_point(data = temp, aes(x = x, y = y), color = "red3", size = 1, shape = 17) +
-      coord_cartesian(xlim = range(c(dta[,1], Kalman[,1])), 
+      geom_point(data = df1, aes(x = x, y = y), color = col_gt, size = 1) + 
+      geom_point(data = temp, aes(x = x, y = y), color = col_imp, size = 1, shape = 17) +
+      coord_cartesian(xlim = range(c(dta[,1], Kalman[,1])),
                       ylim = range(c(dta[,2], Kalman[,2]))) +
+      # coord_cartesian(xlim = range1, 
+      #                 ylim = range2) +
       theme_minimal() +
       labs(title = "Ground truth vs Kalman",
-           x = "Component 1",
-           y = "Component 2")
+           x = "x_{t-1, 1}",
+           y = "x_{t, 2}")
     
-    df1 = data.frame(x = dta[,1], y = dta[,3])
-    temp = data.frame(x = Kalman[which(is.na(x_obs[,1])),1],
-                      y = Kalman[which(is.na(x_obs[,3])),3])
+    df1 = data.frame(x = dta[1:(nrow(dta) - 1),1], y = dta[2:nrow(dta),3])
+    temp = data.frame(x = na_lag_pairs(Kalman[,1], which(is.na(x_obs[,1])))[,1],
+                      y = na_lag_pairs(Kalman[,3], which(is.na(x_obs[,1])))[,2])
     p8 = ggplot() +
-      geom_point(data = df1, aes(x = x, y = y), color = "steelblue", size = 1) + 
-      geom_point(data = temp, aes(x = x, y = y), color = "red3", size = 1, shape = 17) +
-      coord_cartesian(xlim = range(c(dta[,1], Kalman[,1])), 
+      geom_point(data = df1, aes(x = x, y = y), color = col_gt, size = 1) + 
+      geom_point(data = temp, aes(x = x, y = y), color = col_imp, size = 1, shape = 17) +
+      coord_cartesian(xlim = range(c(dta[,1], Kalman[,1])),
                       ylim = range(c(dta[,3], Kalman[,3]))) +
+      # coord_cartesian(xlim = range1, 
+      #                 ylim = range3) +
       theme_minimal() +
       labs(title = "Ground truth vs Kalman",
-           x = "Component 1",
-           y = "Component 3")
+           x = "x_{t-1, 1}",
+           y = "x_{t, 3}")
     
-    df1 = data.frame(x = dta[,2], y = dta[,3])
-    temp = data.frame(x = Kalman[which(is.na(x_obs[,2])),2],
-                      y = Kalman[which(is.na(x_obs[,3])),3])
+    df1 = data.frame(x = dta[1:(nrow(dta) - 1),2], y = dta[2:nrow(dta),3])
+    temp = data.frame(x = na_lag_pairs(Kalman[,2], which(is.na(x_obs[,1])))[,1],
+                      y = na_lag_pairs(Kalman[,3], which(is.na(x_obs[,1])))[,2])
     p9 = ggplot() +
-      geom_point(data = df1, aes(x = x, y = y), color = "steelblue", size = 1) + 
-      geom_point(data = temp, aes(x = x, y = y), color = "red3", size = 1, shape = 17) +
-      coord_cartesian(xlim = range(c(dta[,2], Kalman[,2])), 
+      geom_point(data = df1, aes(x = x, y = y), color = col_gt, size = 1) + 
+      geom_point(data = temp, aes(x = x, y = y), color = col_imp, size = 1, shape = 17) +
+      coord_cartesian(xlim = range(c(dta[,2], Kalman[,2])),
                       ylim = range(c(dta[,3], Kalman[,3]))) +
+      # coord_cartesian(xlim = range2, 
+      #                 ylim = range3) +
       theme_minimal() +
       labs(title = "Ground truth vs Kalman",
-           x = "Component 2",
-           y = "Component 3")
+           x = "x_{t-1, 2}",
+           y = "x_{t, 3}")
     
-    df1 = data.frame(x = dta[,1], y = dta[,2])
-    temp = data.frame(x = PT[which(is.na(x_obs[,1])),1],
-                      y = PT[which(is.na(x_obs[,2])),2])
+    df1 = data.frame(x = dta[1:(nrow(dta) - 1),1], y = dta[2:nrow(dta),2])
+    temp = data.frame(x = na_lag_pairs(PT[,1], which(is.na(x_obs[,1])))[,1],
+                      y = na_lag_pairs(PT[,2], which(is.na(x_obs[,1])))[,2])
     p10 = ggplot() +
-      geom_point(data = df1, aes(x = x, y = y), color = "steelblue", size = 1) + 
-      geom_point(data = temp, aes(x = x, y = y), color = "red3", size = 1, shape = 17) +
-      coord_cartesian(xlim = range(c(dta[,1], PT[,1])), 
+      geom_point(data = df1, aes(x = x, y = y), color = col_gt, size = 1) + 
+      geom_point(data = temp, aes(x = x, y = y), color = col_imp, size = 1, shape = 17) +
+      coord_cartesian(xlim = range(c(dta[,1], PT[,1])),
                       ylim = range(c(dta[,2], PT[,2]))) +
+      # coord_cartesian(xlim = range1, 
+      #                 ylim = range2) +
       theme_minimal() +
       labs(title = "Ground truth vs ScalarF",
-           x = "Component 1",
-           y = "Component 2")
+           x = "x_{t-1, 1}",
+           y = "x_{t, 2}")
     
-    df1 = data.frame(x = dta[,1], y = dta[,3])
-    temp = data.frame(x = PT[which(is.na(x_obs[,1])),1],
-                      y = PT[which(is.na(x_obs[,3])),3])
+    df1 = data.frame(x = dta[1:(nrow(dta) - 1),1], y = dta[2:nrow(dta),3])
+    temp = data.frame(x = na_lag_pairs(PT[,1], which(is.na(x_obs[,1])))[,1],
+                      y = na_lag_pairs(PT[,3], which(is.na(x_obs[,1])))[,2])
     p11 = ggplot() +
-      geom_point(data = df1, aes(x = x, y = y), color = "steelblue", size = 1) + 
-      geom_point(data = temp, aes(x = x, y = y), color = "red3", size = 1, shape = 17) +
-      coord_cartesian(xlim = range(c(dta[,1], PT[,1])), 
+      geom_point(data = df1, aes(x = x, y = y), color = col_gt, size = 1) + 
+      geom_point(data = temp, aes(x = x, y = y), color = col_imp, size = 1, shape = 17) +
+      coord_cartesian(xlim = range(c(dta[,1], PT[,1])),
                       ylim = range(c(dta[,3], PT[,3]))) +
+      # coord_cartesian(xlim = range1, 
+      #                 ylim = range3) +
       theme_minimal() +
       labs(title = "Ground truth vs ScalarF",
-           x = "Component 1",
-           y = "Component 3")
+           x = "x_{t-1, 1}",
+           y = "x_{t, 3}")
     
-    df1 = data.frame(x = dta[,2], y = dta[,3])
-    temp = data.frame(x = PT[which(is.na(x_obs[,2])),2],
-                      y = PT[which(is.na(x_obs[,3])),3])
+    df1 = data.frame(x = dta[1:(nrow(dta) - 1),2], y = dta[2:nrow(dta),3])
+    temp = data.frame(x = na_lag_pairs(PT[,2], which(is.na(x_obs[,1])))[,1],
+                      y = na_lag_pairs(PT[,3], which(is.na(x_obs[,1])))[,2])
     p12 = ggplot() +
-      geom_point(data = df1, aes(x = x, y = y), color = "steelblue", size = 1) + 
-      geom_point(data = temp, aes(x = x, y = y), color = "red3", size = 1, shape = 17) +
-      coord_cartesian(xlim = range(c(dta[,2], PT[,2])), 
+      geom_point(data = df1, aes(x = x, y = y), color = col_gt, size = 1) + 
+      geom_point(data = temp, aes(x = x, y = y), color = col_imp, size = 1, shape = 17) +
+      coord_cartesian(xlim = range(c(dta[,2], PT[,2])),
                       ylim = range(c(dta[,3], PT[,3]))) +
+      # coord_cartesian(xlim = range2, 
+      #                 ylim = range3) +
       theme_minimal() +
       labs(title = "Ground truth vs ScalarF",
-           x = "Component 2",
-           y = "Component 3")
+           x = "x_{t-1, 2}",
+           y = "x_{t, 3}")
     
-    df1 = data.frame(x = dta[,1], y = dta[,2])
-    temp = data.frame(x = wass[which(is.na(x_obs[,1])),1],
-                      y = wass[which(is.na(x_obs[,2])),2])
+    df1 = data.frame(x = dta[1:(nrow(dta) - 1),1], y = dta[2:nrow(dta),2])
+    temp = data.frame(x = na_lag_pairs(wass[,1], which(is.na(x_obs[,1])))[,1],
+                      y = na_lag_pairs(wass[,2], which(is.na(x_obs[,1])))[,2])
     p13 = ggplot() +
-      geom_point(data = df1, aes(x = x, y = y), color = "steelblue", size = 1) + 
-      geom_point(data = temp, aes(x = x, y = y), color = "red3", size = 1, shape = 17) +
-      coord_cartesian(xlim = range(c(dta[,1], wass[,1])), 
-                      ylim = range(c(dta[,2], wass[,2]))) +
+      geom_point(data = df1, aes(x = x, y = y), color = col_gt, size = 1) + 
+      geom_point(data = temp, aes(x = x, y = y), color = col_imp, size = 1, shape = 17) +
+      # coord_cartesian(xlim = range(c(dta[,1], wass[,1])), 
+      #                 ylim = range(c(dta[,2], wass[,2]))) +
+      coord_cartesian(xlim = range1, 
+                      ylim = range2) +
       theme_minimal() +
       labs(title = "Ground truth vs WI (linear)",
-           x = "Component 1",
-           y = "Component 2")
+           x = "x_{t-1, 1}",
+           y = "x_{t, 2}")
     
-    df1 = data.frame(x = dta[,1], y = dta[,3])
-    temp = data.frame(x = wass[which(is.na(x_obs[,1])),1],
-                      y = wass[which(is.na(x_obs[,3])),3])
+    df1 = data.frame(x = dta[1:(nrow(dta) - 1),1], y = dta[2:nrow(dta),3])
+    temp = data.frame(x = na_lag_pairs(wass[,1], which(is.na(x_obs[,1])))[,1],
+                      y = na_lag_pairs(wass[,3], which(is.na(x_obs[,1])))[,2])
     p14 = ggplot() +
-      geom_point(data = df1, aes(x = x, y = y), color = "steelblue", size = 1) + 
-      geom_point(data = temp, aes(x = x, y = y), color = "red3", size = 1, shape = 17) +
-      coord_cartesian(xlim = range(c(dta[,1], wass[,1])), 
-                      ylim = range(c(dta[,3], wass[,3]))) +
+      geom_point(data = df1, aes(x = x, y = y), color = col_gt, size = 1) + 
+      geom_point(data = temp, aes(x = x, y = y), color = col_imp, size = 1, shape = 17) +
+      # coord_cartesian(xlim = range(c(dta[,1], wass[,1])), 
+      #                 ylim = range(c(dta[,3], wass[,3]))) +
+      coord_cartesian(xlim = range1, 
+                      ylim = range3) +
       theme_minimal() +
       labs(title = "Ground truth vs WI (linear)",
-           x = "Component 1",
-           y = "Component 3")
+           x = "x_{t-1, 1}",
+           y = "x_{t, 3}")
     
-    df1 = data.frame(x = dta[,2], y = dta[,3])
-    temp = data.frame(x = wass[which(is.na(x_obs[,2])),2],
-                      y = wass[which(is.na(x_obs[,3])),3])
+    df1 = data.frame(x = dta[1:(nrow(dta) - 1),2], y = dta[2:nrow(dta),3])
+    temp = data.frame(x = na_lag_pairs(wass[,2], which(is.na(x_obs[,1])))[,1],
+                      y = na_lag_pairs(wass[,3], which(is.na(x_obs[,1])))[,2])
     p15 = ggplot() +
-      geom_point(data = df1, aes(x = x, y = y), color = "steelblue", size = 1) + 
-      geom_point(data = temp, aes(x = x, y = y), color = "red3", size = 1, shape = 17) +
-      coord_cartesian(xlim = range(c(dta[,2], wass[,2])), 
-                      ylim = range(c(dta[,3], wass[,3]))) +
+      geom_point(data = df1, aes(x = x, y = y), color = col_gt, size = 1) + 
+      geom_point(data = temp, aes(x = x, y = y), color = col_imp, size = 1, shape = 17) +
+      # coord_cartesian(xlim = range(c(dta[,2], wass[,2])), 
+      #                 ylim = range(c(dta[,3], wass[,3]))) +
+      coord_cartesian(xlim = range2, 
+                      ylim = range3) +
       theme_minimal() +
       labs(title = "Ground truth vs WI (linear)",
-           x = "Component 2",
-           y = "Component 3")
+           x = "x_{t-1, 2}",
+           y = "x_{t, 3}")
     
-    df1 = data.frame(x = dta[,1], y = dta[,2])
-    temp = data.frame(x = kwass[which(is.na(x_obs[,1])),1],
-                      y = kwass[which(is.na(x_obs[,2])),2])
+    df1 = data.frame(x = dta[1:(nrow(dta) - 1),1], y = dta[2:nrow(dta),2])
+    temp = data.frame(x = na_lag_pairs(kwass[,1], which(is.na(x_obs[,1])))[,1],
+                      y = na_lag_pairs(kwass[,2], which(is.na(x_obs[,1])))[,2])
     p16 = ggplot() +
-      geom_point(data = df1, aes(x = x, y = y), color = "steelblue", size = 1) + 
-      geom_point(data = temp, aes(x = x, y = y), color = "red3", size = 1, shape = 17) +
-      coord_cartesian(xlim = range(c(dta[,1], kwass[,1])), 
-                      ylim = range(c(dta[,2], kwass[,2]))) +
+      geom_point(data = df1, aes(x = x, y = y), color = col_gt, size = 1) + 
+      geom_point(data = temp, aes(x = x, y = y), color = col_imp, size = 1, shape = 17) +
+      # coord_cartesian(xlim = range(c(dta[,1], kwass[,1])), 
+      #                 ylim = range(c(dta[,2], kwass[,2]))) +
+      coord_cartesian(xlim = range1, 
+                      ylim = range2) +
       theme_minimal() +
       labs(title = "Ground truth vs kWI (linear)",
-           x = "Component 1",
-           y = "Component 2")
+           x = "x_{t-1, 1}",
+           y = "x_{t, 2}")
     
-    df1 = data.frame(x = dta[,1], y = dta[,3])
-    temp = data.frame(x = kwass[which(is.na(x_obs[,1])),1],
-                      y = kwass[which(is.na(x_obs[,3])),3])
+    df1 = data.frame(x = dta[1:(nrow(dta) - 1),1], y = dta[2:nrow(dta),3])
+    temp = data.frame(x = na_lag_pairs(kwass[,1], which(is.na(x_obs[,1])))[,1],
+                      y = na_lag_pairs(kwass[,3], which(is.na(x_obs[,1])))[,2])
     p17 = ggplot() +
-      geom_point(data = df1, aes(x = x, y = y), color = "steelblue", size = 1) + 
-      geom_point(data = temp, aes(x = x, y = y), color = "red3", size = 1, shape = 17) +
-      coord_cartesian(xlim = range(c(dta[,1], kwass[,1])), 
-                      ylim = range(c(dta[,3], kwass[,3]))) +
+      geom_point(data = df1, aes(x = x, y = y), color = col_gt, size = 1) + 
+      geom_point(data = temp, aes(x = x, y = y), color = col_imp, size = 1, shape = 17) +
+      # coord_cartesian(xlim = range(c(dta[,1], kwass[,1])), 
+      #                 ylim = range(c(dta[,3], kwass[,3]))) +
+      coord_cartesian(xlim = range1, 
+                      ylim = range3) +
       theme_minimal() +
       labs(title = "Ground truth vs kWI (linear)",
-           x = "Component 1",
-           y = "Component 3")
+           x = "x_{t-1, 1}",
+           y = "x_{t, 3}")
     
-    df1 = data.frame(x = dta[,2], y = dta[,3])
-    temp = data.frame(x = kwass[which(is.na(x_obs[,2])),2],
-                      y = kwass[which(is.na(x_obs[,3])),3])
+    df1 = data.frame(x = dta[1:(nrow(dta) - 1),2], y = dta[2:nrow(dta),3])
+    temp = data.frame(x = na_lag_pairs(kwass[,2], which(is.na(x_obs[,1])))[,1],
+                      y = na_lag_pairs(kwass[,3], which(is.na(x_obs[,1])))[,2])
     p18 = ggplot() +
-      geom_point(data = df1, aes(x = x, y = y), color = "steelblue", size = 1) + 
-      geom_point(data = temp, aes(x = x, y = y), color = "red3", size = 1, shape = 17) +
-      coord_cartesian(xlim = range(c(dta[,2], kwass[,2])), 
-                      ylim = range(c(dta[,3], kwass[,3]))) +
+      geom_point(data = df1, aes(x = x, y = y), color = col_gt, size = 1) + 
+      geom_point(data = temp, aes(x = x, y = y), color = col_imp, size = 1, shape = 17) +
+      # coord_cartesian(xlim = range(c(dta[,2], kwass[,2])), 
+      #                 ylim = range(c(dta[,3], kwass[,3]))) +
+      coord_cartesian(xlim = range2, 
+                      ylim = range3) +
       theme_minimal() +
       labs(title = "Ground truth vs kWI (linear)",
-           x = "Component 2",
-           y = "Component 3")
+           x = "x_{t-1, 2}",
+           y = "x_{t, 3}")
     
-    df1 = data.frame(x = dta[,1], y = dta[,2])
-    temp = data.frame(x = wass_Kalman[which(is.na(x_obs[,1])),1],
-                      y = wass_Kalman[which(is.na(x_obs[,2])),2])
+    df1 = data.frame(x = dta[1:(nrow(dta) - 1),1], y = dta[2:nrow(dta),2])
+    temp = data.frame(x = na_lag_pairs(wass_Kalman[,1], which(is.na(x_obs[,1])))[,1],
+                      y = na_lag_pairs(wass_Kalman[,2], which(is.na(x_obs[,1])))[,2])
     p19 = ggplot() +
-      geom_point(data = df1, aes(x = x, y = y), color = "steelblue", size = 1) + 
-      geom_point(data = temp, aes(x = x, y = y), color = "red3", size = 1, shape = 17) +
-      coord_cartesian(xlim = range(c(dta[,1], wass_Kalman[,1])), 
-                      ylim = range(c(dta[,2], wass_Kalman[,2]))) +
+      geom_point(data = df1, aes(x = x, y = y), color = col_gt, size = 1) + 
+      geom_point(data = temp, aes(x = x, y = y), color = col_imp, size = 1, shape = 17) +
+      # coord_cartesian(xlim = range(c(dta[,1], wass_Kalman[,1])), 
+      #                 ylim = range(c(dta[,2], wass_Kalman[,2]))) +
+      coord_cartesian(xlim = range1, 
+                      ylim = range2) +
       theme_minimal() +
       labs(title = "Ground truth vs WI (Kalman)",
-           x = "Component 1",
-           y = "Component 2")
+           x = "x_{t-1, 1}",
+           y = "x_{t, 2}")
     
-    df1 = data.frame(x = dta[,1], y = dta[,3])
-    temp = data.frame(x = wass_Kalman[which(is.na(x_obs[,1])),1],
-                      y = wass_Kalman[which(is.na(x_obs[,3])),3])
+    df1 = data.frame(x = dta[1:(nrow(dta) - 1),1], y = dta[2:nrow(dta),3])
+    temp = data.frame(x = na_lag_pairs(wass_Kalman[,1], which(is.na(x_obs[,1])))[,1],
+                      y = na_lag_pairs(wass_Kalman[,3], which(is.na(x_obs[,1])))[,2])
     p20 = ggplot() +
-      geom_point(data = df1, aes(x = x, y = y), color = "steelblue", size = 1) + 
-      geom_point(data = temp, aes(x = x, y = y), color = "red3", size = 1, shape = 17) +
-      coord_cartesian(xlim = range(c(dta[,1], wass_Kalman[,1])), 
-                      ylim = range(c(dta[,3], wass_Kalman[,3]))) +
+      geom_point(data = df1, aes(x = x, y = y), color = col_gt, size = 1) + 
+      geom_point(data = temp, aes(x = x, y = y), color = col_imp, size = 1, shape = 17) +
+      # coord_cartesian(xlim = range(c(dta[,1], wass_Kalman[,1])), 
+      #                 ylim = range(c(dta[,3], wass_Kalman[,3]))) +
+      coord_cartesian(xlim = range1, 
+                      ylim = range3) +
       theme_minimal() +
       labs(title = "Ground truth vs WI (Kalman)",
-           x = "Component 1",
-           y = "Component 3")
+           x = "x_{t-1, 1}",
+           y = "x_{t, 3}")
     
-    df1 = data.frame(x = dta[,2], y = dta[,3])
-    temp = data.frame(x = wass_Kalman[which(is.na(x_obs[,2])),2],
-                      y = wass_Kalman[which(is.na(x_obs[,3])),3])
+    df1 = data.frame(x = dta[1:(nrow(dta) - 1),2], y = dta[2:nrow(dta),3])
+    temp = data.frame(x = na_lag_pairs(wass_Kalman[,2], which(is.na(x_obs[,1])))[,1],
+                      y = na_lag_pairs(wass_Kalman[,3], which(is.na(x_obs[,1])))[,2])
     p21 = ggplot() +
-      geom_point(data = df1, aes(x = x, y = y), color = "steelblue", size = 1) + 
-      geom_point(data = temp, aes(x = x, y = y), color = "red3", size = 1, shape = 17) +
-      coord_cartesian(xlim = range(c(dta[,2], wass_Kalman[,2])), 
-                      ylim = range(c(dta[,3], wass_Kalman[,3]))) +
+      geom_point(data = df1, aes(x = x, y = y), color = col_gt, size = 1) + 
+      geom_point(data = temp, aes(x = x, y = y), color = col_imp, size = 1, shape = 17) +
+      # coord_cartesian(xlim = range(c(dta[,2], wass_Kalman[,2])), 
+      #                 ylim = range(c(dta[,3], wass_Kalman[,3]))) +
+      coord_cartesian(xlim = range2, 
+                      ylim = range3) +
       theme_minimal() +
       labs(title = "Ground truth vs WI (Kalman)",
-           x = "Component 2",
-           y = "Component 3")
+           x = "x_{t-1, 2}",
+           y = "x_{t, 3}")
     
-    df1 = data.frame(x = dta[,1], y = dta[,2])
-    temp = data.frame(x = kwass_Kalman[which(is.na(x_obs[,1])),1],
-                      y = kwass_Kalman[which(is.na(x_obs[,2])),2])
+    df1 = data.frame(x = dta[1:(nrow(dta) - 1),1], y = dta[2:nrow(dta),2])
+    temp = data.frame(x = na_lag_pairs(kwass_Kalman[,1], which(is.na(x_obs[,1])))[,1],
+                      y = na_lag_pairs(kwass_Kalman[,2], which(is.na(x_obs[,1])))[,2])
     p22 = ggplot() +
-      geom_point(data = df1, aes(x = x, y = y), color = "steelblue", size = 1) + 
-      geom_point(data = temp, aes(x = x, y = y), color = "red3", size = 1, shape = 17) +
-      coord_cartesian(xlim = range(c(dta[,1], kwass_Kalman[,1])), 
-                      ylim = range(c(dta[,2], kwass_Kalman[,2]))) +
+      geom_point(data = df1, aes(x = x, y = y), color = col_gt, size = 1) + 
+      geom_point(data = temp, aes(x = x, y = y), color = col_imp, size = 1, shape = 17) +
+      # coord_cartesian(xlim = range(c(dta[,1], kwass_Kalman[,1])), 
+      #                 ylim = range(c(dta[,2], kwass_Kalman[,2]))) +
+      coord_cartesian(xlim = range1, 
+                      ylim = range2) +
       theme_minimal() +
       labs(title = "Ground truth vs kWI (Kalman)",
-           x = "Component 1",
-           y = "Component 2")
+           x = "x_{t-1, 1}",
+           y = "x_{t, 2}")
     
-    df1 = data.frame(x = dta[,1], y = dta[,3])
-    temp = data.frame(x = kwass_Kalman[which(is.na(x_obs[,1])),1],
-                      y = kwass_Kalman[which(is.na(x_obs[,3])),3])
+    df1 = data.frame(x = dta[1:(nrow(dta) - 1),1], y = dta[2:nrow(dta),3])
+    temp = data.frame(x = na_lag_pairs(kwass_Kalman[,1], which(is.na(x_obs[,1])))[,1],
+                      y = na_lag_pairs(kwass_Kalman[,3], which(is.na(x_obs[,1])))[,2])
     p23 = ggplot() +
-      geom_point(data = df1, aes(x = x, y = y), color = "steelblue", size = 1) + 
-      geom_point(data = temp, aes(x = x, y = y), color = "red3", size = 1, shape = 17) +
-      coord_cartesian(xlim = range(c(dta[,1], kwass_Kalman[,1])), 
-                      ylim = range(c(dta[,3], kwass_Kalman[,3]))) +
+      geom_point(data = df1, aes(x = x, y = y), color = col_gt, size = 1) + 
+      geom_point(data = temp, aes(x = x, y = y), color = col_imp, size = 1, shape = 17) +
+      # coord_cartesian(xlim = range(c(dta[,1], kwass_Kalman[,1])), 
+      #                 ylim = range(c(dta[,3], kwass_Kalman[,3]))) +
+      coord_cartesian(xlim = range1, 
+                      ylim = range3) +
       theme_minimal() +
       labs(title = "Ground truth vs kWI (Kalman)",
-           x = "Component 1",
-           y = "Component 3")
+           x = "x_{t-1, 1}",
+           y = "x_{t, 3}")
     
-    df1 = data.frame(x = dta[,2], y = dta[,3])
-    temp = data.frame(x = kwass_Kalman[which(is.na(x_obs[,2])),2],
-                      y = kwass_Kalman[which(is.na(x_obs[,3])),3])
+    df1 = data.frame(x = dta[1:(nrow(dta) - 1),2], y = dta[2:nrow(dta),3])
+    temp = data.frame(x = na_lag_pairs(kwass_Kalman[,2], which(is.na(x_obs[,1])))[,1],
+                      y = na_lag_pairs(kwass_Kalman[,3], which(is.na(x_obs[,1])))[,2])
     p24 = ggplot() +
-      geom_point(data = df1, aes(x = x, y = y), color = "steelblue", size = 1) + 
-      geom_point(data = temp, aes(x = x, y = y), color = "red3", size = 1, shape = 17) +
-      coord_cartesian(xlim = range(c(dta[,2], kwass_Kalman[,2])), 
-                      ylim = range(c(dta[,3], kwass_Kalman[,3]))) +
+      geom_point(data = df1, aes(x = x, y = y), color = col_gt, size = 1) + 
+      geom_point(data = temp, aes(x = x, y = y), color = col_imp, size = 1, shape = 17) +
+      # coord_cartesian(xlim = range(c(dta[,2], kwass_Kalman[,2])), 
+      #                 ylim = range(c(dta[,3], kwass_Kalman[,3]))) +
+      coord_cartesian(xlim = range2, 
+                      ylim = range3) +
       theme_minimal() +
       labs(title = "Ground truth vs kWI (Kalman)",
-           x = "Component 2",
-           y = "Component 3")
-    
+           x = "x_{t-1, 2}",
+           y = "x_{t, 3}")
     
     grid.arrange(p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12,
                  nrow = 4, ncol = 3)
@@ -554,436 +618,6 @@ for (sim in 1:1000) {
   }
   cat("iteration", sim, "\n")
 }
-
-temp = as.data.frame(as.table(ccf_gt[,,1]))
-temp$Var1 <- factor(temp$Var1, levels = rev(unique(temp$Var1)), labels = c("x3", "x2", "x1"))
-temp$Var2 <- factor(temp$Var2, levels = unique(temp$Var2), labels = c("x1", "x2", "x3"))
-
-p1 = ggplot(temp, aes(Var2, Var1, fill = Freq)) +
-  geom_tile(color = "white") +
-  geom_text(aes(label = round(Freq, 3)), color = "black", size = 3) +
-  scale_fill_gradient(low = "lightblue", high = "steelblue", limits = c(-1, 1)) +
-  theme_minimal()  +
-  labs(title = paste0("Ground truth (cross-correlation Lag ", 0, ")"),
-       x = "",
-       y = "")
-
-temp = as.data.frame(as.table(ccf_gt[,,2]))
-temp$Var1 <- factor(temp$Var1, levels = rev(unique(temp$Var1)), labels = c("x3", "x2", "x1"))
-temp$Var2 <- factor(temp$Var2, levels = unique(temp$Var2), labels = c("x1", "x2", "x3"))
-
-p2 = ggplot(temp, aes(Var2, Var1, fill = Freq)) +
-  geom_tile(color = "white") +
-  geom_text(aes(label = round(Freq, 3)), color = "black", size = 3) +
-  scale_fill_gradient(low = "lightblue", high = "steelblue", limits = c(-1, 1)) +
-  theme_minimal()  +
-  labs(title = paste0("Ground truth (cross-correlation Lag ", 1, ")"),
-       x = "",
-       y = "") +
-  theme(legend.position = "none")
-
-temp = as.data.frame(as.table(ccf_gt[,,4]))
-temp$Var1 <- factor(temp$Var1, levels = rev(unique(temp$Var1)), labels = c("x3", "x2", "x1"))
-temp$Var2 <- factor(temp$Var2, levels = unique(temp$Var2), labels = c("x1", "x2", "x3"))
-
-p3 = ggplot(temp, aes(Var2, Var1, fill = Freq)) +
-  geom_tile(color = "white") +
-  geom_text(aes(label = round(Freq, 3)), color = "black", size = 3) +
-  scale_fill_gradient(low = "lightblue", high = "steelblue", limits = c(-1, 1)) +
-  theme_minimal()  +
-  labs(title = paste0("Ground truth (cross-correlation Lag ", -1, ")"),
-       x = "",
-       y = "") +
-  theme(legend.position = "none")
-
-temp = as.data.frame(as.table(ccfs[,,1,1]))
-temp$Var1 <- factor(temp$Var1, levels = rev(unique(temp$Var1)), labels = c("x3", "x2", "x1"))
-temp$Var2 <- factor(temp$Var2, levels = unique(temp$Var2), labels = c("x1", "x2", "x3"))
-
-p4 = ggplot(temp, aes(Var2, Var1, fill = Freq)) +
-  geom_tile(color = "white") +
-  geom_text(aes(label = round(Freq, 3)), color = "black", size = 3) +
-  scale_fill_gradient(low = "lightblue", high = "steelblue", limits = c(-1, 1)) +
-  theme_minimal()  +
-  labs(title = paste0("Linear (cross-correlation Lag ", 0, ")"),
-       x = "",
-       y = "") +
-  theme(legend.position = "none")
-
-
-temp = as.data.frame(as.table(ccfs[,,2,1]))
-temp$Var1 <- factor(temp$Var1, levels = rev(unique(temp$Var1)), labels = c("x3", "x2", "x1"))
-temp$Var2 <- factor(temp$Var2, levels = unique(temp$Var2), labels = c("x1", "x2", "x3"))
-
-p5 = ggplot(temp, aes(Var2, Var1, fill = Freq)) +
-  geom_tile(color = "white") +
-  geom_text(aes(label = round(Freq, 3)), color = "black", size = 3) +
-  scale_fill_gradient(low = "lightblue", high = "steelblue", limits = c(-1, 1)) +
-  theme_minimal()  +
-  labs(title = paste0("Linear (cross-correlation Lag ", 1, ")"),
-       x = "",
-       y = "") +
-  theme(legend.position = "none")
-
-temp = as.data.frame(as.table(ccfs[,,4,1]))
-temp$Var1 <- factor(temp$Var1, levels = rev(unique(temp$Var1)), labels = c("x3", "x2", "x1"))
-temp$Var2 <- factor(temp$Var2, levels = unique(temp$Var2), labels = c("x1", "x2", "x3"))
-
-p6 = ggplot(temp, aes(Var2, Var1, fill = Freq)) +
-  geom_tile(color = "white") +
-  geom_text(aes(label = round(Freq, 3)), color = "black", size = 3) +
-  scale_fill_gradient(low = "lightblue", high = "steelblue", limits = c(-1, 1)) +
-  theme_minimal()  +
-  labs(title = paste0("Linear (cross-correlation Lag ", -1, ")"),
-       x = "",
-       y = "") +
-  theme(legend.position = "none")
-
-temp = as.data.frame(as.table(ccfs[,,1,2]))
-temp$Var1 <- factor(temp$Var1, levels = rev(unique(temp$Var1)), labels = c("x3", "x2", "x1"))
-temp$Var2 <- factor(temp$Var2, levels = unique(temp$Var2), labels = c("x1", "x2", "x3"))
-
-p7 = ggplot(temp, aes(Var2, Var1, fill = Freq)) +
-  geom_tile(color = "white") +
-  geom_text(aes(label = round(Freq, 3)), color = "black", size = 3) +
-  scale_fill_gradient(low = "lightblue", high = "steelblue", limits = c(-1, 1)) +
-  theme_minimal()  +
-  labs(title = paste0("Spline (cross-correlation Lag ", 0, ")"),
-       x = "",
-       y = "") +
-  theme(legend.position = "none")
-
-
-temp = as.data.frame(as.table(ccfs[,,2,2]))
-temp$Var1 <- factor(temp$Var1, levels = rev(unique(temp$Var1)), labels = c("x3", "x2", "x1"))
-temp$Var2 <- factor(temp$Var2, levels = unique(temp$Var2), labels = c("x1", "x2", "x3"))
-
-p8 = ggplot(temp, aes(Var2, Var1, fill = Freq)) +
-  geom_tile(color = "white") +
-  geom_text(aes(label = round(Freq, 3)), color = "black", size = 3) +
-  scale_fill_gradient(low = "lightblue", high = "steelblue", limits = c(-1, 1)) +
-  theme_minimal()  +
-  labs(title = paste0("Spline (cross-correlation Lag ", 1, ")"),
-       x = "",
-       y = "") +
-  theme(legend.position = "none")
-
-temp = as.data.frame(as.table(ccfs[,,4,2]))
-temp$Var1 <- factor(temp$Var1, levels = rev(unique(temp$Var1)), labels = c("x3", "x2", "x1"))
-temp$Var2 <- factor(temp$Var2, levels = unique(temp$Var2), labels = c("x1", "x2", "x3"))
-
-p9 = ggplot(temp, aes(Var2, Var1, fill = Freq)) +
-  geom_tile(color = "white") +
-  geom_text(aes(label = round(Freq, 3)), color = "black", size = 3) +
-  scale_fill_gradient(low = "lightblue", high = "steelblue", limits = c(-1, 1)) +
-  theme_minimal()  +
-  labs(title = paste0("Spline (cross-correlation Lag ", -1, ")"),
-       x = "",
-       y = "") +
-  theme(legend.position = "none")
-
-temp = as.data.frame(as.table(ccfs[,,1,3]))
-temp$Var1 <- factor(temp$Var1, levels = rev(unique(temp$Var1)), labels = c("x3", "x2", "x1"))
-temp$Var2 <- factor(temp$Var2, levels = unique(temp$Var2), labels = c("x1", "x2", "x3"))
-
-p10 = ggplot(temp, aes(Var2, Var1, fill = Freq)) +
-  geom_tile(color = "white") +
-  geom_text(aes(label = round(Freq, 3)), color = "black", size = 3) +
-  scale_fill_gradient(low = "lightblue", high = "steelblue", limits = c(-1, 1)) +
-  theme_minimal()  +
-  labs(title = paste0("Kalman (cross-correlation Lag ", 0, ")"),
-       x = "",
-       y = "") +
-  theme(legend.position = "none")
-
-
-temp = as.data.frame(as.table(ccfs[,,2,3]))
-temp$Var1 <- factor(temp$Var1, levels = rev(unique(temp$Var1)), labels = c("x3", "x2", "x1"))
-temp$Var2 <- factor(temp$Var2, levels = unique(temp$Var2), labels = c("x1", "x2", "x3"))
-
-p11 = ggplot(temp, aes(Var2, Var1, fill = Freq)) +
-  geom_tile(color = "white") +
-  geom_text(aes(label = round(Freq, 3)), color = "black", size = 3) +
-  scale_fill_gradient(low = "lightblue", high = "steelblue", limits = c(-1, 1)) +
-  theme_minimal()  +
-  labs(title = paste0("Kalman (cross-correlation Lag ", 1, ")"),
-       x = "",
-       y = "") +
-  theme(legend.position = "none")
-
-temp = as.data.frame(as.table(ccfs[,,4,3]))
-temp$Var1 <- factor(temp$Var1, levels = rev(unique(temp$Var1)), labels = c("x3", "x2", "x1"))
-temp$Var2 <- factor(temp$Var2, levels = unique(temp$Var2), labels = c("x1", "x2", "x3"))
-
-p12 = ggplot(temp, aes(Var2, Var1, fill = Freq)) +
-  geom_tile(color = "white") +
-  geom_text(aes(label = round(Freq, 3)), color = "black", size = 3) +
-  scale_fill_gradient(low = "lightblue", high = "steelblue", limits = c(-1, 1)) +
-  theme_minimal()  +
-  labs(title = paste0("Kalman (cross-correlation Lag ", -1, ")"),
-       x = "",
-       y = "") +
-  theme(legend.position = "none")
-
-temp = as.data.frame(as.table(ccfs[,,1,4]))
-temp$Var1 <- factor(temp$Var1, levels = rev(unique(temp$Var1)), labels = c("x3", "x2", "x1"))
-temp$Var2 <- factor(temp$Var2, levels = unique(temp$Var2), labels = c("x1", "x2", "x3"))
-
-p13 = ggplot(temp, aes(Var2, Var1, fill = Freq)) +
-  geom_tile(color = "white") +
-  geom_text(aes(label = round(Freq, 3)), color = "black", size = 3) +
-  scale_fill_gradient(low = "lightblue", high = "steelblue", limits = c(-1, 1)) +
-  theme_minimal()  +
-  labs(title = paste0("ScalarF (cross-correlation Lag ", 0, ")"),
-       x = "",
-       y = "") +
-  theme(legend.position = "none")
-
-
-temp = as.data.frame(as.table(ccfs[,,2,4]))
-temp$Var1 <- factor(temp$Var1, levels = rev(unique(temp$Var1)), labels = c("x3", "x2", "x1"))
-temp$Var2 <- factor(temp$Var2, levels = unique(temp$Var2), labels = c("x1", "x2", "x3"))
-
-p14 = ggplot(temp, aes(Var2, Var1, fill = Freq)) +
-  geom_tile(color = "white") +
-  geom_text(aes(label = round(Freq, 3)), color = "black", size = 3) +
-  scale_fill_gradient(low = "lightblue", high = "steelblue", limits = c(-1, 1)) +
-  theme_minimal()  +
-  labs(title = paste0("ScalarF (cross-correlation Lag ", 1, ")"),
-       x = "",
-       y = "") +
-  theme(legend.position = "none")
-
-temp = as.data.frame(as.table(ccfs[,,4,4]))
-temp$Var1 <- factor(temp$Var1, levels = rev(unique(temp$Var1)), labels = c("x3", "x2", "x1"))
-temp$Var2 <- factor(temp$Var2, levels = unique(temp$Var2), labels = c("x1", "x2", "x3"))
-
-p15 = ggplot(temp, aes(Var2, Var1, fill = Freq)) +
-  geom_tile(color = "white") +
-  geom_text(aes(label = round(Freq, 3)), color = "black", size = 3) +
-  scale_fill_gradient(low = "lightblue", high = "steelblue", limits = c(-1, 1)) +
-  theme_minimal()  +
-  labs(title = paste0("ScalarF (cross-correlation Lag ", -1, ")"),
-       x = "",
-       y = "") +
-  theme(legend.position = "none")
-
-grid.arrange(p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12, p13, p14, p15,
-             nrow = 5, ncol = 3)
-
-temp = as.data.frame(as.table(ccf_gt[,,1]))
-temp$Var1 <- factor(temp$Var1, levels = rev(unique(temp$Var1)), labels = c("x3", "x2", "x1"))
-temp$Var2 <- factor(temp$Var2, levels = unique(temp$Var2), labels = c("x1", "x2", "x3"))
-
-p1 = ggplot(temp, aes(Var2, Var1, fill = Freq)) +
-  geom_tile(color = "white") +
-  geom_text(aes(label = round(Freq, 3)), color = "black", size = 3) +
-  scale_fill_gradient(low = "lightblue", high = "steelblue", limits = c(-1, 1)) +
-  theme_minimal()  +
-  labs(title = paste0("Ground truth (cross-correlation Lag ", 0, ")"),
-       x = "",
-       y = "")
-
-temp = as.data.frame(as.table(ccf_gt[,,2]))
-temp$Var1 <- factor(temp$Var1, levels = rev(unique(temp$Var1)), labels = c("x3", "x2", "x1"))
-temp$Var2 <- factor(temp$Var2, levels = unique(temp$Var2), labels = c("x1", "x2", "x3"))
-
-p2 = ggplot(temp, aes(Var2, Var1, fill = Freq)) +
-  geom_tile(color = "white") +
-  geom_text(aes(label = round(Freq, 3)), color = "black", size = 3) +
-  scale_fill_gradient(low = "lightblue", high = "steelblue", limits = c(-1, 1)) +
-  theme_minimal()  +
-  labs(title = paste0("Ground truth (cross-correlation Lag ", 1, ")"),
-       x = "",
-       y = "") +
-  theme(legend.position = "none")
-
-temp = as.data.frame(as.table(ccf_gt[,,4]))
-temp$Var1 <- factor(temp$Var1, levels = rev(unique(temp$Var1)), labels = c("x3", "x2", "x1"))
-temp$Var2 <- factor(temp$Var2, levels = unique(temp$Var2), labels = c("x1", "x2", "x3"))
-
-p3 = ggplot(temp, aes(Var2, Var1, fill = Freq)) +
-  geom_tile(color = "white") +
-  geom_text(aes(label = round(Freq, 3)), color = "black", size = 3) +
-  scale_fill_gradient(low = "lightblue", high = "steelblue", limits = c(-1, 1)) +
-  theme_minimal()  +
-  labs(title = paste0("Ground truth (cross-correlation Lag ", -1, ")"),
-       x = "",
-       y = "") +
-  theme(legend.position = "none")
-
-temp = as.data.frame(as.table(ccfs[,,1,5]))
-temp$Var1 <- factor(temp$Var1, levels = rev(unique(temp$Var1)), labels = c("x3", "x2", "x1"))
-temp$Var2 <- factor(temp$Var2, levels = unique(temp$Var2), labels = c("x1", "x2", "x3"))
-
-p4 = ggplot(temp, aes(Var2, Var1, fill = Freq)) +
-  geom_tile(color = "white") +
-  geom_text(aes(label = round(Freq, 3)), color = "black", size = 3) +
-  scale_fill_gradient(low = "lightblue", high = "steelblue", limits = c(-1, 1)) +
-  theme_minimal()  +
-  labs(title = paste0("WI-lin (cross-correlation Lag ", 0, ")"),
-       x = "",
-       y = "") +
-  theme(legend.position = "none")
-
-
-temp = as.data.frame(as.table(ccfs[,,2,5]))
-temp$Var1 <- factor(temp$Var1, levels = rev(unique(temp$Var1)), labels = c("x3", "x2", "x1"))
-temp$Var2 <- factor(temp$Var2, levels = unique(temp$Var2), labels = c("x1", "x2", "x3"))
-
-p5 = ggplot(temp, aes(Var2, Var1, fill = Freq)) +
-  geom_tile(color = "white") +
-  geom_text(aes(label = round(Freq, 3)), color = "black", size = 3) +
-  scale_fill_gradient(low = "lightblue", high = "steelblue", limits = c(-1, 1)) +
-  theme_minimal()  +
-  labs(title = paste0("WI-lin (cross-correlation Lag ", 1, ")"),
-       x = "",
-       y = "") +
-  theme(legend.position = "none")
-
-temp = as.data.frame(as.table(ccfs[,,4,5]))
-temp$Var1 <- factor(temp$Var1, levels = rev(unique(temp$Var1)), labels = c("x3", "x2", "x1"))
-temp$Var2 <- factor(temp$Var2, levels = unique(temp$Var2), labels = c("x1", "x2", "x3"))
-
-p6 = ggplot(temp, aes(Var2, Var1, fill = Freq)) +
-  geom_tile(color = "white") +
-  geom_text(aes(label = round(Freq, 3)), color = "black", size = 3) +
-  scale_fill_gradient(low = "lightblue", high = "steelblue", limits = c(-1, 1)) +
-  theme_minimal()  +
-  labs(title = paste0("WI-lin (cross-correlation Lag ", -1, ")"),
-       x = "",
-       y = "") +
-  theme(legend.position = "none")
-
-temp = as.data.frame(as.table(ccfs[,,1,6]))
-temp$Var1 <- factor(temp$Var1, levels = rev(unique(temp$Var1)), labels = c("x3", "x2", "x1"))
-temp$Var2 <- factor(temp$Var2, levels = unique(temp$Var2), labels = c("x1", "x2", "x3"))
-
-p7 = ggplot(temp, aes(Var2, Var1, fill = Freq)) +
-  geom_tile(color = "white") +
-  geom_text(aes(label = round(Freq, 3)), color = "black", size = 3) +
-  scale_fill_gradient(low = "lightblue", high = "steelblue", limits = c(-1, 1)) +
-  theme_minimal()  +
-  labs(title = paste0("kWI-lin (cross-correlation Lag ", 0, ")"),
-       x = "",
-       y = "") +
-  theme(legend.position = "none")
-
-
-temp = as.data.frame(as.table(ccfs[,,2,6]))
-temp$Var1 <- factor(temp$Var1, levels = rev(unique(temp$Var1)), labels = c("x3", "x2", "x1"))
-temp$Var2 <- factor(temp$Var2, levels = unique(temp$Var2), labels = c("x1", "x2", "x3"))
-
-p8 = ggplot(temp, aes(Var2, Var1, fill = Freq)) +
-  geom_tile(color = "white") +
-  geom_text(aes(label = round(Freq, 3)), color = "black", size = 3) +
-  scale_fill_gradient(low = "lightblue", high = "steelblue", limits = c(-1, 1)) +
-  theme_minimal()  +
-  labs(title = paste0("kWI-lin (cross-correlation Lag ", 1, ")"),
-       x = "",
-       y = "") +
-  theme(legend.position = "none")
-
-temp = as.data.frame(as.table(ccfs[,,4,6]))
-temp$Var1 <- factor(temp$Var1, levels = rev(unique(temp$Var1)), labels = c("x3", "x2", "x1"))
-temp$Var2 <- factor(temp$Var2, levels = unique(temp$Var2), labels = c("x1", "x2", "x3"))
-
-p9 = ggplot(temp, aes(Var2, Var1, fill = Freq)) +
-  geom_tile(color = "white") +
-  geom_text(aes(label = round(Freq, 3)), color = "black", size = 3) +
-  scale_fill_gradient(low = "lightblue", high = "steelblue", limits = c(-1, 1)) +
-  theme_minimal()  +
-  labs(title = paste0("kWI-lin (cross-correlation Lag ", -1, ")"),
-       x = "",
-       y = "") +
-  theme(legend.position = "none")
-
-temp = as.data.frame(as.table(ccfs[,,1,7]))
-temp$Var1 <- factor(temp$Var1, levels = rev(unique(temp$Var1)), labels = c("x3", "x2", "x1"))
-temp$Var2 <- factor(temp$Var2, levels = unique(temp$Var2), labels = c("x1", "x2", "x3"))
-
-p10 = ggplot(temp, aes(Var2, Var1, fill = Freq)) +
-  geom_tile(color = "white") +
-  geom_text(aes(label = round(Freq, 3)), color = "black", size = 3) +
-  scale_fill_gradient(low = "lightblue", high = "steelblue", limits = c(-1, 1)) +
-  theme_minimal()  +
-  labs(title = paste0("WI-Kalman (cross-correlation Lag ", 0, ")"),
-       x = "",
-       y = "") +
-  theme(legend.position = "none")
-
-temp = as.data.frame(as.table(ccfs[,,2,7]))
-temp$Var1 <- factor(temp$Var1, levels = rev(unique(temp$Var1)), labels = c("x3", "x2", "x1"))
-temp$Var2 <- factor(temp$Var2, levels = unique(temp$Var2), labels = c("x1", "x2", "x3"))
-
-p11 = ggplot(temp, aes(Var2, Var1, fill = Freq)) +
-  geom_tile(color = "white") +
-  geom_text(aes(label = round(Freq, 3)), color = "black", size = 3) +
-  scale_fill_gradient(low = "lightblue", high = "steelblue", limits = c(-1, 1)) +
-  theme_minimal()  +
-  labs(title = paste0("WI-Kalman (cross-correlation Lag ", 1, ")"),
-       x = "",
-       y = "") +
-  theme(legend.position = "none")
-
-temp = as.data.frame(as.table(ccfs[,,4,7]))
-temp$Var1 <- factor(temp$Var1, levels = rev(unique(temp$Var1)), labels = c("x3", "x2", "x1"))
-temp$Var2 <- factor(temp$Var2, levels = unique(temp$Var2), labels = c("x1", "x2", "x3"))
-
-p12 = ggplot(temp, aes(Var2, Var1, fill = Freq)) +
-  geom_tile(color = "white") +
-  geom_text(aes(label = round(Freq, 3)), color = "black", size = 3) +
-  scale_fill_gradient(low = "lightblue", high = "steelblue", limits = c(-1, 1)) +
-  theme_minimal()  +
-  labs(title = paste0("WI-Kalman (cross-correlation Lag ", -1, ")"),
-       x = "",
-       y = "") +
-  theme(legend.position = "none")
-
-temp = as.data.frame(as.table(ccfs[,,1,8]))
-temp$Var1 <- factor(temp$Var1, levels = rev(unique(temp$Var1)), labels = c("x3", "x2", "x1"))
-temp$Var2 <- factor(temp$Var2, levels = unique(temp$Var2), labels = c("x1", "x2", "x3"))
-
-p13 = ggplot(temp, aes(Var2, Var1, fill = Freq)) +
-  geom_tile(color = "white") +
-  geom_text(aes(label = round(Freq, 3)), color = "black", size = 3) +
-  scale_fill_gradient(low = "lightblue", high = "steelblue", limits = c(-1, 1)) +
-  theme_minimal()  +
-  labs(title = paste0("kWI-Kalman (cross-correlation Lag ", 0, ")"),
-       x = "",
-       y = "") +
-  theme(legend.position = "none")
-
-temp = as.data.frame(as.table(ccfs[,,2,8]))
-temp$Var1 <- factor(temp$Var1, levels = rev(unique(temp$Var1)), labels = c("x3", "x2", "x1"))
-temp$Var2 <- factor(temp$Var2, levels = unique(temp$Var2), labels = c("x1", "x2", "x3"))
-
-p14 = ggplot(temp, aes(Var2, Var1, fill = Freq)) +
-  geom_tile(color = "white") +
-  geom_text(aes(label = round(Freq, 3)), color = "black", size = 3) +
-  scale_fill_gradient(low = "lightblue", high = "steelblue", limits = c(-1, 1)) +
-  theme_minimal()  +
-  labs(title = paste0("kWI-Kalman (cross-correlation Lag ", 1, ")"),
-       x = "",
-       y = "") +
-  theme(legend.position = "none")
-
-temp = as.data.frame(as.table(ccfs[,,4,8]))
-temp$Var1 <- factor(temp$Var1, levels = rev(unique(temp$Var1)), labels = c("x3", "x2", "x1"))
-temp$Var2 <- factor(temp$Var2, levels = unique(temp$Var2), labels = c("x1", "x2", "x3"))
-
-p15 = ggplot(temp, aes(Var2, Var1, fill = Freq)) +
-  geom_tile(color = "white") +
-  geom_text(aes(label = round(Freq, 3)), color = "black", size = 3) +
-  scale_fill_gradient(low = "lightblue", high = "steelblue", limits = c(-1, 1)) +
-  theme_minimal()  +
-  labs(title = paste0("kWI-Kalman (cross-correlation Lag ", -1, ")"),
-       x = "",
-       y = "") +
-  theme(legend.position = "none")
-
-grid.arrange(p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12, p13, p14, p15,
-             nrow = 5, ncol = 3)
 
 
 print(round(colMeans(wass_d), 4))
@@ -1053,777 +687,383 @@ for (sim in 1:1000) {
   ccf_loss[,8] = ccf_loss[,8] + apply((ccf_summary(kwass_Kalman) - ccf_gt)^2, MARGIN = 3, FUN = sum)
   
   if (sim == 1) {
-    df1 = data.frame(x = dta[,1], y = dta[,2])
-    temp = data.frame(x = lin[which(is.na(x_obs[,1])),1],
-                      y = lin[which(is.na(x_obs[,2])),2])
+    col_gt = "steelblue"
+    col_imp = "red3"
+    range1 = enlarge(range(c(dta[,1], lin[,1], Kalman[,1], PT[,1], wass[,1], kwass[,1],
+                             wass_Kalman[,1], kwass_Kalman[,1])))
+    range2 = enlarge(range(c(dta[,2], lin[,2], Kalman[,2], PT[,2], wass[,2], kwass[,2],
+                             wass_Kalman[,2], kwass_Kalman[,2])))
+    range3 = enlarge(range(c(dta[,3], lin[,3], Kalman[,3], PT[,3], wass[,3], kwass[,3],
+                             wass_Kalman[,3], kwass_Kalman[,3])))
+        
+    df1 = data.frame(x = dta[1:(nrow(dta) - 1),1], y = dta[2:nrow(dta),2])
+    temp = data.frame(x = na_lag_pairs(lin[,1], which(is.na(x_obs[,1])))[,1],
+                      y = na_lag_pairs(lin[,2], which(is.na(x_obs[,1])))[,2])
     p1 = ggplot() +
-      geom_point(data = df1, aes(x = x, y = y), color = "steelblue", size = 1) + 
-      geom_point(data = temp, aes(x = x, y = y), color = "red3", size = 1, shape = 17) +
-      coord_cartesian(xlim = range(c(dta[,1], lin[,1])), 
-                      ylim = range(c(dta[,2], lin[,2]))) +
+      geom_point(data = df1, aes(x = x, y = y), color = col_gt, size = 1) + 
+      geom_point(data = temp, aes(x = x, y = y), color = col_imp, size = 1, shape = 17) +
+      # coord_cartesian(xlim = range(c(dta[,1], lin[,1])), 
+      #                 ylim = range(c(dta[,2], lin[,2]))) +
+      coord_cartesian(xlim = range1, 
+                      ylim = range2) +
       theme_minimal() +
       labs(title = "Ground truth vs linear",
-           x = "Component 1",
-           y = "Component 2")
+           x = "x_{t-1, 1}",
+           y = "x_{t, 2}")
     
-    df1 = data.frame(x = dta[,1], y = dta[,3])
-    temp = data.frame(x = lin[which(is.na(x_obs[,1])),1],
-                      y = lin[which(is.na(x_obs[,3])),3])
+    df1 = data.frame(x = dta[1:(nrow(dta) - 1),1], y = dta[2:nrow(dta),3])
+    temp = data.frame(x = na_lag_pairs(lin[,1], which(is.na(x_obs[,1])))[,1],
+                      y = na_lag_pairs(lin[,3], which(is.na(x_obs[,1])))[,2])
     p2 = ggplot() +
-      geom_point(data = df1, aes(x = x, y = y), color = "steelblue", size = 1) + 
-      geom_point(data = temp, aes(x = x, y = y), color = "red3", size = 1, shape = 17) +
-      coord_cartesian(xlim = range(c(dta[,1], lin[,1])), 
-                      ylim = range(c(dta[,3], lin[,3]))) +
+      geom_point(data = df1, aes(x = x, y = y), color = col_gt, size = 1) + 
+      geom_point(data = temp, aes(x = x, y = y), color = col_imp, size = 1, shape = 17) +
+      # coord_cartesian(xlim = range(c(dta[,1], lin[,1])), 
+      #                 ylim = range(c(dta[,3], lin[,3]))) +
+      coord_cartesian(xlim = range1, 
+                      ylim = range3) +
       theme_minimal() +
       labs(title = "Ground truth vs linear",
-           x = "Component 1",
-           y = "Component 3")
+           x = "x_{t-1, 1}",
+           y = "x_{t, 3}")
     
-    df1 = data.frame(x = dta[,2], y = dta[,3])
-    temp = data.frame(x = lin[which(is.na(x_obs[,2])),2],
-                      y = lin[which(is.na(x_obs[,3])),3])
+    df1 = data.frame(x = dta[1:(nrow(dta) - 1),2], y = dta[2:nrow(dta),3])
+    temp = data.frame(x = na_lag_pairs(lin[,2], which(is.na(x_obs[,1])))[,1],
+                      y = na_lag_pairs(lin[,3], which(is.na(x_obs[,1])))[,2])
     p3 = ggplot() +
-      geom_point(data = df1, aes(x = x, y = y), color = "steelblue", size = 1) + 
-      geom_point(data = temp, aes(x = x, y = y), color = "red3", size = 1, shape = 17) +
-      coord_cartesian(xlim = range(c(dta[,2], lin[,2])), 
-                      ylim = range(c(dta[,3], lin[,3]))) +
+      geom_point(data = df1, aes(x = x, y = y), color = col_gt, size = 1) + 
+      geom_point(data = temp, aes(x = x, y = y), color = col_imp, size = 1, shape = 17) +
+      # coord_cartesian(xlim = range(c(dta[,2], lin[,2])), 
+      #                 ylim = range(c(dta[,3], lin[,3]))) +
+      coord_cartesian(xlim = range2, 
+                      ylim = range3) +
       theme_minimal() +
       labs(title = "Ground truth vs linear",
-           x = "Component 2",
-           y = "Component 3")
+           x = "x_{t-1, 2}",
+           y = "x_{t, 3}")
     
-    df1 = data.frame(x = dta[,1], y = dta[,2])
-    temp = data.frame(x = spl[which(is.na(x_obs[,1])),1],
-                      y = spl[which(is.na(x_obs[,2])),2])
+    df1 = data.frame(x = dta[1:(nrow(dta) - 1),1], y = dta[2:nrow(dta),2])
+    temp = data.frame(x = na_lag_pairs(spl[,1], which(is.na(x_obs[,1])))[,1],
+                      y = na_lag_pairs(spl[,2], which(is.na(x_obs[,1])))[,2])
     p4 = ggplot() +
-      geom_point(data = df1, aes(x = x, y = y), color = "steelblue", size = 1) + 
-      geom_point(data = temp, aes(x = x, y = y), color = "red3", size = 1, shape = 17) +
-      coord_cartesian(xlim = range(c(dta[,1], lin[,1])), 
-                      ylim = range(c(dta[,2], lin[,2]))) +
+      geom_point(data = df1, aes(x = x, y = y), color = col_gt, size = 1) + 
+      geom_point(data = temp, aes(x = x, y = y), color = col_imp, size = 1, shape = 17) +
+      # coord_cartesian(xlim = range(c(dta[,1], spl[,1])),
+      #                 ylim = range(c(dta[,2], spl[,2]))) +
+      coord_cartesian(xlim = range1,
+                      ylim = range2) +
       theme_minimal() +
       labs(title = "Ground truth vs spline",
-           x = "Component 1",
-           y = "Component 2")
+           x = "x_{t-1, 1}",
+           y = "x_{t, 2}")
     
-    df1 = data.frame(x = dta[,1], y = dta[,3])
-    temp = data.frame(x = spl[which(is.na(x_obs[,1])),1],
-                      y = spl[which(is.na(x_obs[,3])),3])
+    df1 = data.frame(x = dta[1:(nrow(dta) - 1),1], y = dta[2:nrow(dta),3])
+    temp = data.frame(x = na_lag_pairs(spl[,1], which(is.na(x_obs[,1])))[,1],
+                      y = na_lag_pairs(spl[,3], which(is.na(x_obs[,1])))[,2])
     p5 = ggplot() +
-      geom_point(data = df1, aes(x = x, y = y), color = "steelblue", size = 1) + 
-      geom_point(data = temp, aes(x = x, y = y), color = "red3", size = 1, shape = 17) +
-      coord_cartesian(xlim = range(c(dta[,1], spl[,1])), 
-                      ylim = range(c(dta[,3], spl[,3]))) +
+      geom_point(data = df1, aes(x = x, y = y), color = col_gt, size = 1) + 
+      geom_point(data = temp, aes(x = x, y = y), color = col_imp, size = 1, shape = 17) +
+      # coord_cartesian(xlim = range(c(dta[,1], spl[,1])), 
+      #                 ylim = range(c(dta[,3], spl[,3]))) +
+      coord_cartesian(xlim = range1, 
+                      ylim = range3) +
       theme_minimal() +
       labs(title = "Ground truth vs spline",
-           x = "Component 1",
-           y = "Component 3")
+           x = "x_{t-1, 1}",
+           y = "x_{t, 3}")
     
-    df1 = data.frame(x = dta[,2], y = dta[,3])
-    temp = data.frame(x = spl[which(is.na(x_obs[,2])),2],
-                      y = spl[which(is.na(x_obs[,3])),3])
+    df1 = data.frame(x = dta[1:(nrow(dta) - 1),2], y = dta[2:nrow(dta),3])
+    temp = data.frame(x = na_lag_pairs(spl[,2], which(is.na(x_obs[,1])))[,1],
+                      y = na_lag_pairs(spl[,3], which(is.na(x_obs[,1])))[,2])
     p6 = ggplot() +
-      geom_point(data = df1, aes(x = x, y = y), color = "steelblue", size = 1) + 
-      geom_point(data = temp, aes(x = x, y = y), color = "red3", size = 1, shape = 17) +
-      coord_cartesian(xlim = range(c(dta[,2], spl[,2])), 
-                      ylim = range(c(dta[,3], spl[,3]))) +
+      geom_point(data = df1, aes(x = x, y = y), color = col_gt, size = 1) + 
+      geom_point(data = temp, aes(x = x, y = y), color = col_imp, size = 1, shape = 17) +
+      # coord_cartesian(xlim = range(c(dta[,2], spl[,2])), 
+      #                 ylim = range(c(dta[,3], spl[,3]))) +
+      coord_cartesian(xlim = range2, 
+                      ylim = range3) +
       theme_minimal() +
       labs(title = "Ground truth vs spline",
-           x = "Component 2",
-           y = "Component 3")
+           x = "x_{t-1, 2}",
+           y = "x_{t, 3}")
     
-    df1 = data.frame(x = dta[,1], y = dta[,2])
-    temp = data.frame(x = Kalman[which(is.na(x_obs[,1])),1],
-                      y = Kalman[which(is.na(x_obs[,2])),2])
+    df1 = data.frame(x = dta[1:(nrow(dta) - 1),1], y = dta[2:nrow(dta),2])
+    temp = data.frame(x = na_lag_pairs(Kalman[,1], which(is.na(x_obs[,1])))[,1],
+                      y = na_lag_pairs(Kalman[,2], which(is.na(x_obs[,1])))[,2])
     p7 = ggplot() +
-      geom_point(data = df1, aes(x = x, y = y), color = "steelblue", size = 1) + 
-      geom_point(data = temp, aes(x = x, y = y), color = "red3", size = 1, shape = 17) +
-      coord_cartesian(xlim = range(c(dta[,1], Kalman[,1])), 
-                      ylim = range(c(dta[,2], Kalman[,2]))) +
+      geom_point(data = df1, aes(x = x, y = y), color = col_gt, size = 1) + 
+      geom_point(data = temp, aes(x = x, y = y), color = col_imp, size = 1, shape = 17) +
+      # coord_cartesian(xlim = range(c(dta[,1], Kalman[,1])), 
+      #                 ylim = range(c(dta[,2], Kalman[,2]))) +
+      coord_cartesian(xlim = range1, 
+                      ylim = range2) +
       theme_minimal() +
       labs(title = "Ground truth vs Kalman",
-           x = "Component 1",
-           y = "Component 2")
+           x = "x_{t-1, 1}",
+           y = "x_{t, 2}")
     
-    df1 = data.frame(x = dta[,1], y = dta[,3])
-    temp = data.frame(x = Kalman[which(is.na(x_obs[,1])),1],
-                      y = Kalman[which(is.na(x_obs[,3])),3])
+    df1 = data.frame(x = dta[1:(nrow(dta) - 1),1], y = dta[2:nrow(dta),3])
+    temp = data.frame(x = na_lag_pairs(Kalman[,1], which(is.na(x_obs[,1])))[,1],
+                      y = na_lag_pairs(Kalman[,3], which(is.na(x_obs[,1])))[,2])
     p8 = ggplot() +
-      geom_point(data = df1, aes(x = x, y = y), color = "steelblue", size = 1) + 
-      geom_point(data = temp, aes(x = x, y = y), color = "red3", size = 1, shape = 17) +
-      coord_cartesian(xlim = range(c(dta[,1], Kalman[,1])), 
-                      ylim = range(c(dta[,3], Kalman[,3]))) +
+      geom_point(data = df1, aes(x = x, y = y), color = col_gt, size = 1) + 
+      geom_point(data = temp, aes(x = x, y = y), color = col_imp, size = 1, shape = 17) +
+      # coord_cartesian(xlim = range(c(dta[,1], Kalman[,1])), 
+      #                 ylim = range(c(dta[,3], Kalman[,3]))) +
+      coord_cartesian(xlim = range1, 
+                      ylim = range3) +
       theme_minimal() +
       labs(title = "Ground truth vs Kalman",
-           x = "Component 1",
-           y = "Component 3")
+           x = "x_{t-1, 1}",
+           y = "x_{t, 3}")
     
-    df1 = data.frame(x = dta[,2], y = dta[,3])
-    temp = data.frame(x = Kalman[which(is.na(x_obs[,2])),2],
-                      y = Kalman[which(is.na(x_obs[,3])),3])
+    df1 = data.frame(x = dta[1:(nrow(dta) - 1),2], y = dta[2:nrow(dta),3])
+    temp = data.frame(x = na_lag_pairs(Kalman[,2], which(is.na(x_obs[,1])))[,1],
+                      y = na_lag_pairs(Kalman[,3], which(is.na(x_obs[,1])))[,2])
     p9 = ggplot() +
-      geom_point(data = df1, aes(x = x, y = y), color = "steelblue", size = 1) + 
-      geom_point(data = temp, aes(x = x, y = y), color = "red3", size = 1, shape = 17) +
-      coord_cartesian(xlim = range(c(dta[,2], Kalman[,2])), 
-                      ylim = range(c(dta[,3], Kalman[,3]))) +
+      geom_point(data = df1, aes(x = x, y = y), color = col_gt, size = 1) + 
+      geom_point(data = temp, aes(x = x, y = y), color = col_imp, size = 1, shape = 17) +
+      # coord_cartesian(xlim = range(c(dta[,2], Kalman[,2])), 
+      #                 ylim = range(c(dta[,3], Kalman[,3]))) +
+      coord_cartesian(xlim = range2, 
+                      ylim = range3) +
       theme_minimal() +
       labs(title = "Ground truth vs Kalman",
-           x = "Component 2",
-           y = "Component 3")
+           x = "x_{t-1, 2}",
+           y = "x_{t, 3}")
     
-    df1 = data.frame(x = dta[,1], y = dta[,2])
-    temp = data.frame(x = PT[which(is.na(x_obs[,1])),1],
-                      y = PT[which(is.na(x_obs[,2])),2])
+    df1 = data.frame(x = dta[1:(nrow(dta) - 1),1], y = dta[2:nrow(dta),2])
+    temp = data.frame(x = na_lag_pairs(PT[,1], which(is.na(x_obs[,1])))[,1],
+                      y = na_lag_pairs(PT[,2], which(is.na(x_obs[,1])))[,2])
     p10 = ggplot() +
-      geom_point(data = df1, aes(x = x, y = y), color = "steelblue", size = 1) + 
-      geom_point(data = temp, aes(x = x, y = y), color = "red3", size = 1, shape = 17) +
-      coord_cartesian(xlim = range(c(dta[,1], PT[,1])), 
-                      ylim = range(c(dta[,2], PT[,2]))) +
+      geom_point(data = df1, aes(x = x, y = y), color = col_gt, size = 1) + 
+      geom_point(data = temp, aes(x = x, y = y), color = col_imp, size = 1, shape = 17) +
+      # coord_cartesian(xlim = range(c(dta[,1], PT[,1])), 
+      #                 ylim = range(c(dta[,2], PT[,2]))) +
+      coord_cartesian(xlim = range1, 
+                      ylim = range2) +
       theme_minimal() +
       labs(title = "Ground truth vs ScalarF",
-           x = "Component 1",
-           y = "Component 2")
+           x = "x_{t-1, 1}",
+           y = "x_{t, 2}")
     
-    df1 = data.frame(x = dta[,1], y = dta[,3])
-    temp = data.frame(x = PT[which(is.na(x_obs[,1])),1],
-                      y = PT[which(is.na(x_obs[,3])),3])
+    df1 = data.frame(x = dta[1:(nrow(dta) - 1),1], y = dta[2:nrow(dta),3])
+    temp = data.frame(x = na_lag_pairs(PT[,1], which(is.na(x_obs[,1])))[,1],
+                      y = na_lag_pairs(PT[,3], which(is.na(x_obs[,1])))[,2])
     p11 = ggplot() +
-      geom_point(data = df1, aes(x = x, y = y), color = "steelblue", size = 1) + 
-      geom_point(data = temp, aes(x = x, y = y), color = "red3", size = 1, shape = 17) +
-      coord_cartesian(xlim = range(c(dta[,1], PT[,1])), 
-                      ylim = range(c(dta[,3], PT[,3]))) +
+      geom_point(data = df1, aes(x = x, y = y), color = col_gt, size = 1) + 
+      geom_point(data = temp, aes(x = x, y = y), color = col_imp, size = 1, shape = 17) +
+      # coord_cartesian(xlim = range(c(dta[,1], PT[,1])), 
+      #                 ylim = range(c(dta[,3], PT[,3]))) +
+      coord_cartesian(xlim = range1, 
+                      ylim = range3) +
       theme_minimal() +
       labs(title = "Ground truth vs ScalarF",
-           x = "Component 1",
-           y = "Component 3")
+           x = "x_{t-1, 1}",
+           y = "x_{t, 3}")
     
-    df1 = data.frame(x = dta[,2], y = dta[,3])
-    temp = data.frame(x = PT[which(is.na(x_obs[,2])),2],
-                      y = PT[which(is.na(x_obs[,3])),3])
+    df1 = data.frame(x = dta[1:(nrow(dta) - 1),2], y = dta[2:nrow(dta),3])
+    temp = data.frame(x = na_lag_pairs(PT[,2], which(is.na(x_obs[,1])))[,1],
+                      y = na_lag_pairs(PT[,3], which(is.na(x_obs[,1])))[,2])
     p12 = ggplot() +
-      geom_point(data = df1, aes(x = x, y = y), color = "steelblue", size = 1) + 
-      geom_point(data = temp, aes(x = x, y = y), color = "red3", size = 1, shape = 17) +
-      coord_cartesian(xlim = range(c(dta[,2], PT[,2])), 
-                      ylim = range(c(dta[,3], PT[,3]))) +
+      geom_point(data = df1, aes(x = x, y = y), color = col_gt, size = 1) + 
+      geom_point(data = temp, aes(x = x, y = y), color = col_imp, size = 1, shape = 17) +
+      # coord_cartesian(xlim = range(c(dta[,2], PT[,2])), 
+      #                 ylim = range(c(dta[,3], PT[,3]))) +
+      coord_cartesian(xlim = range2, 
+                      ylim = range3) +
       theme_minimal() +
       labs(title = "Ground truth vs ScalarF",
-           x = "Component 2",
-           y = "Component 3")
+           x = "x_{t-1, 2}",
+           y = "x_{t, 3}")
     
-    df1 = data.frame(x = dta[,1], y = dta[,2])
-    temp = data.frame(x = wass[which(is.na(x_obs[,1])),1],
-                      y = wass[which(is.na(x_obs[,2])),2])
+    df1 = data.frame(x = dta[1:(nrow(dta) - 1),1], y = dta[2:nrow(dta),2])
+    temp = data.frame(x = na_lag_pairs(wass[,1], which(is.na(x_obs[,1])))[,1],
+                      y = na_lag_pairs(wass[,2], which(is.na(x_obs[,1])))[,2])
     p13 = ggplot() +
-      geom_point(data = df1, aes(x = x, y = y), color = "steelblue", size = 1) + 
-      geom_point(data = temp, aes(x = x, y = y), color = "red3", size = 1, shape = 17) +
-      coord_cartesian(xlim = range(c(dta[,1], wass[,1])), 
-                      ylim = range(c(dta[,2], wass[,2]))) +
+      geom_point(data = df1, aes(x = x, y = y), color = col_gt, size = 1) + 
+      geom_point(data = temp, aes(x = x, y = y), color = col_imp, size = 1, shape = 17) +
+      # coord_cartesian(xlim = range(c(dta[,1], wass[,1])), 
+      #                 ylim = range(c(dta[,2], wass[,2]))) +
+      coord_cartesian(xlim = range1, 
+                      ylim = range2) +
       theme_minimal() +
       labs(title = "Ground truth vs WI (linear)",
-           x = "Component 1",
-           y = "Component 2")
+           x = "x_{t-1, 1}",
+           y = "x_{t, 2}")
     
-    df1 = data.frame(x = dta[,1], y = dta[,3])
-    temp = data.frame(x = wass[which(is.na(x_obs[,1])),1],
-                      y = wass[which(is.na(x_obs[,3])),3])
+    df1 = data.frame(x = dta[1:(nrow(dta) - 1),1], y = dta[2:nrow(dta),3])
+    temp = data.frame(x = na_lag_pairs(wass[,1], which(is.na(x_obs[,1])))[,1],
+                      y = na_lag_pairs(wass[,3], which(is.na(x_obs[,1])))[,2])
     p14 = ggplot() +
-      geom_point(data = df1, aes(x = x, y = y), color = "steelblue", size = 1) + 
-      geom_point(data = temp, aes(x = x, y = y), color = "red3", size = 1, shape = 17) +
-      coord_cartesian(xlim = range(c(dta[,1], wass[,1])), 
-                      ylim = range(c(dta[,3], wass[,3]))) +
+      geom_point(data = df1, aes(x = x, y = y), color = col_gt, size = 1) + 
+      geom_point(data = temp, aes(x = x, y = y), color = col_imp, size = 1, shape = 17) +
+      # coord_cartesian(xlim = range(c(dta[,1], wass[,1])), 
+      #                 ylim = range(c(dta[,3], wass[,3]))) +
+      coord_cartesian(xlim = range1, 
+                      ylim = range3) +
       theme_minimal() +
       labs(title = "Ground truth vs WI (linear)",
-           x = "Component 1",
-           y = "Component 3")
+           x = "x_{t-1, 1}",
+           y = "x_{t, 3}")
     
-    df1 = data.frame(x = dta[,2], y = dta[,3])
-    temp = data.frame(x = wass[which(is.na(x_obs[,2])),2],
-                      y = wass[which(is.na(x_obs[,3])),3])
+    df1 = data.frame(x = dta[1:(nrow(dta) - 1),2], y = dta[2:nrow(dta),3])
+    temp = data.frame(x = na_lag_pairs(wass[,2], which(is.na(x_obs[,1])))[,1],
+                      y = na_lag_pairs(wass[,3], which(is.na(x_obs[,1])))[,2])
     p15 = ggplot() +
-      geom_point(data = df1, aes(x = x, y = y), color = "steelblue", size = 1) + 
-      geom_point(data = temp, aes(x = x, y = y), color = "red3", size = 1, shape = 17) +
-      coord_cartesian(xlim = range(c(dta[,2], wass[,2])), 
-                      ylim = range(c(dta[,3], wass[,3]))) +
+      geom_point(data = df1, aes(x = x, y = y), color = col_gt, size = 1) + 
+      geom_point(data = temp, aes(x = x, y = y), color = col_imp, size = 1, shape = 17) +
+      # coord_cartesian(xlim = range(c(dta[,2], wass[,2])), 
+      #                 ylim = range(c(dta[,3], wass[,3]))) +
+      coord_cartesian(xlim = range2, 
+                      ylim = range3) +
       theme_minimal() +
       labs(title = "Ground truth vs WI (linear)",
-           x = "Component 2",
-           y = "Component 3")
+           x = "x_{t-1, 2}",
+           y = "x_{t, 3}")
     
-    df1 = data.frame(x = dta[,1], y = dta[,2])
-    temp = data.frame(x = kwass[which(is.na(x_obs[,1])),1],
-                      y = kwass[which(is.na(x_obs[,2])),2])
+    df1 = data.frame(x = dta[1:(nrow(dta) - 1),1], y = dta[2:nrow(dta),2])
+    temp = data.frame(x = na_lag_pairs(kwass[,1], which(is.na(x_obs[,1])))[,1],
+                      y = na_lag_pairs(kwass[,2], which(is.na(x_obs[,1])))[,2])
     p16 = ggplot() +
-      geom_point(data = df1, aes(x = x, y = y), color = "steelblue", size = 1) + 
-      geom_point(data = temp, aes(x = x, y = y), color = "red3", size = 1, shape = 17) +
-      coord_cartesian(xlim = range(c(dta[,1], kwass[,1])), 
-                      ylim = range(c(dta[,2], kwass[,2]))) +
+      geom_point(data = df1, aes(x = x, y = y), color = col_gt, size = 1) + 
+      geom_point(data = temp, aes(x = x, y = y), color = col_imp, size = 1, shape = 17) +
+      # coord_cartesian(xlim = range(c(dta[,1], kwass[,1])), 
+      #                 ylim = range(c(dta[,2], kwass[,2]))) +
+      coord_cartesian(xlim = range1, 
+                      ylim = range2) +
       theme_minimal() +
       labs(title = "Ground truth vs kWI (linear)",
-           x = "Component 1",
-           y = "Component 2")
+           x = "x_{t-1, 1}",
+           y = "x_{t, 2}")
     
-    df1 = data.frame(x = dta[,1], y = dta[,3])
-    temp = data.frame(x = kwass[which(is.na(x_obs[,1])),1],
-                      y = kwass[which(is.na(x_obs[,3])),3])
+    df1 = data.frame(x = dta[1:(nrow(dta) - 1),1], y = dta[2:nrow(dta),3])
+    temp = data.frame(x = na_lag_pairs(kwass[,1], which(is.na(x_obs[,1])))[,1],
+                      y = na_lag_pairs(kwass[,3], which(is.na(x_obs[,1])))[,2])
     p17 = ggplot() +
-      geom_point(data = df1, aes(x = x, y = y), color = "steelblue", size = 1) + 
-      geom_point(data = temp, aes(x = x, y = y), color = "red3", size = 1, shape = 17) +
-      coord_cartesian(xlim = range(c(dta[,1], kwass[,1])), 
-                      ylim = range(c(dta[,3], kwass[,3]))) +
+      geom_point(data = df1, aes(x = x, y = y), color = col_gt, size = 1) + 
+      geom_point(data = temp, aes(x = x, y = y), color = col_imp, size = 1, shape = 17) +
+      # coord_cartesian(xlim = range(c(dta[,1], kwass[,1])), 
+      #                 ylim = range(c(dta[,3], kwass[,3]))) +
+      coord_cartesian(xlim = range1, 
+                      ylim = range3) +
       theme_minimal() +
       labs(title = "Ground truth vs kWI (linear)",
-           x = "Component 1",
-           y = "Component 3")
+           x = "x_{t-1, 1}",
+           y = "x_{t, 3}")
     
-    df1 = data.frame(x = dta[,2], y = dta[,3])
-    temp = data.frame(x = kwass[which(is.na(x_obs[,2])),2],
-                      y = kwass[which(is.na(x_obs[,3])),3])
+    df1 = data.frame(x = dta[1:(nrow(dta) - 1),2], y = dta[2:nrow(dta),3])
+    temp = data.frame(x = na_lag_pairs(kwass[,2], which(is.na(x_obs[,1])))[,1],
+                      y = na_lag_pairs(kwass[,3], which(is.na(x_obs[,1])))[,2])
     p18 = ggplot() +
-      geom_point(data = df1, aes(x = x, y = y), color = "steelblue", size = 1) + 
-      geom_point(data = temp, aes(x = x, y = y), color = "red3", size = 1, shape = 17) +
-      coord_cartesian(xlim = range(c(dta[,2], kwass[,2])), 
-                      ylim = range(c(dta[,3], kwass[,3]))) +
+      geom_point(data = df1, aes(x = x, y = y), color = col_gt, size = 1) + 
+      geom_point(data = temp, aes(x = x, y = y), color = col_imp, size = 1, shape = 17) +
+      # coord_cartesian(xlim = range(c(dta[,2], kwass[,2])), 
+      #                 ylim = range(c(dta[,3], kwass[,3]))) +
+      coord_cartesian(xlim = range2, 
+                      ylim = range3) +
       theme_minimal() +
       labs(title = "Ground truth vs kWI (linear)",
-           x = "Component 2",
-           y = "Component 3")
+           x = "x_{t-1, 2}",
+           y = "x_{t, 3}")
     
-    df1 = data.frame(x = dta[,1], y = dta[,2])
-    temp = data.frame(x = wass_Kalman[which(is.na(x_obs[,1])),1],
-                      y = wass_Kalman[which(is.na(x_obs[,2])),2])
+    df1 = data.frame(x = dta[1:(nrow(dta) - 1),1], y = dta[2:nrow(dta),2])
+    temp = data.frame(x = na_lag_pairs(wass_Kalman[,1], which(is.na(x_obs[,1])))[,1],
+                      y = na_lag_pairs(wass_Kalman[,2], which(is.na(x_obs[,1])))[,2])
     p19 = ggplot() +
-      geom_point(data = df1, aes(x = x, y = y), color = "steelblue", size = 1) + 
-      geom_point(data = temp, aes(x = x, y = y), color = "red3", size = 1, shape = 17) +
-      coord_cartesian(xlim = range(c(dta[,1], wass_Kalman[,1])), 
-                      ylim = range(c(dta[,2], wass_Kalman[,2]))) +
+      geom_point(data = df1, aes(x = x, y = y), color = col_gt, size = 1) + 
+      geom_point(data = temp, aes(x = x, y = y), color = col_imp, size = 1, shape = 17) +
+      # coord_cartesian(xlim = range(c(dta[,1], wass_Kalman[,1])), 
+      #                 ylim = range(c(dta[,2], wass_Kalman[,2]))) +
+      coord_cartesian(xlim = range1, 
+                      ylim = range2) +
       theme_minimal() +
       labs(title = "Ground truth vs WI (Kalman)",
-           x = "Component 1",
-           y = "Component 2")
+           x = "x_{t-1, 1}",
+           y = "x_{t, 2}")
     
-    df1 = data.frame(x = dta[,1], y = dta[,3])
-    temp = data.frame(x = wass_Kalman[which(is.na(x_obs[,1])),1],
-                      y = wass_Kalman[which(is.na(x_obs[,3])),3])
+    df1 = data.frame(x = dta[1:(nrow(dta) - 1),1], y = dta[2:nrow(dta),3])
+    temp = data.frame(x = na_lag_pairs(wass_Kalman[,1], which(is.na(x_obs[,1])))[,1],
+                      y = na_lag_pairs(wass_Kalman[,3], which(is.na(x_obs[,1])))[,2])
     p20 = ggplot() +
-      geom_point(data = df1, aes(x = x, y = y), color = "steelblue", size = 1) + 
-      geom_point(data = temp, aes(x = x, y = y), color = "red3", size = 1, shape = 17) +
-      coord_cartesian(xlim = range(c(dta[,1], wass_Kalman[,1])), 
-                      ylim = range(c(dta[,3], wass_Kalman[,3]))) +
+      geom_point(data = df1, aes(x = x, y = y), color = col_gt, size = 1) + 
+      geom_point(data = temp, aes(x = x, y = y), color = col_imp, size = 1, shape = 17) +
+      # coord_cartesian(xlim = range(c(dta[,1], wass_Kalman[,1])), 
+      #                 ylim = range(c(dta[,3], wass_Kalman[,3]))) +
+      coord_cartesian(xlim = range1, 
+                      ylim = range3) +
       theme_minimal() +
       labs(title = "Ground truth vs WI (Kalman)",
-           x = "Component 1",
-           y = "Component 3")
+           x = "x_{t-1, 1}",
+           y = "x_{t, 3}")
     
-    df1 = data.frame(x = dta[,2], y = dta[,3])
-    temp = data.frame(x = wass_Kalman[which(is.na(x_obs[,2])),2],
-                      y = wass_Kalman[which(is.na(x_obs[,3])),3])
+    df1 = data.frame(x = dta[1:(nrow(dta) - 1),2], y = dta[2:nrow(dta),3])
+    temp = data.frame(x = na_lag_pairs(wass_Kalman[,2], which(is.na(x_obs[,1])))[,1],
+                      y = na_lag_pairs(wass_Kalman[,3], which(is.na(x_obs[,1])))[,2])
     p21 = ggplot() +
-      geom_point(data = df1, aes(x = x, y = y), color = "steelblue", size = 1) + 
-      geom_point(data = temp, aes(x = x, y = y), color = "red3", size = 1, shape = 17) +
-      coord_cartesian(xlim = range(c(dta[,2], wass_Kalman[,2])), 
-                      ylim = range(c(dta[,3], wass_Kalman[,3]))) +
+      geom_point(data = df1, aes(x = x, y = y), color = col_gt, size = 1) + 
+      geom_point(data = temp, aes(x = x, y = y), color = col_imp, size = 1, shape = 17) +
+      # coord_cartesian(xlim = range(c(dta[,2], wass_Kalman[,2])), 
+      #                 ylim = range(c(dta[,3], wass_Kalman[,3]))) +
+      coord_cartesian(xlim = range2, 
+                      ylim = range3) +
       theme_minimal() +
       labs(title = "Ground truth vs WI (Kalman)",
-           x = "Component 2",
-           y = "Component 3")
+           x = "x_{t-1, 2}",
+           y = "x_{t, 3}")
     
-    df1 = data.frame(x = dta[,1], y = dta[,2])
-    temp = data.frame(x = kwass_Kalman[which(is.na(x_obs[,1])),1],
-                      y = kwass_Kalman[which(is.na(x_obs[,2])),2])
+    df1 = data.frame(x = dta[1:(nrow(dta) - 1),1], y = dta[2:nrow(dta),2])
+    temp = data.frame(x = na_lag_pairs(kwass_Kalman[,1], which(is.na(x_obs[,1])))[,1],
+                      y = na_lag_pairs(kwass_Kalman[,2], which(is.na(x_obs[,1])))[,2])
     p22 = ggplot() +
-      geom_point(data = df1, aes(x = x, y = y), color = "steelblue", size = 1) + 
-      geom_point(data = temp, aes(x = x, y = y), color = "red3", size = 1, shape = 17) +
-      coord_cartesian(xlim = range(c(dta[,1], kwass_Kalman[,1])), 
-                      ylim = range(c(dta[,2], kwass_Kalman[,2]))) +
+      geom_point(data = df1, aes(x = x, y = y), color = col_gt, size = 1) + 
+      geom_point(data = temp, aes(x = x, y = y), color = col_imp, size = 1, shape = 17) +
+      # coord_cartesian(xlim = range(c(dta[,1], kwass_Kalman[,1])), 
+      #                 ylim = range(c(dta[,2], kwass_Kalman[,2]))) +
+      coord_cartesian(xlim = range1, 
+                      ylim = range2) +
       theme_minimal() +
       labs(title = "Ground truth vs kWI (Kalman)",
-           x = "Component 1",
-           y = "Component 2")
+           x = "x_{t-1, 1}",
+           y = "x_{t, 2}")
     
-    df1 = data.frame(x = dta[,1], y = dta[,3])
-    temp = data.frame(x = kwass_Kalman[which(is.na(x_obs[,1])),1],
-                      y = kwass_Kalman[which(is.na(x_obs[,3])),3])
+    df1 = data.frame(x = dta[1:(nrow(dta) - 1),1], y = dta[2:nrow(dta),3])
+    temp = data.frame(x = na_lag_pairs(kwass_Kalman[,1], which(is.na(x_obs[,1])))[,1],
+                      y = na_lag_pairs(kwass_Kalman[,3], which(is.na(x_obs[,1])))[,2])
     p23 = ggplot() +
-      geom_point(data = df1, aes(x = x, y = y), color = "steelblue", size = 1) + 
-      geom_point(data = temp, aes(x = x, y = y), color = "red3", size = 1, shape = 17) +
-      coord_cartesian(xlim = range(c(dta[,1], kwass_Kalman[,1])), 
-                      ylim = range(c(dta[,3], kwass_Kalman[,3]))) +
+      geom_point(data = df1, aes(x = x, y = y), color = col_gt, size = 1) + 
+      geom_point(data = temp, aes(x = x, y = y), color = col_imp, size = 1, shape = 17) +
+      # coord_cartesian(xlim = range(c(dta[,1], kwass_Kalman[,1])), 
+      #                 ylim = range(c(dta[,3], kwass_Kalman[,3]))) +
+      coord_cartesian(xlim = range1, 
+                      ylim = range3) +
       theme_minimal() +
       labs(title = "Ground truth vs kWI (Kalman)",
-           x = "Component 1",
-           y = "Component 3")
+           x = "x_{t-1, 1}",
+           y = "x_{t, 3}")
     
-    df1 = data.frame(x = dta[,2], y = dta[,3])
-    temp = data.frame(x = kwass_Kalman[which(is.na(x_obs[,2])),2],
-                      y = kwass_Kalman[which(is.na(x_obs[,3])),3])
+    df1 = data.frame(x = dta[1:(nrow(dta) - 1),2], y = dta[2:nrow(dta),3])
+    temp = data.frame(x = na_lag_pairs(kwass_Kalman[,2], which(is.na(x_obs[,1])))[,1],
+                      y = na_lag_pairs(kwass_Kalman[,3], which(is.na(x_obs[,1])))[,2])
     p24 = ggplot() +
-      geom_point(data = df1, aes(x = x, y = y), color = "steelblue", size = 1) + 
-      geom_point(data = temp, aes(x = x, y = y), color = "red3", size = 1, shape = 17) +
-      coord_cartesian(xlim = range(c(dta[,2], kwass_Kalman[,2])), 
-                      ylim = range(c(dta[,3], kwass_Kalman[,3]))) +
+      geom_point(data = df1, aes(x = x, y = y), color = col_gt, size = 1) + 
+      geom_point(data = temp, aes(x = x, y = y), color = col_imp, size = 1, shape = 17) +
+      # coord_cartesian(xlim = range(c(dta[,2], kwass_Kalman[,2])), 
+      #                 ylim = range(c(dta[,3], kwass_Kalman[,3]))) +
+      coord_cartesian(xlim = range2, 
+                      ylim = range3) +
       theme_minimal() +
       labs(title = "Ground truth vs kWI (Kalman)",
-           x = "Component 2",
-           y = "Component 3")
-    
+           x = "x_{t-1, 2}",
+           y = "x_{t, 3}")
     
     grid.arrange(p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12,
                  nrow = 4, ncol = 3)
     grid.arrange(p13, p14, p15, p16, p17, p18, p19, p20, p21, p22, p23, p24,
                  nrow = 4, ncol = 3)
-    
-    p0 = imp_plot(dta, x_obs, "Ground truth")
-    p1 = imp_plot(lin, x_obs, "Linear")
-    p2 = imp_plot(spl, x_obs, "Spline")
-    p3 = imp_plot(Kalman, x_obs, "Kalman")
-    p4 = imp_plot(PT, x_obs, "ScalarF")
-    p5 = imp_plot(wass, x_obs, "WI (linear)")
-    p6 = imp_plot(kwass, x_obs, "kWI (linear)")
-    p7 = imp_plot(wass_Kalman, x_obs, "WI (Kalman)")
-    p8 = imp_plot(kwass_Kalman, x_obs, "kWI (Kalman)")
-    
-    grid.arrange(p0, p1, p2, p3, p4, p5, p6, p7, p8, nrow=3, ncol=3)
   }
   cat("iteration", sim, "\n")
 }
 
-temp = as.data.frame(as.table(ccf_gt[,,1]))
-temp$Var1 <- factor(temp$Var1, levels = rev(unique(temp$Var1)), labels = c("x3", "x2", "x1"))
-temp$Var2 <- factor(temp$Var2, levels = unique(temp$Var2), labels = c("x1", "x2", "x3"))
-
-p1 = ggplot(temp, aes(Var2, Var1, fill = Freq)) +
-  geom_tile(color = "white") +
-  geom_text(aes(label = round(Freq, 3)), color = "black", size = 3) +
-  scale_fill_gradient(low = "lightblue", high = "steelblue", limits = c(-1, 1)) +
-  theme_minimal()  +
-  labs(title = paste0("Ground truth (cross-correlation Lag ", 0, ")"),
-       x = "",
-       y = "")
-
-temp = as.data.frame(as.table(ccf_gt[,,2]))
-temp$Var1 <- factor(temp$Var1, levels = rev(unique(temp$Var1)), labels = c("x3", "x2", "x1"))
-temp$Var2 <- factor(temp$Var2, levels = unique(temp$Var2), labels = c("x1", "x2", "x3"))
-
-p2 = ggplot(temp, aes(Var2, Var1, fill = Freq)) +
-  geom_tile(color = "white") +
-  geom_text(aes(label = round(Freq, 3)), color = "black", size = 3) +
-  scale_fill_gradient(low = "lightblue", high = "steelblue", limits = c(-1, 1)) +
-  theme_minimal()  +
-  labs(title = paste0("Ground truth (cross-correlation Lag ", 1, ")"),
-       x = "",
-       y = "") +
-  theme(legend.position = "none")
-
-temp = as.data.frame(as.table(ccf_gt[,,4]))
-temp$Var1 <- factor(temp$Var1, levels = rev(unique(temp$Var1)), labels = c("x3", "x2", "x1"))
-temp$Var2 <- factor(temp$Var2, levels = unique(temp$Var2), labels = c("x1", "x2", "x3"))
-
-p3 = ggplot(temp, aes(Var2, Var1, fill = Freq)) +
-  geom_tile(color = "white") +
-  geom_text(aes(label = round(Freq, 3)), color = "black", size = 3) +
-  scale_fill_gradient(low = "lightblue", high = "steelblue", limits = c(-1, 1)) +
-  theme_minimal()  +
-  labs(title = paste0("Ground truth (cross-correlation Lag ", -1, ")"),
-       x = "",
-       y = "") +
-  theme(legend.position = "none")
-
-temp = as.data.frame(as.table(ccfs[,,1,1]))
-temp$Var1 <- factor(temp$Var1, levels = rev(unique(temp$Var1)), labels = c("x3", "x2", "x1"))
-temp$Var2 <- factor(temp$Var2, levels = unique(temp$Var2), labels = c("x1", "x2", "x3"))
-
-p4 = ggplot(temp, aes(Var2, Var1, fill = Freq)) +
-  geom_tile(color = "white") +
-  geom_text(aes(label = round(Freq, 3)), color = "black", size = 3) +
-  scale_fill_gradient(low = "lightblue", high = "steelblue", limits = c(-1, 1)) +
-  theme_minimal()  +
-  labs(title = paste0("Linear (cross-correlation Lag ", 0, ")"),
-       x = "",
-       y = "") +
-  theme(legend.position = "none")
-
-
-temp = as.data.frame(as.table(ccfs[,,2,1]))
-temp$Var1 <- factor(temp$Var1, levels = rev(unique(temp$Var1)), labels = c("x3", "x2", "x1"))
-temp$Var2 <- factor(temp$Var2, levels = unique(temp$Var2), labels = c("x1", "x2", "x3"))
-
-p5 = ggplot(temp, aes(Var2, Var1, fill = Freq)) +
-  geom_tile(color = "white") +
-  geom_text(aes(label = round(Freq, 3)), color = "black", size = 3) +
-  scale_fill_gradient(low = "lightblue", high = "steelblue", limits = c(-1, 1)) +
-  theme_minimal()  +
-  labs(title = paste0("Linear (cross-correlation Lag ", 1, ")"),
-       x = "",
-       y = "") +
-  theme(legend.position = "none")
-
-temp = as.data.frame(as.table(ccfs[,,4,1]))
-temp$Var1 <- factor(temp$Var1, levels = rev(unique(temp$Var1)), labels = c("x3", "x2", "x1"))
-temp$Var2 <- factor(temp$Var2, levels = unique(temp$Var2), labels = c("x1", "x2", "x3"))
-
-p6 = ggplot(temp, aes(Var2, Var1, fill = Freq)) +
-  geom_tile(color = "white") +
-  geom_text(aes(label = round(Freq, 3)), color = "black", size = 3) +
-  scale_fill_gradient(low = "lightblue", high = "steelblue", limits = c(-1, 1)) +
-  theme_minimal()  +
-  labs(title = paste0("Linear (cross-correlation Lag ", -1, ")"),
-       x = "",
-       y = "") +
-  theme(legend.position = "none")
-
-temp = as.data.frame(as.table(ccfs[,,1,2]))
-temp$Var1 <- factor(temp$Var1, levels = rev(unique(temp$Var1)), labels = c("x3", "x2", "x1"))
-temp$Var2 <- factor(temp$Var2, levels = unique(temp$Var2), labels = c("x1", "x2", "x3"))
-
-p7 = ggplot(temp, aes(Var2, Var1, fill = Freq)) +
-  geom_tile(color = "white") +
-  geom_text(aes(label = round(Freq, 3)), color = "black", size = 3) +
-  scale_fill_gradient(low = "lightblue", high = "steelblue", limits = c(-1, 1)) +
-  theme_minimal()  +
-  labs(title = paste0("Spline (cross-correlation Lag ", 0, ")"),
-       x = "",
-       y = "") +
-  theme(legend.position = "none")
-
-
-temp = as.data.frame(as.table(ccfs[,,2,2]))
-temp$Var1 <- factor(temp$Var1, levels = rev(unique(temp$Var1)), labels = c("x3", "x2", "x1"))
-temp$Var2 <- factor(temp$Var2, levels = unique(temp$Var2), labels = c("x1", "x2", "x3"))
-
-p8 = ggplot(temp, aes(Var2, Var1, fill = Freq)) +
-  geom_tile(color = "white") +
-  geom_text(aes(label = round(Freq, 3)), color = "black", size = 3) +
-  scale_fill_gradient(low = "lightblue", high = "steelblue", limits = c(-1, 1)) +
-  theme_minimal()  +
-  labs(title = paste0("Spline (cross-correlation Lag ", 1, ")"),
-       x = "",
-       y = "") +
-  theme(legend.position = "none")
-
-temp = as.data.frame(as.table(ccfs[,,4,2]))
-temp$Var1 <- factor(temp$Var1, levels = rev(unique(temp$Var1)), labels = c("x3", "x2", "x1"))
-temp$Var2 <- factor(temp$Var2, levels = unique(temp$Var2), labels = c("x1", "x2", "x3"))
-
-p9 = ggplot(temp, aes(Var2, Var1, fill = Freq)) +
-  geom_tile(color = "white") +
-  geom_text(aes(label = round(Freq, 3)), color = "black", size = 3) +
-  scale_fill_gradient(low = "lightblue", high = "steelblue", limits = c(-1, 1)) +
-  theme_minimal()  +
-  labs(title = paste0("Spline (cross-correlation Lag ", -1, ")"),
-       x = "",
-       y = "") +
-  theme(legend.position = "none")
-
-temp = as.data.frame(as.table(ccfs[,,1,3]))
-temp$Var1 <- factor(temp$Var1, levels = rev(unique(temp$Var1)), labels = c("x3", "x2", "x1"))
-temp$Var2 <- factor(temp$Var2, levels = unique(temp$Var2), labels = c("x1", "x2", "x3"))
-
-p10 = ggplot(temp, aes(Var2, Var1, fill = Freq)) +
-  geom_tile(color = "white") +
-  geom_text(aes(label = round(Freq, 3)), color = "black", size = 3) +
-  scale_fill_gradient(low = "lightblue", high = "steelblue", limits = c(-1, 1)) +
-  theme_minimal()  +
-  labs(title = paste0("Kalman (cross-correlation Lag ", 0, ")"),
-       x = "",
-       y = "") +
-  theme(legend.position = "none")
-
-
-temp = as.data.frame(as.table(ccfs[,,2,3]))
-temp$Var1 <- factor(temp$Var1, levels = rev(unique(temp$Var1)), labels = c("x3", "x2", "x1"))
-temp$Var2 <- factor(temp$Var2, levels = unique(temp$Var2), labels = c("x1", "x2", "x3"))
-
-p11 = ggplot(temp, aes(Var2, Var1, fill = Freq)) +
-  geom_tile(color = "white") +
-  geom_text(aes(label = round(Freq, 3)), color = "black", size = 3) +
-  scale_fill_gradient(low = "lightblue", high = "steelblue", limits = c(-1, 1)) +
-  theme_minimal()  +
-  labs(title = paste0("Kalman (cross-correlation Lag ", 1, ")"),
-       x = "",
-       y = "") +
-  theme(legend.position = "none")
-
-temp = as.data.frame(as.table(ccfs[,,4,3]))
-temp$Var1 <- factor(temp$Var1, levels = rev(unique(temp$Var1)), labels = c("x3", "x2", "x1"))
-temp$Var2 <- factor(temp$Var2, levels = unique(temp$Var2), labels = c("x1", "x2", "x3"))
-
-p12 = ggplot(temp, aes(Var2, Var1, fill = Freq)) +
-  geom_tile(color = "white") +
-  geom_text(aes(label = round(Freq, 3)), color = "black", size = 3) +
-  scale_fill_gradient(low = "lightblue", high = "steelblue", limits = c(-1, 1)) +
-  theme_minimal()  +
-  labs(title = paste0("Kalman (cross-correlation Lag ", -1, ")"),
-       x = "",
-       y = "") +
-  theme(legend.position = "none")
-
-temp = as.data.frame(as.table(ccfs[,,1,4]))
-temp$Var1 <- factor(temp$Var1, levels = rev(unique(temp$Var1)), labels = c("x3", "x2", "x1"))
-temp$Var2 <- factor(temp$Var2, levels = unique(temp$Var2), labels = c("x1", "x2", "x3"))
-
-p13 = ggplot(temp, aes(Var2, Var1, fill = Freq)) +
-  geom_tile(color = "white") +
-  geom_text(aes(label = round(Freq, 3)), color = "black", size = 3) +
-  scale_fill_gradient(low = "lightblue", high = "steelblue", limits = c(-1, 1)) +
-  theme_minimal()  +
-  labs(title = paste0("ScalarF (cross-correlation Lag ", 0, ")"),
-       x = "",
-       y = "") +
-  theme(legend.position = "none")
-
-
-temp = as.data.frame(as.table(ccfs[,,2,4]))
-temp$Var1 <- factor(temp$Var1, levels = rev(unique(temp$Var1)), labels = c("x3", "x2", "x1"))
-temp$Var2 <- factor(temp$Var2, levels = unique(temp$Var2), labels = c("x1", "x2", "x3"))
-
-p14 = ggplot(temp, aes(Var2, Var1, fill = Freq)) +
-  geom_tile(color = "white") +
-  geom_text(aes(label = round(Freq, 3)), color = "black", size = 3) +
-  scale_fill_gradient(low = "lightblue", high = "steelblue", limits = c(-1, 1)) +
-  theme_minimal()  +
-  labs(title = paste0("ScalarF (cross-correlation Lag ", 1, ")"),
-       x = "",
-       y = "") +
-  theme(legend.position = "none")
-
-temp = as.data.frame(as.table(ccfs[,,4,4]))
-temp$Var1 <- factor(temp$Var1, levels = rev(unique(temp$Var1)), labels = c("x3", "x2", "x1"))
-temp$Var2 <- factor(temp$Var2, levels = unique(temp$Var2), labels = c("x1", "x2", "x3"))
-
-p15 = ggplot(temp, aes(Var2, Var1, fill = Freq)) +
-  geom_tile(color = "white") +
-  geom_text(aes(label = round(Freq, 3)), color = "black", size = 3) +
-  scale_fill_gradient(low = "lightblue", high = "steelblue", limits = c(-1, 1)) +
-  theme_minimal()  +
-  labs(title = paste0("ScalarF (cross-correlation Lag ", -1, ")"),
-       x = "",
-       y = "") +
-  theme(legend.position = "none")
-
-grid.arrange(p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12, p13, p14, p15,
-             nrow = 5, ncol = 3)
-
-temp = as.data.frame(as.table(ccf_gt[,,1]))
-temp$Var1 <- factor(temp$Var1, levels = rev(unique(temp$Var1)), labels = c("x3", "x2", "x1"))
-temp$Var2 <- factor(temp$Var2, levels = unique(temp$Var2), labels = c("x1", "x2", "x3"))
-
-p1 = ggplot(temp, aes(Var2, Var1, fill = Freq)) +
-  geom_tile(color = "white") +
-  geom_text(aes(label = round(Freq, 3)), color = "black", size = 3) +
-  scale_fill_gradient(low = "lightblue", high = "steelblue", limits = c(-1, 1)) +
-  theme_minimal()  +
-  labs(title = paste0("Ground truth (cross-correlation Lag ", 0, ")"),
-       x = "",
-       y = "")
-
-temp = as.data.frame(as.table(ccf_gt[,,2]))
-temp$Var1 <- factor(temp$Var1, levels = rev(unique(temp$Var1)), labels = c("x3", "x2", "x1"))
-temp$Var2 <- factor(temp$Var2, levels = unique(temp$Var2), labels = c("x1", "x2", "x3"))
-
-p2 = ggplot(temp, aes(Var2, Var1, fill = Freq)) +
-  geom_tile(color = "white") +
-  geom_text(aes(label = round(Freq, 3)), color = "black", size = 3) +
-  scale_fill_gradient(low = "lightblue", high = "steelblue", limits = c(-1, 1)) +
-  theme_minimal()  +
-  labs(title = paste0("Ground truth (cross-correlation Lag ", 1, ")"),
-       x = "",
-       y = "") +
-  theme(legend.position = "none")
-
-temp = as.data.frame(as.table(ccf_gt[,,4]))
-temp$Var1 <- factor(temp$Var1, levels = rev(unique(temp$Var1)), labels = c("x3", "x2", "x1"))
-temp$Var2 <- factor(temp$Var2, levels = unique(temp$Var2), labels = c("x1", "x2", "x3"))
-
-p3 = ggplot(temp, aes(Var2, Var1, fill = Freq)) +
-  geom_tile(color = "white") +
-  geom_text(aes(label = round(Freq, 3)), color = "black", size = 3) +
-  scale_fill_gradient(low = "lightblue", high = "steelblue", limits = c(-1, 1)) +
-  theme_minimal()  +
-  labs(title = paste0("Ground truth (cross-correlation Lag ", -1, ")"),
-       x = "",
-       y = "") +
-  theme(legend.position = "none")
-
-temp = as.data.frame(as.table(ccfs[,,1,5]))
-temp$Var1 <- factor(temp$Var1, levels = rev(unique(temp$Var1)), labels = c("x3", "x2", "x1"))
-temp$Var2 <- factor(temp$Var2, levels = unique(temp$Var2), labels = c("x1", "x2", "x3"))
-
-p4 = ggplot(temp, aes(Var2, Var1, fill = Freq)) +
-  geom_tile(color = "white") +
-  geom_text(aes(label = round(Freq, 3)), color = "black", size = 3) +
-  scale_fill_gradient(low = "lightblue", high = "steelblue", limits = c(-1, 1)) +
-  theme_minimal()  +
-  labs(title = paste0("WI-lin (cross-correlation Lag ", 0, ")"),
-       x = "",
-       y = "") +
-  theme(legend.position = "none")
-
-
-temp = as.data.frame(as.table(ccfs[,,2,5]))
-temp$Var1 <- factor(temp$Var1, levels = rev(unique(temp$Var1)), labels = c("x3", "x2", "x1"))
-temp$Var2 <- factor(temp$Var2, levels = unique(temp$Var2), labels = c("x1", "x2", "x3"))
-
-p5 = ggplot(temp, aes(Var2, Var1, fill = Freq)) +
-  geom_tile(color = "white") +
-  geom_text(aes(label = round(Freq, 3)), color = "black", size = 3) +
-  scale_fill_gradient(low = "lightblue", high = "steelblue", limits = c(-1, 1)) +
-  theme_minimal()  +
-  labs(title = paste0("WI-lin (cross-correlation Lag ", 1, ")"),
-       x = "",
-       y = "") +
-  theme(legend.position = "none")
-
-temp = as.data.frame(as.table(ccfs[,,4,5]))
-temp$Var1 <- factor(temp$Var1, levels = rev(unique(temp$Var1)), labels = c("x3", "x2", "x1"))
-temp$Var2 <- factor(temp$Var2, levels = unique(temp$Var2), labels = c("x1", "x2", "x3"))
-
-p6 = ggplot(temp, aes(Var2, Var1, fill = Freq)) +
-  geom_tile(color = "white") +
-  geom_text(aes(label = round(Freq, 3)), color = "black", size = 3) +
-  scale_fill_gradient(low = "lightblue", high = "steelblue", limits = c(-1, 1)) +
-  theme_minimal()  +
-  labs(title = paste0("WI-lin (cross-correlation Lag ", -1, ")"),
-       x = "",
-       y = "") +
-  theme(legend.position = "none")
-
-temp = as.data.frame(as.table(ccfs[,,1,6]))
-temp$Var1 <- factor(temp$Var1, levels = rev(unique(temp$Var1)), labels = c("x3", "x2", "x1"))
-temp$Var2 <- factor(temp$Var2, levels = unique(temp$Var2), labels = c("x1", "x2", "x3"))
-
-p7 = ggplot(temp, aes(Var2, Var1, fill = Freq)) +
-  geom_tile(color = "white") +
-  geom_text(aes(label = round(Freq, 3)), color = "black", size = 3) +
-  scale_fill_gradient(low = "lightblue", high = "steelblue", limits = c(-1, 1)) +
-  theme_minimal()  +
-  labs(title = paste0("kWI-lin (cross-correlation Lag ", 0, ")"),
-       x = "",
-       y = "") +
-  theme(legend.position = "none")
-
-
-temp = as.data.frame(as.table(ccfs[,,2,6]))
-temp$Var1 <- factor(temp$Var1, levels = rev(unique(temp$Var1)), labels = c("x3", "x2", "x1"))
-temp$Var2 <- factor(temp$Var2, levels = unique(temp$Var2), labels = c("x1", "x2", "x3"))
-
-p8 = ggplot(temp, aes(Var2, Var1, fill = Freq)) +
-  geom_tile(color = "white") +
-  geom_text(aes(label = round(Freq, 3)), color = "black", size = 3) +
-  scale_fill_gradient(low = "lightblue", high = "steelblue", limits = c(-1, 1)) +
-  theme_minimal()  +
-  labs(title = paste0("kWI-lin (cross-correlation Lag ", 1, ")"),
-       x = "",
-       y = "") +
-  theme(legend.position = "none")
-
-temp = as.data.frame(as.table(ccfs[,,4,6]))
-temp$Var1 <- factor(temp$Var1, levels = rev(unique(temp$Var1)), labels = c("x3", "x2", "x1"))
-temp$Var2 <- factor(temp$Var2, levels = unique(temp$Var2), labels = c("x1", "x2", "x3"))
-
-p9 = ggplot(temp, aes(Var2, Var1, fill = Freq)) +
-  geom_tile(color = "white") +
-  geom_text(aes(label = round(Freq, 3)), color = "black", size = 3) +
-  scale_fill_gradient(low = "lightblue", high = "steelblue", limits = c(-1, 1)) +
-  theme_minimal()  +
-  labs(title = paste0("kWI-lin (cross-correlation Lag ", -1, ")"),
-       x = "",
-       y = "") +
-  theme(legend.position = "none")
-
-temp = as.data.frame(as.table(ccfs[,,1,7]))
-temp$Var1 <- factor(temp$Var1, levels = rev(unique(temp$Var1)), labels = c("x3", "x2", "x1"))
-temp$Var2 <- factor(temp$Var2, levels = unique(temp$Var2), labels = c("x1", "x2", "x3"))
-
-p10 = ggplot(temp, aes(Var2, Var1, fill = Freq)) +
-  geom_tile(color = "white") +
-  geom_text(aes(label = round(Freq, 3)), color = "black", size = 3) +
-  scale_fill_gradient(low = "lightblue", high = "steelblue", limits = c(-1, 1)) +
-  theme_minimal()  +
-  labs(title = paste0("WI-Kalman (cross-correlation Lag ", 0, ")"),
-       x = "",
-       y = "") +
-  theme(legend.position = "none")
-
-temp = as.data.frame(as.table(ccfs[,,2,7]))
-temp$Var1 <- factor(temp$Var1, levels = rev(unique(temp$Var1)), labels = c("x3", "x2", "x1"))
-temp$Var2 <- factor(temp$Var2, levels = unique(temp$Var2), labels = c("x1", "x2", "x3"))
-
-p11 = ggplot(temp, aes(Var2, Var1, fill = Freq)) +
-  geom_tile(color = "white") +
-  geom_text(aes(label = round(Freq, 3)), color = "black", size = 3) +
-  scale_fill_gradient(low = "lightblue", high = "steelblue", limits = c(-1, 1)) +
-  theme_minimal()  +
-  labs(title = paste0("WI-Kalman (cross-correlation Lag ", 1, ")"),
-       x = "",
-       y = "") +
-  theme(legend.position = "none")
-
-temp = as.data.frame(as.table(ccfs[,,4,7]))
-temp$Var1 <- factor(temp$Var1, levels = rev(unique(temp$Var1)), labels = c("x3", "x2", "x1"))
-temp$Var2 <- factor(temp$Var2, levels = unique(temp$Var2), labels = c("x1", "x2", "x3"))
-
-p12 = ggplot(temp, aes(Var2, Var1, fill = Freq)) +
-  geom_tile(color = "white") +
-  geom_text(aes(label = round(Freq, 3)), color = "black", size = 3) +
-  scale_fill_gradient(low = "lightblue", high = "steelblue", limits = c(-1, 1)) +
-  theme_minimal()  +
-  labs(title = paste0("WI-Kalman (cross-correlation Lag ", -1, ")"),
-       x = "",
-       y = "") +
-  theme(legend.position = "none")
-
-temp = as.data.frame(as.table(ccfs[,,1,8]))
-temp$Var1 <- factor(temp$Var1, levels = rev(unique(temp$Var1)), labels = c("x3", "x2", "x1"))
-temp$Var2 <- factor(temp$Var2, levels = unique(temp$Var2), labels = c("x1", "x2", "x3"))
-
-p13 = ggplot(temp, aes(Var2, Var1, fill = Freq)) +
-  geom_tile(color = "white") +
-  geom_text(aes(label = round(Freq, 3)), color = "black", size = 3) +
-  scale_fill_gradient(low = "lightblue", high = "steelblue", limits = c(-1, 1)) +
-  theme_minimal()  +
-  labs(title = paste0("kWI-Kalman (cross-correlation Lag ", 0, ")"),
-       x = "",
-       y = "") +
-  theme(legend.position = "none")
-
-temp = as.data.frame(as.table(ccfs[,,2,8]))
-temp$Var1 <- factor(temp$Var1, levels = rev(unique(temp$Var1)), labels = c("x3", "x2", "x1"))
-temp$Var2 <- factor(temp$Var2, levels = unique(temp$Var2), labels = c("x1", "x2", "x3"))
-
-p14 = ggplot(temp, aes(Var2, Var1, fill = Freq)) +
-  geom_tile(color = "white") +
-  geom_text(aes(label = round(Freq, 3)), color = "black", size = 3) +
-  scale_fill_gradient(low = "lightblue", high = "steelblue", limits = c(-1, 1)) +
-  theme_minimal()  +
-  labs(title = paste0("kWI-Kalman (cross-correlation Lag ", 1, ")"),
-       x = "",
-       y = "") +
-  theme(legend.position = "none")
-
-temp = as.data.frame(as.table(ccfs[,,4,8]))
-temp$Var1 <- factor(temp$Var1, levels = rev(unique(temp$Var1)), labels = c("x3", "x2", "x1"))
-temp$Var2 <- factor(temp$Var2, levels = unique(temp$Var2), labels = c("x1", "x2", "x3"))
-
-p15 = ggplot(temp, aes(Var2, Var1, fill = Freq)) +
-  geom_tile(color = "white") +
-  geom_text(aes(label = round(Freq, 3)), color = "black", size = 3) +
-  scale_fill_gradient(low = "lightblue", high = "steelblue", limits = c(-1, 1)) +
-  theme_minimal()  +
-  labs(title = paste0("kWI-Kalman (cross-correlation Lag ", -1, ")"),
-       x = "",
-       y = "") +
-  theme(legend.position = "none")
-
-grid.arrange(p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12, p13, p14, p15,
-             nrow = 5, ncol = 3)
-
-
 print(round(colMeans(wass_d), 4))
 print(round(sqrt(ccf_loss / 1000), 4))
-
-
-
-
-
-
-
 

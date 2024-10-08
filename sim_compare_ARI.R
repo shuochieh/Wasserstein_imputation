@@ -25,7 +25,7 @@ na_lag_pairs = function (x, missing_idx, h = 1) {
 
 model_estimate = function (x, model) {
   if (model == "ARI") {
-    temp = arima(x, order = c(1, 0, 0), include.mean = F)
+    temp = arima(x, order = c(1, 0, 1), include.mean = F)
     return (unname(temp$coef))
   } else if (model == "Cyc") {
     temp = arima(x, order = c(1, 0, 0), include.mean = F)
@@ -220,9 +220,9 @@ for (sim in 1:1000) {
 par(mfrow = c(3, 3))
 for (i in 1:9) {
   if (i == 1) {
-    hist(model_coef[[1]], prob = TRUE, col = "lightblue", 
-         main = "Ground truth", xlab = "")
-    lines(density(model_coef[[1]]), col = "blue", lwd = 2)
+    hist(model_coef[[1]][,1], prob = TRUE, col = "lightblue", 
+         main = "Ground truth ", xlab = "")
+    lines(density(model_coef[[1]][,1]), col = "blue", lwd = 2)
   } else {
     if (i == 2) {
       method = "Linear"
@@ -241,10 +241,39 @@ for (i in 1:9) {
     } else {
       method = "kWI (Kalman)"
     }
-    hist(model_coef[[i]], prob = TRUE, col = "lightblue", 
-         main = method,
-         xlab = "")
-    lines(density(model_coef[[1]]), col = "blue", lwd = 2)
+    hist(model_coef[[i]][,1], prob = TRUE, col = "lightblue", 
+         main = paste0(method, ": phi1"),
+         xlab = "", breaks = 15)
+    lines(density(model_coef[[1]][,1]), col = "blue", lwd = 2)
+  }
+}
+for (i in 1:9) {
+  if (i == 1) {
+    hist(model_coef[[1]][,2], prob = TRUE, col = "lightblue", 
+         main = "Ground truth ", xlab = "")
+    lines(density(model_coef[[1]][,2]), col = "blue", lwd = 2)
+  } else {
+    if (i == 2) {
+      method = "Linear"
+    } else if (i == 3) {
+      method = "Spline"
+    } else if (i == 4) {
+      method = "Kalman"
+    } else if (i == 5) {
+      method = "Scalar filter"
+    } else if (i == 6) {
+      method = "WI (linear)"
+    } else if (i == 7) {
+      method = "kWI (linear)"
+    } else if (i == 8) {
+      method = "WI (Kalman)"
+    } else {
+      method = "kWI (Kalman)"
+    }
+    hist(model_coef[[i]][,2], prob = TRUE, col = "lightblue", 
+         main = paste0(method, ": phi2"),
+         xlab = "", breaks = 15)
+    lines(density(model_coef[[1]][,2]), col = "blue", lwd = 2)
   }
 }
 for (j in 1:3) {
@@ -274,7 +303,7 @@ for (j in 1:3) {
       }
       hist(acfs[,((i - 1) * 6) + j + 1], prob = TRUE, col = "lightblue", 
            main = paste0(method, ": ACF Lag ", j),
-           xlab = "")
+           xlab = "", breaks = 15)
       lines(density(acfs[,j + 1]), col = "blue", lwd = 2)
     }
   }
@@ -514,9 +543,9 @@ for (sim in 1:1000) {
 par(mfrow = c(3, 3))
 for (i in 1:9) {
   if (i == 1) {
-    hist(model_coef[[1]], prob = TRUE, col = "lightblue", 
-         main = "Ground truth", xlab = "")
-    lines(density(model_coef[[1]]), col = "blue", lwd = 2)
+    hist(model_coef[[1]][,1], prob = TRUE, col = "lightblue", 
+         main = "Ground truth ", xlab = "")
+    lines(density(model_coef[[1]][,1]), col = "blue", lwd = 2)
   } else {
     if (i == 2) {
       method = "Linear"
@@ -535,10 +564,39 @@ for (i in 1:9) {
     } else {
       method = "kWI (Kalman)"
     }
-    hist(model_coef[[i]], prob = TRUE, col = "lightblue", 
-         main = method,
-         xlab = "")
-    lines(density(model_coef[[1]]), col = "blue", lwd = 2)
+    hist(model_coef[[i]][,1], prob = TRUE, col = "lightblue", 
+         main = paste0(method, ": phi1"),
+         xlab = "", breaks = 15)
+    lines(density(model_coef[[1]][,1]), col = "blue", lwd = 2)
+  }
+}
+for (i in 1:9) {
+  if (i == 1) {
+    hist(model_coef[[1]][,2], prob = TRUE, col = "lightblue", 
+         main = "Ground truth ", xlab = "")
+    lines(density(model_coef[[1]][,2]), col = "blue", lwd = 2)
+  } else {
+    if (i == 2) {
+      method = "Linear"
+    } else if (i == 3) {
+      method = "Spline"
+    } else if (i == 4) {
+      method = "Kalman"
+    } else if (i == 5) {
+      method = "Scalar filter"
+    } else if (i == 6) {
+      method = "WI (linear)"
+    } else if (i == 7) {
+      method = "kWI (linear)"
+    } else if (i == 8) {
+      method = "WI (Kalman)"
+    } else {
+      method = "kWI (Kalman)"
+    }
+    hist(model_coef[[i]][,2], prob = TRUE, col = "lightblue", 
+         main = paste0(method, ": phi2"),
+         xlab = "", breaks = 15)
+    lines(density(model_coef[[1]][,2]), col = "blue", lwd = 2)
   }
 }
 for (j in 1:3) {

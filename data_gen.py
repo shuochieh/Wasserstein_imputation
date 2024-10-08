@@ -66,7 +66,7 @@ def alr_composition(n, k, A):
     res = np.zeros((n + 100, k))
     x = np.zeros((n + 100, k - 1))
     for i in range(4, n + 100):
-        x[i,:] = np.array([0.1] + [0.1] * (k - 2)) + np.dot(A, x[i - 1,:]) + 0.15 * x[i - 4,:] + np.random.normal(size = k - 1, scale = 0.1)
+        x[i,:] = np.array([0.1] + [0.1] * (k - 2)) + np.dot(A, x[i - 1,:]) + np.random.normal(size = 1, scale = 0.2)
         res[i, k - 1] = 1 / (1 + np.sum(np.exp(x[i,:])))
         for j in range(k - 1):
             res[i, j] = res[i,k - 1] * np.exp(x[i, j])
@@ -120,14 +120,30 @@ plt.plot(x[:(n - 1)], x[1:], 'co')
 plt.title("GARCH(1,1): original series")
 plt.show()
 
-A = np.array([[0.75, -0.1], [0, 0.5]])
-x, a = alr_composition(n, 3, A)
-plt.plot(np.linspace(0, n - 1, n), x[:,0], 'r-')
-plt.plot(np.linspace(0, n - 1, n), x[:,1], 'g-')
-plt.plot(np.linspace(0, n - 1, n), x[:,2], 'b-')
+#%%
+A = np.array([[0.7, -0.5], [0.0, -0.7]])
+x, a = alr_composition(300, 3, A)
+plt.plot(np.linspace(0, 300 - 1, 300), x[:,0], 'r-')
+plt.show()
+plt.plot(np.linspace(0, 300 - 1, 300), x[:,1], 'g-')
+plt.show()
+plt.plot(np.linspace(0, 300 - 1, 300), x[:,2], 'b-')
 plt.title("ALR: original series")
 plt.show()
 
+plt.plot(x[:299,0], x[1:,0], 'r.')
+plt.plot(x[:299,1], x[1:,1], 'g.')
+plt.plot(x[:299,2], x[1:,2], 'b.')
+plt.show()
+
+plt.plot(x[:,0], x[:,1], 'r.')
+plt.show()
+plt.plot(x[:,0], x[:,2], 'g.')
+plt.show()
+plt.plot(x[:,1], x[:,2], 'b.')
+plt.show()
+
+#%%
 x, dx = ARI_sim(n, -0.7)
 plt.plot(np.linspace(0, n - 1, n), x[:,0], 'r-')
 plt.title("ARI(1,1): original series")
@@ -164,6 +180,7 @@ m2 = []
 for i in temp:
     m2.extend(list(int(i) + np.array([1,2,3,4,5,6])))
 
+#%%
 # AR(1) Model
 res_original = np.zeros((n, n_exper))
 res_miss1 = np.zeros((n, n_exper))
@@ -311,7 +328,7 @@ res_original = np.zeros((n, n_exper * 3))
 res_miss1 = np.zeros((n, n_exper * 3))
 res_miss2 = np.zeros((n, n_exper * 3))
 
-A = np.array([[0.75, -0.1], [0, 0.5]])
+A = np.array([[0.7, -0.5], [0.0, -0.7]])
 
 for b in range(n_exper):
     temp, _ = alr_composition(n, 3, A)

@@ -1178,7 +1178,7 @@ for (j in 1:3) {
       }
       hist(acfs[,((i - 1) * 6) + j + 1], prob = TRUE, col = "lightblue", 
            main = paste0(method, ": ACF Lag ", j),
-           xlab = "")
+           xlab = "", breaks = 15)
       lines(density(acfs[,j + 1]), col = "blue", lwd = 2)
     }
   }
@@ -1519,7 +1519,7 @@ for (j in 1:3) {
       }
       hist(acfs[,((i - 1) * 6) + j + 1], prob = TRUE, col = "lightblue", 
            main = paste0(method, ": ACF Lag ", j),
-           xlab = "")
+           xlab = "", breaks = 15)
       lines(density(acfs[,j + 1]), col = "blue", lwd = 2)
     }
   }
