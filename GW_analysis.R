@@ -67,88 +67,89 @@ WI_Kalman = unname(as.matrix(read.csv("./real_data/WI_Kalman.csv", header = F)))
 kWI_Kalman = unname(as.matrix(read.csv("./real_data/kWI_Kalman.csv", header = F)))
 
 # Factor analysis
-par(mfrow = c(6, 2), mar = c(0.5, 2, 1, 0.5))
+par(mfrow = c(4, 2), mar = c(2.5, 2, 1, 0.5))
 r = 2
 
 # linear 
 lin_fac = LYB_FM(lin_imp, r, 6)
 temp = lin_fac$f_hat
+temp[,1] = -temp[,1]
 for (ii in 1:r) {
-  plot(temp[,ii], type = "l", lwd = 1, xlab = "", ylab = "",
+  plot(x = seq(from = as.Date("1992-10-01"), to = as.Date("2020-08-01"), by = "month"),
+       y = temp[,ii], type = "l", lwd = 1, xlab = "", ylab = "",
        main = paste("Estimated factor", ii, "(linear)"),
-       ylim = range(temp, na.rm = TRUE),
-       xaxt = "n")
-  abline(v = 120, col = "red")
+       ylim = range(temp, na.rm = TRUE))
+  abline(v = as.Date("2002-01-01"), col = "red", lty = 2)
 }
 
 # spline
 spl_fac = LYB_FM(spl_imp, r, 6)
 temp = spl_fac$f_hat
+temp[,1] = -temp[,1]
 for (ii in 1:r) {
-  plot(temp[,ii], type = "l", lwd = 1, xlab = "", ylab = "",
+  plot(x = seq(from = as.Date("1992-10-01"), to = as.Date("2020-08-01"), by = "month"),
+       y = temp[,ii], type = "l", lwd = 1, xlab = "", ylab = "",
        main = paste("Estimated factor", ii, "(spline)"),
-       ylim = range(temp, na.rm = TRUE),
-       xaxt = "n")
-  abline(v = 120, col = "red")
+       ylim = range(temp, na.rm = TRUE))
+  abline(v = as.Date("2002-01-01"), col = "red", lty = 2)
 }
 
 # Kalman
 KS_fac = LYB_FM(KS_imp, r, 6)
 temp = KS_fac$f_hat
 for (ii in 1:r) {
-  plot(temp[,ii], type = "l", lwd = 1, xlab = "", ylab = "",
+  plot(x = seq(from = as.Date("1992-10-01"), to = as.Date("2020-08-01"), by = "month"),
+       y = temp[,ii], type = "l", lwd = 1, xlab = "", ylab = "",
        main = paste("Estimated factor", ii, "(Kalman)"),
-       ylim = range(temp, na.rm = TRUE),
-       xaxt = "n")
-  abline(v = 120, col = "red")
+       ylim = range(temp, na.rm = TRUE))
+  abline(v = as.Date("2002-01-01"), col = "red", lty = 2)
 }
 
 # Scalar filter
 SF_fac = LYB_FM(SF_imp, r, 6)
 temp = SF_fac$f_hat
 for (ii in 1:r) {
-  plot(temp[,ii], type = "l", lwd = 1, xlab = "", ylab = "",
+  plot(x = seq(from = as.Date("1992-10-01"), to = as.Date("2020-08-01"), by = "month"),
+       y = temp[,ii], type = "l", lwd = 1, xlab = "", ylab = "",
        main = paste("Estimated factor", ii, "(ScalarF)"),
-       ylim = range(temp, na.rm = TRUE),
-       xaxt = "n")
-  abline(v = 120, col = "red")
+       ylim = range(temp, na.rm = TRUE))
+  abline(v = as.Date("2002-01-01"), col = "red", lty = 2)
 }
 
 # WI (linear)
-# WI_lin_fac = LYB_FM(WI_lin, r, 6)
-# temp = WI_lin_fac$f_hat
-# temp[,2] = -temp[,2]
-# for (ii in 1:r) {
-#   plot(temp[,ii], type = "l", lwd = 1, xlab = "", ylab = "",
-#        main = paste("Estimated factor", ii, "(WI - linear)"),
-#        ylim = range(temp, na.rm = TRUE),
-#        xaxt = "n")
-#   # lines(x = 1:60, temp[1:60,ii], lwd = 3, col = "blue2")
-#   abline(v = 120, col = "red")
-# }
+WI_lin_fac = LYB_FM(WI_lin, r, 6)
+temp = WI_lin_fac$f_hat
+temp[,2] = -temp[,2]
+for (ii in 1:r) {
+  plot(x = seq(from = as.Date("1992-10-01"), to = as.Date("2020-08-01"), by = "month"),
+       y = temp[,ii], type = "l", lwd = 1, xlab = "", ylab = "",
+       main = paste("Estimated factor", ii, "(WI - linear)"),
+       ylim = range(temp, na.rm = TRUE))
+  abline(v = as.Date("2002-01-01"), col = "red", lty = 2)
+}
 
 # kWI (linear)
-# kWI_lin_fac = LYB_FM(kWI_lin, r, 6)
-# temp = kWI_lin_fac$f_hat
-# temp = -temp
-# for (ii in 1:r) {
-#   plot(temp[,ii], type = "l", lwd = 1, xlab = "", ylab = "",
-#        main = paste("Estimated factor", ii, "(kWI - linear)"),
-#        ylim = range(temp, na.rm = TRUE),
-#        xaxt = "n")
-#   abline(v = 120, col = "red")
-# }
+kWI_lin_fac = LYB_FM(kWI_lin, r, 6)
+temp = kWI_lin_fac$f_hat
+temp = -temp
+for (ii in 1:r) {
+  plot(x = seq(from = as.Date("1992-10-01"), to = as.Date("2020-08-01"), by = "month"),
+       y = temp[,ii], type = "l", lwd = 1, xlab = "", ylab = "",
+       main = paste("Estimated factor", ii, "(kWI - linear)"),
+       ylim = range(temp, na.rm = TRUE))
+  abline(v = as.Date("2002-01-01"), col = "red", lty = 2)
+}
 
 # WI (Kalman)
 WI_Kalman_fac = LYB_FM(WI_Kalman, r, 6)
 temp = WI_Kalman_fac$f_hat
 temp[,1] = -temp[,1]
 for (ii in 1:r) {
-  plot(temp[,ii], type = "l", lwd = 1, xlab = "", ylab = "",
+  plot(x = seq(from = as.Date("1992-10-01"), to = as.Date("2020-08-01"), by = "month"),
+       y = temp[,ii], type = "l", lwd = 1, xlab = "", ylab = "",
        main = paste("Estimated factor", ii, "(WI - Kalman)"),
-       ylim = range(temp, na.rm = TRUE),
-       xaxt = "n")
-  abline(v = 120, col = "red")
+       ylim = range(temp, na.rm = TRUE))
+  abline(v = as.Date("2002-01-01"), col = "red", lty = 2)
 }
 
 # kWI (Kalman)
@@ -156,11 +157,11 @@ kWI_Kalman_fac = LYB_FM(kWI_Kalman, r, 6)
 temp = kWI_Kalman_fac$f_hat
 temp = -temp
 for (ii in 1:r) {
-  plot(temp[,ii], type = "l", lwd = 1, xlab = "", ylab = "",
+  plot(x = seq(from = as.Date("1992-10-01"), to = as.Date("2020-08-01"), by = "month"),
+       y = temp[,ii], type = "l", lwd = 1, xlab = "", ylab = "",
        main = paste("Estimated factor", ii, "(kWI - Kalman)"),
-       ylim = range(temp, na.rm = TRUE),
-       xaxt = "n")
-  abline(v = 120, col = "red")
+       ylim = range(temp, na.rm = TRUE))
+  abline(v = as.Date("2002-01-01"), col = "red", lty = 2)
 }
 
 
@@ -224,7 +225,7 @@ for (j in 1:ncol(kWI_Kalman)) {
 }
 
 
-errors = matrix(0, nrow = 6, ncol = 176)
+errors = matrix(0, nrow = 8, ncol = 176)
 
 # linear
 errors[1,] = sqrt(colMeans((raw_clip[-c(1:n_training),] - pred_linear)^2, na.rm = T))
@@ -239,36 +240,38 @@ errors[3,] = sqrt(colMeans((raw_clip[-c(1:n_training),] - pred_Kalman)^2, na.rm 
 errors[4,] = sqrt(colMeans((raw_clip[-c(1:n_training),] - pred_SF)^2, na.rm = T))
 
 # WI - lin
-# errors[5,] = sqrt(colMeans((raw_clip[-c(1:n_training),] - pred_WI_lin)^2, na.rm = T))
+errors[5,] = sqrt(colMeans((raw_clip[-c(1:n_training),] - pred_WI_lin)^2, na.rm = T))
 
 # kWI - lin
-# errors[6,] = sqrt(colMeans((raw_clip[-c(1:n_training),] - pred_kWI_lin)^2, na.rm = T))
+errors[6,] = sqrt(colMeans((raw_clip[-c(1:n_training),] - pred_kWI_lin)^2, na.rm = T))
 
 # WI - Kalman
-errors[5,] = sqrt(colMeans((raw_clip[-c(1:n_training),] - pred_WI_Kalman)^2, na.rm = T))
+errors[7,] = sqrt(colMeans((raw_clip[-c(1:n_training),] - pred_WI_Kalman)^2, na.rm = T))
 
 # kWI - Kalman
-errors[6,] = sqrt(colMeans((raw_clip[-c(1:n_training),] - pred_kWI_Kalman)^2, na.rm = T))
+errors[8,] = sqrt(colMeans((raw_clip[-c(1:n_training),] - pred_kWI_Kalman)^2, na.rm = T))
 
 
 
 
+errors = errors[c(2, 1, 4, 3, 5:8),]
 data_long <- melt(errors)
 colnames(data_long) <- c("Method", "Observation", "RMSE")
 
 # Convert Method to a factor with appropriate labels
 data_long$Method <- factor(data_long$Method, 
-                           labels = c("linear", "spline", "Kalman", "Scalar filter",
+                           labels = c("spline", "linear", "Scalar filter", "Kalman",
+                                      "WI (linear)", "kWI (linear)",
                                       "WI (Kalman)", "kWI (Kalman)"))
 
 # Create the violin plot
 p <- ggplot(data_long, aes(x = Method, y = RMSE, fill = Method)) +
   geom_violin(trim = FALSE, color = "black") +  # Violin plot
-  geom_boxplot(width = 0.1, position = position_dodge(0.9), fill = "white") +  # Add boxplot inside violins
-  scale_fill_brewer(palette = "Set3") +  # Color palette
-  labs(title = "", x = "", y = "Root Mean Squared Error (RMSE)") +  # Labels
-  theme_minimal(base_size = 15) +  # Minimal theme for a clean look
-  theme(legend.position = "none")  # Remove legend if not needed
+  geom_boxplot(width = 0.1, position = position_dodge(0.9), fill = "white") +  
+  scale_fill_brewer(palette = "Set3") +  
+  labs(title = "", x = "", y = "Root Mean Squared Error (RMSE)") +  
+  theme_minimal(base_size = 18) +  
+  theme(legend.position = "none")  
 
 # Display the plot
 print(p)
