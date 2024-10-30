@@ -1362,7 +1362,7 @@ for (sim in 1:1000) {
       geom_point(color = "steelblue1", size = 1) +
       coord_cartesian(xlim = plot_range, ylim = plot_range) +
       theme_minimal() +
-      labs(title = "WI (linear)",
+      labs(title = "TWI (linear)",
            x = "x_{t-1}",
            y = "x_t")
     
@@ -1373,7 +1373,7 @@ for (sim in 1:1000) {
       geom_point(color = "steelblue1", size = 1) +
       coord_cartesian(xlim = plot_range, ylim = plot_range) +
       theme_minimal() +
-      labs(title = "k-WI (linear)",
+      labs(title = "k-TWI (linear)",
            x = "x_{t-1}",
            y = "x_t")
     
@@ -1384,7 +1384,7 @@ for (sim in 1:1000) {
       geom_point(color = "steelblue1", size = 1) +
       coord_cartesian(xlim = plot_range, ylim = plot_range) +
       theme_minimal() +
-      labs(title = "WI (Kalman)",
+      labs(title = "TWI (Kalman)",
            x = "x_{t-1}",
            y = "x_t")
     
@@ -1395,7 +1395,7 @@ for (sim in 1:1000) {
       geom_point(color = "steelblue1", size = 1) +
       coord_cartesian(xlim = plot_range, ylim = plot_range) +
       theme_minimal() +
-      labs(title = "k-WI (Kalman)",
+      labs(title = "k-TWI (Kalman)",
            x = "x_{t-1}",
            y = "x_t")
     
@@ -1703,7 +1703,7 @@ for (sim in 1:1000) {
       geom_point(color = "steelblue1", size = 1) +
       coord_cartesian(xlim = plot_range, ylim = plot_range) +
       theme_minimal() +
-      labs(title = "WI (linear)",
+      labs(title = "TWI (linear)",
            x = "x_{t-1}",
            y = "x_t")
     
@@ -1714,7 +1714,7 @@ for (sim in 1:1000) {
       geom_point(color = "steelblue1", size = 1) +
       coord_cartesian(xlim = plot_range, ylim = plot_range) +
       theme_minimal() +
-      labs(title = "k-WI (linear)",
+      labs(title = "k-TWI (linear)",
            x = "x_{t-1}",
            y = "x_t")
     
@@ -1725,7 +1725,7 @@ for (sim in 1:1000) {
       geom_point(color = "steelblue1", size = 1) +
       coord_cartesian(xlim = plot_range, ylim = plot_range) +
       theme_minimal() +
-      labs(title = "WI (Kalman)",
+      labs(title = "TWI (Kalman)",
            x = "x_{t-1}",
            y = "x_t")
     
@@ -1736,7 +1736,7 @@ for (sim in 1:1000) {
       geom_point(color = "steelblue1", size = 1) +
       coord_cartesian(xlim = plot_range, ylim = plot_range) +
       theme_minimal() +
-      labs(title = "k-WI (Kalman)",
+      labs(title = "k-TWI (Kalman)",
            x = "x_{t-1}",
            y = "x_t")
     

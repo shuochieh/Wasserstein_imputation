@@ -233,13 +233,13 @@ for (i in 1:9) {
     } else if (i == 5) {
       method = "Scalar filter"
     } else if (i == 6) {
-      method = "WI (linear)"
+      method = "TWI (linear)"
     } else if (i == 7) {
-      method = "kWI (linear)"
+      method = "k-TWI (linear)"
     } else if (i == 8) {
-      method = "WI (Kalman)"
+      method = "TWI (Kalman)"
     } else {
-      method = "kWI (Kalman)"
+      method = "k-WI (Kalman)"
     }
     hist(model_coef[[i]][,1], prob = TRUE, col = "lightblue", 
          main = paste0(method, ": phi1"),
@@ -759,7 +759,10 @@ p1 = ggplot(df1, aes(x = x, y = y)) +
   coord_cartesian(xlim = plot_range, ylim = plot_range) +
   geom_point(color = "steelblue", size = 1) +
   theme_minimal() +
-  labs(title = "Ground truth", x = "x_{t-1}", y = "x_t")
+  labs(title = "Ground truth", x = "x_{t-1}", y = "x_t") +
+  theme(
+    plot.title = element_text(size = 16)        
+  )
   
 temp = na_lag_pairs(lin, which(is.na(x_obs[,1])))
 temp = data.frame(x = temp[,1], y = temp[,2])
@@ -769,7 +772,10 @@ p2 = ggplot(temp, aes(x = x, y = y)) +
   theme_minimal() +
   labs(title = "Linear interpolation",
        x = "x_{t-1}",
-       y = "x_t")
+       y = "x_t") +
+  theme(
+    plot.title = element_text(size = 16)        
+  )
   
 temp = na_lag_pairs(spl, which(is.na(x_obs[,1])))
 temp = data.frame(x = temp[,1], y = temp[,2])
@@ -779,7 +785,10 @@ p3 = ggplot(temp, aes(x = x, y = y)) +
   theme_minimal() +
   labs(title = "Spline smoothing",
        x = "x_{t-1}",
-       y = "x_t")
+       y = "x_t") +
+  theme(
+    plot.title = element_text(size = 16)        
+  )
   
 temp = na_lag_pairs(Kalman, which(is.na(x_obs[,1])))
 temp = data.frame(x = temp[,1], y = temp[,2])
@@ -789,7 +798,10 @@ p4 = ggplot(temp, aes(x = x, y = y)) +
   theme_minimal() +
   labs(title = "Kalman smoothing",
        x = "x_{t-1}",
-       y = "x_t")
+       y = "x_t") +
+  theme(
+    plot.title = element_text(size = 16)        
+  )
   
 temp = na_lag_pairs(PT, which(is.na(x_obs[,1])))
 temp = data.frame(x = temp[,1], y = temp[,2])
@@ -799,7 +811,10 @@ p5 = ggplot(temp, aes(x = x, y = y)) +
   theme_minimal() +
   labs(title = "Scalar filter",
        x = "x_{t-1}",
-       y = "x_t")
+       y = "x_t") +
+  theme(
+    plot.title = element_text(size = 16)        
+  )
   
 temp = na_lag_pairs(wass, which(is.na(x_obs[,1])))
 temp = data.frame(x = temp[,1], y = temp[,2])
@@ -807,9 +822,12 @@ p6 = ggplot(temp, aes(x = x, y = y)) +
   geom_point(color = "steelblue1", size = 1) +
   coord_cartesian(xlim = plot_range, ylim = plot_range) +
   theme_minimal() +
-  labs(title = "WI (linear)",
+  labs(title = "TWI (linear)",
        x = "x_{t-1}",
-       y = "x_t")
+       y = "x_t") +
+  theme(
+    plot.title = element_text(size = 16)        
+  )
   
 temp = na_lag_pairs(kwass, which(is.na(x_obs[,1])))
 temp = data.frame(x = temp[,1], y = temp[,2])
@@ -817,9 +835,12 @@ p7 = ggplot(temp, aes(x = x, y = y)) +
   geom_point(color = "steelblue1", size = 1) +
   coord_cartesian(xlim = plot_range, ylim = plot_range) +
   theme_minimal() +
-  labs(title = "kWI (linear)",
+  labs(title = "k-TWI (linear)",
        x = "x_{t-1}",
-       y = "x_t")
+       y = "x_t") +
+  theme(
+    plot.title = element_text(size = 16)        
+  )
   
 temp = na_lag_pairs(wass_Kalman, which(is.na(x_obs[,1])))
 temp = data.frame(x = temp[,1], y = temp[,2])
@@ -827,9 +848,12 @@ p8 = ggplot(temp, aes(x = x, y = y)) +
   geom_point(color = "steelblue1", size = 1) +
   coord_cartesian(xlim = plot_range, ylim = plot_range) +
   theme_minimal() +
-  labs(title = "WI (Kalman)",
+  labs(title = "TWI (Kalman)",
        x = "x_{t-1}",
-       y = "x_t")
+       y = "x_t") +
+  theme(
+    plot.title = element_text(size = 16)        
+  )
   
 temp = na_lag_pairs(kwass_Kalman, which(is.na(x_obs[,1])))
 temp = data.frame(x = temp[,1], y = temp[,2])
@@ -837,9 +861,12 @@ p9 = ggplot(temp, aes(x = x, y = y)) +
   geom_point(color = "steelblue1", size = 1) +
   coord_cartesian(xlim = plot_range, ylim = plot_range) +
   theme_minimal() +
-  labs(title = "k-WI (Kalman)",
+  labs(title = "k-TWI (Kalman)",
        x = "x_{t-1}",
-       y = "x_t")
+       y = "x_t") +
+  theme(
+    plot.title = element_text(size = 16)        
+  )
   
 grid.arrange(p1, p2, p3, p4, p5, p6, p7, p8, p9, nrow = 3, ncol = 3)
 
@@ -852,7 +879,10 @@ p1 = ggplot(df1, aes(x = x, y = y)) +
   theme_minimal() +
   labs(title = "Ground truth", 
        x = paste0("x_{t-", h, "}"), 
-       y = "x_t")
+       y = "x_t") +
+  theme(
+    plot.title = element_text(size = 16)        
+  )
 
 temp = na_lag_pairs(lin, which(is.na(x_obs[,1])), h = h)
 temp = data.frame(x = temp[,1], y = temp[,2])
@@ -862,7 +892,10 @@ p2 = ggplot(temp, aes(x = x, y = y)) +
   theme_minimal() +
   labs(title = "Linear interpolation",
        x = paste0("x_{t-", h, "}"),
-       y = "x_t")
+       y = "x_t") +
+  theme(
+    plot.title = element_text(size = 16)        
+  )
 
 temp = na_lag_pairs(spl, which(is.na(x_obs[,1])), h = h)
 temp = data.frame(x = temp[,1], y = temp[,2])
@@ -872,7 +905,10 @@ p3 = ggplot(temp, aes(x = x, y = y)) +
   theme_minimal() +
   labs(title = "Spline smoothing",
        x = paste0("x_{t-", h, "}"),
-       y = "x_t")
+       y = "x_t") +
+  theme(
+    plot.title = element_text(size = 16)        
+  )
 
 temp = na_lag_pairs(Kalman, which(is.na(x_obs[,1])), h = h)
 temp = data.frame(x = temp[,1], y = temp[,2])
@@ -882,7 +918,10 @@ p4 = ggplot(temp, aes(x = x, y = y)) +
   theme_minimal() +
   labs(title = "Kalman smoothing",
        x = paste0("x_{t-", h, "}"),
-       y = "x_t")
+       y = "x_t") +
+  theme(
+    plot.title = element_text(size = 16)        
+  )
 
 temp = na_lag_pairs(PT, which(is.na(x_obs[,1])), h = h)
 temp = data.frame(x = temp[,1], y = temp[,2])
@@ -892,7 +931,10 @@ p5 = ggplot(temp, aes(x = x, y = y)) +
   theme_minimal() +
   labs(title = "Scalar filter",
        x = paste0("x_{t-", h, "}"),
-       y = "x_t")
+       y = "x_t") +
+  theme(
+    plot.title = element_text(size = 16)        
+  )
 
 temp = na_lag_pairs(wass, which(is.na(x_obs[,1])), h = h)
 temp = data.frame(x = temp[,1], y = temp[,2])
@@ -900,9 +942,12 @@ p6 = ggplot(temp, aes(x = x, y = y)) +
   geom_point(color = "steelblue1", size = 1) +
   coord_cartesian(xlim = plot_range, ylim = plot_range) +
   theme_minimal() +
-  labs(title = "WI (linear)",
+  labs(title = "TWI (linear)",
        x = paste0("x_{t-", h, "}"),
-       y = "x_t")
+       y = "x_t") +
+  theme(
+    plot.title = element_text(size = 16)        
+  )
 
 temp = na_lag_pairs(kwass, which(is.na(x_obs[,1])), h = h)
 temp = data.frame(x = temp[,1], y = temp[,2])
@@ -910,9 +955,12 @@ p7 = ggplot(temp, aes(x = x, y = y)) +
   geom_point(color = "steelblue1", size = 1) +
   coord_cartesian(xlim = plot_range, ylim = plot_range) +
   theme_minimal() +
-  labs(title = "kWI (linear)",
+  labs(title = "k-TWI (linear)",
        x = paste0("x_{t-", h, "}"),
-       y = "x_t")
+       y = "x_t") +
+  theme(
+    plot.title = element_text(size = 16)        
+  )
 
 temp = na_lag_pairs(wass_Kalman, which(is.na(x_obs[,1])), h = h)
 temp = data.frame(x = temp[,1], y = temp[,2])
@@ -920,9 +968,12 @@ p8 = ggplot(temp, aes(x = x, y = y)) +
   geom_point(color = "steelblue1", size = 1) +
   coord_cartesian(xlim = plot_range, ylim = plot_range) +
   theme_minimal() +
-  labs(title = "WI (Kalman)",
+  labs(title = "TWI (Kalman)",
        x = paste0("x_{t-", h, "}"),
-       y = "x_t")
+       y = "x_t") +
+  theme(
+    plot.title = element_text(size = 16)        
+  )
 
 temp = na_lag_pairs(kwass_Kalman, which(is.na(x_obs[,1])), h = h)
 temp = data.frame(x = temp[,1], y = temp[,2])
@@ -930,9 +981,12 @@ p9 = ggplot(temp, aes(x = x, y = y)) +
   geom_point(color = "steelblue1", size = 1) +
   coord_cartesian(xlim = plot_range, ylim = plot_range) +
   theme_minimal() +
-  labs(title = "k-WI (Kalman)",
+  labs(title = "k-TWI (Kalman)",
        x = paste0("x_{t-", h, "}"),
-       y = "x_t")
+       y = "x_t") +
+  theme(
+    plot.title = element_text(size = 16)        
+  )
 
 grid.arrange(p1, p2, p3, p4, p5, p6, p7, p8, p9, nrow = 3, ncol = 3)
 
@@ -945,7 +999,10 @@ p1 = ggplot(df1, aes(x = x, y = y)) +
   theme_minimal() +
   labs(title = "Ground truth", 
        x = paste0("x_{t-", h, "}"), 
-       y = "x_t")
+       y = "x_t") +
+  theme(
+    plot.title = element_text(size = 16)        
+  )
 
 temp = na_lag_pairs(lin, which(is.na(x_obs[,1])), h = h)
 temp = data.frame(x = temp[,1], y = temp[,2])
@@ -955,7 +1012,10 @@ p2 = ggplot(temp, aes(x = x, y = y)) +
   theme_minimal() +
   labs(title = "Linear interpolation",
        x = paste0("x_{t-", h, "}"),
-       y = "x_t")
+       y = "x_t") +
+  theme(
+    plot.title = element_text(size = 16)        
+  )
 
 temp = na_lag_pairs(spl, which(is.na(x_obs[,1])), h = h)
 temp = data.frame(x = temp[,1], y = temp[,2])
@@ -965,7 +1025,10 @@ p3 = ggplot(temp, aes(x = x, y = y)) +
   theme_minimal() +
   labs(title = "Spline smoothing",
        x = paste0("x_{t-", h, "}"),
-       y = "x_t")
+       y = "x_t") +
+  theme(
+    plot.title = element_text(size = 16)        
+  )
 
 temp = na_lag_pairs(Kalman, which(is.na(x_obs[,1])), h = h)
 temp = data.frame(x = temp[,1], y = temp[,2])
@@ -975,7 +1038,10 @@ p4 = ggplot(temp, aes(x = x, y = y)) +
   theme_minimal() +
   labs(title = "Kalman smoothing",
        x = paste0("x_{t-", h, "}"),
-       y = "x_t")
+       y = "x_t") +
+  theme(
+    plot.title = element_text(size = 16)        
+  )
 
 temp = na_lag_pairs(PT, which(is.na(x_obs[,1])), h = h)
 temp = data.frame(x = temp[,1], y = temp[,2])
@@ -985,7 +1051,10 @@ p5 = ggplot(temp, aes(x = x, y = y)) +
   theme_minimal() +
   labs(title = "Scalar filter",
        x = paste0("x_{t-", h, "}"),
-       y = "x_t")
+       y = "x_t") +
+  theme(
+    plot.title = element_text(size = 16)        
+  )
 
 temp = na_lag_pairs(wass, which(is.na(x_obs[,1])), h = h)
 temp = data.frame(x = temp[,1], y = temp[,2])
@@ -993,9 +1062,12 @@ p6 = ggplot(temp, aes(x = x, y = y)) +
   geom_point(color = "steelblue1", size = 1) +
   coord_cartesian(xlim = plot_range, ylim = plot_range) +
   theme_minimal() +
-  labs(title = "WI (linear)",
+  labs(title = "TWI (linear)",
        x = paste0("x_{t-", h, "}"),
-       y = "x_t")
+       y = "x_t") +
+  theme(
+    plot.title = element_text(size = 16)        
+  )
 
 temp = na_lag_pairs(kwass, which(is.na(x_obs[,1])), h = h)
 temp = data.frame(x = temp[,1], y = temp[,2])
@@ -1003,9 +1075,12 @@ p7 = ggplot(temp, aes(x = x, y = y)) +
   geom_point(color = "steelblue1", size = 1) +
   coord_cartesian(xlim = plot_range, ylim = plot_range) +
   theme_minimal() +
-  labs(title = "kWI (linear)",
+  labs(title = "k-TWI (linear)",
        x = paste0("x_{t-", h, "}"),
-       y = "x_t")
+       y = "x_t") +
+  theme(
+    plot.title = element_text(size = 16)        
+  )
 
 temp = na_lag_pairs(wass_Kalman, which(is.na(x_obs[,1])), h = h)
 temp = data.frame(x = temp[,1], y = temp[,2])
@@ -1013,9 +1088,12 @@ p8 = ggplot(temp, aes(x = x, y = y)) +
   geom_point(color = "steelblue1", size = 1) +
   coord_cartesian(xlim = plot_range, ylim = plot_range) +
   theme_minimal() +
-  labs(title = "WI (Kalman)",
+  labs(title = "TWI (Kalman)",
        x = paste0("x_{t-", h, "}"),
-       y = "x_t")
+       y = "x_t") +
+  theme(
+    plot.title = element_text(size = 16)        
+  )
 
 temp = na_lag_pairs(kwass_Kalman, which(is.na(x_obs[,1])), h = h)
 temp = data.frame(x = temp[,1], y = temp[,2])
@@ -1023,9 +1101,12 @@ p9 = ggplot(temp, aes(x = x, y = y)) +
   geom_point(color = "steelblue1", size = 1) +
   coord_cartesian(xlim = plot_range, ylim = plot_range) +
   theme_minimal() +
-  labs(title = "k-WI (Kalman)",
+  labs(title = "k-TWI (Kalman)",
        x = paste0("x_{t-", h, "}"),
-       y = "x_t")
+       y = "x_t") +
+  theme(
+    plot.title = element_text(size = 16)        
+  )
 
 grid.arrange(p1, p2, p3, p4, p5, p6, p7, p8, p9, nrow = 3, ncol = 3)
 
@@ -1038,7 +1119,10 @@ p1 = ggplot(df1, aes(x = x, y = y)) +
   theme_minimal() +
   labs(title = "Ground truth", 
        x = paste0("x_{t-", h, "}"), 
-       y = "x_t")
+       y = "x_t") +
+  theme(
+    plot.title = element_text(size = 16)        
+  )
 
 temp = na_lag_pairs(lin, which(is.na(x_obs[,1])), h = h)
 temp = data.frame(x = temp[,1], y = temp[,2])
@@ -1048,7 +1132,10 @@ p2 = ggplot(temp, aes(x = x, y = y)) +
   theme_minimal() +
   labs(title = "Linear interpolation",
        x = paste0("x_{t-", h, "}"),
-       y = "x_t")
+       y = "x_t") +
+  theme(
+    plot.title = element_text(size = 16)        
+  )
 
 temp = na_lag_pairs(spl, which(is.na(x_obs[,1])), h = h)
 temp = data.frame(x = temp[,1], y = temp[,2])
@@ -1058,7 +1145,10 @@ p3 = ggplot(temp, aes(x = x, y = y)) +
   theme_minimal() +
   labs(title = "Spline smoothing",
        x = paste0("x_{t-", h, "}"),
-       y = "x_t")
+       y = "x_t") +
+  theme(
+    plot.title = element_text(size = 16)        
+  )
 
 temp = na_lag_pairs(Kalman, which(is.na(x_obs[,1])), h = h)
 temp = data.frame(x = temp[,1], y = temp[,2])
@@ -1068,7 +1158,10 @@ p4 = ggplot(temp, aes(x = x, y = y)) +
   theme_minimal() +
   labs(title = "Kalman smoothing",
        x = paste0("x_{t-", h, "}"),
-       y = "x_t")
+       y = "x_t") +
+  theme(
+    plot.title = element_text(size = 16)        
+  )
 
 temp = na_lag_pairs(PT, which(is.na(x_obs[,1])), h = h)
 temp = data.frame(x = temp[,1], y = temp[,2])
@@ -1078,7 +1171,10 @@ p5 = ggplot(temp, aes(x = x, y = y)) +
   theme_minimal() +
   labs(title = "Scalar filter",
        x = paste0("x_{t-", h, "}"),
-       y = "x_t")
+       y = "x_t") +
+  theme(
+    plot.title = element_text(size = 16)        
+  )
 
 temp = na_lag_pairs(wass, which(is.na(x_obs[,1])), h = h)
 temp = data.frame(x = temp[,1], y = temp[,2])
@@ -1086,9 +1182,12 @@ p6 = ggplot(temp, aes(x = x, y = y)) +
   geom_point(color = "steelblue1", size = 1) +
   coord_cartesian(xlim = plot_range, ylim = plot_range) +
   theme_minimal() +
-  labs(title = "WI (linear)",
+  labs(title = "TWI (linear)",
        x = paste0("x_{t-", h, "}"),
-       y = "x_t")
+       y = "x_t") +
+  theme(
+    plot.title = element_text(size = 16)        
+  )
 
 temp = na_lag_pairs(kwass, which(is.na(x_obs[,1])), h = h)
 temp = data.frame(x = temp[,1], y = temp[,2])
@@ -1096,9 +1195,12 @@ p7 = ggplot(temp, aes(x = x, y = y)) +
   geom_point(color = "steelblue1", size = 1) +
   coord_cartesian(xlim = plot_range, ylim = plot_range) +
   theme_minimal() +
-  labs(title = "kWI (linear)",
+  labs(title = "k-TWI (linear)",
        x = paste0("x_{t-", h, "}"),
-       y = "x_t")
+       y = "x_t") +
+  theme(
+    plot.title = element_text(size = 16)        
+  )
 
 temp = na_lag_pairs(wass_Kalman, which(is.na(x_obs[,1])), h = h)
 temp = data.frame(x = temp[,1], y = temp[,2])
@@ -1106,9 +1208,12 @@ p8 = ggplot(temp, aes(x = x, y = y)) +
   geom_point(color = "steelblue1", size = 1) +
   coord_cartesian(xlim = plot_range, ylim = plot_range) +
   theme_minimal() +
-  labs(title = "WI (Kalman)",
+  labs(title = "TWI (Kalman)",
        x = paste0("x_{t-", h, "}"),
-       y = "x_t")
+       y = "x_t") +
+  theme(
+    plot.title = element_text(size = 16)        
+  )
 
 temp = na_lag_pairs(kwass_Kalman, which(is.na(x_obs[,1])), h = h)
 temp = data.frame(x = temp[,1], y = temp[,2])
@@ -1116,9 +1221,12 @@ p9 = ggplot(temp, aes(x = x, y = y)) +
   geom_point(color = "steelblue1", size = 1) +
   coord_cartesian(xlim = plot_range, ylim = plot_range) +
   theme_minimal() +
-  labs(title = "k-WI (Kalman)",
+  labs(title = "k-TWI (Kalman)",
        x = paste0("x_{t-", h, "}"),
-       y = "x_t")
+       y = "x_t") +
+  theme(
+    plot.title = element_text(size = 16)        
+  )
 
 grid.arrange(p1, p2, p3, p4, p5, p6, p7, p8, p9, nrow = 3, ncol = 3)
 

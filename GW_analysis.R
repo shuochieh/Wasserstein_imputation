@@ -123,7 +123,7 @@ temp[,2] = -temp[,2]
 for (ii in 1:r) {
   plot(x = seq(from = as.Date("1992-10-01"), to = as.Date("2020-08-01"), by = "month"),
        y = temp[,ii], type = "l", lwd = 1, xlab = "", ylab = "",
-       main = paste("Estimated factor", ii, "(WI - linear)"),
+       main = paste("Estimated factor", ii, "(TWI - linear)"),
        ylim = range(temp, na.rm = TRUE))
   abline(v = as.Date("2002-01-01"), col = "red", lty = 2)
 }
@@ -135,7 +135,7 @@ temp = -temp
 for (ii in 1:r) {
   plot(x = seq(from = as.Date("1992-10-01"), to = as.Date("2020-08-01"), by = "month"),
        y = temp[,ii], type = "l", lwd = 1, xlab = "", ylab = "",
-       main = paste("Estimated factor", ii, "(kWI - linear)"),
+       main = paste("Estimated factor", ii, "(k-TWI - linear)"),
        ylim = range(temp, na.rm = TRUE))
   abline(v = as.Date("2002-01-01"), col = "red", lty = 2)
 }
@@ -147,7 +147,7 @@ temp[,1] = -temp[,1]
 for (ii in 1:r) {
   plot(x = seq(from = as.Date("1992-10-01"), to = as.Date("2020-08-01"), by = "month"),
        y = temp[,ii], type = "l", lwd = 1, xlab = "", ylab = "",
-       main = paste("Estimated factor", ii, "(WI - Kalman)"),
+       main = paste("Estimated factor", ii, "(TWI - Kalman)"),
        ylim = range(temp, na.rm = TRUE))
   abline(v = as.Date("2002-01-01"), col = "red", lty = 2)
 }
@@ -159,7 +159,7 @@ temp = -temp
 for (ii in 1:r) {
   plot(x = seq(from = as.Date("1992-10-01"), to = as.Date("2020-08-01"), by = "month"),
        y = temp[,ii], type = "l", lwd = 1, xlab = "", ylab = "",
-       main = paste("Estimated factor", ii, "(kWI - Kalman)"),
+       main = paste("Estimated factor", ii, "(k-TWI - Kalman)"),
        ylim = range(temp, na.rm = TRUE))
   abline(v = as.Date("2002-01-01"), col = "red", lty = 2)
 }
@@ -254,15 +254,20 @@ errors[8,] = sqrt(colMeans((raw_clip[-c(1:n_training),] - pred_kWI_Kalman)^2, na
 
 
 
-errors = errors[c(2, 1, 4, 3, 5:8),]
+errors = errors[c(2, 4, 1, 5, 7, 3, 6, 8),]
 data_long <- melt(errors)
 colnames(data_long) <- c("Method", "Observation", "RMSE")
 
 # Convert Method to a factor with appropriate labels
 data_long$Method <- factor(data_long$Method, 
-                           labels = c("spline", "linear", "Scalar filter", "Kalman",
-                                      "WI (linear)", "kWI (linear)",
-                                      "WI (Kalman)", "kWI (Kalman)"))
+                           labels = c("Spline", 
+                                      "Scalar filter",
+                                      "Linear", 
+                                      "TWI (lin)", 
+                                      "TWI (Kal)", 
+                                      "Kalman",
+                                      "k-TWI (lin)",
+                                      "k-TWI (Kal)"))
 
 # Create the violin plot
 p <- ggplot(data_long, aes(x = Method, y = RMSE, fill = Method)) +

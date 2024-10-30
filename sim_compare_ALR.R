@@ -442,7 +442,7 @@ for (sim in 1:1000) {
       coord_cartesian(xlim = range1, 
                       ylim = range2) +
       theme_minimal() +
-      labs(title = "Ground truth vs WI (linear)",
+      labs(title = "Ground truth vs TWI (linear)",
            x = "x_{t-1, 1}",
            y = "x_{t, 2}")
     
@@ -457,7 +457,7 @@ for (sim in 1:1000) {
       coord_cartesian(xlim = range1, 
                       ylim = range3) +
       theme_minimal() +
-      labs(title = "Ground truth vs WI (linear)",
+      labs(title = "Ground truth vs TWI (linear)",
            x = "x_{t-1, 1}",
            y = "x_{t, 3}")
     
@@ -472,7 +472,7 @@ for (sim in 1:1000) {
       coord_cartesian(xlim = range2, 
                       ylim = range3) +
       theme_minimal() +
-      labs(title = "Ground truth vs WI (linear)",
+      labs(title = "Ground truth vs TWI (linear)",
            x = "x_{t-1, 2}",
            y = "x_{t, 3}")
     
@@ -487,7 +487,7 @@ for (sim in 1:1000) {
       coord_cartesian(xlim = range1, 
                       ylim = range2) +
       theme_minimal() +
-      labs(title = "Ground truth vs kWI (linear)",
+      labs(title = "Ground truth vs k-TWI (linear)",
            x = "x_{t-1, 1}",
            y = "x_{t, 2}")
     
@@ -502,7 +502,7 @@ for (sim in 1:1000) {
       coord_cartesian(xlim = range1, 
                       ylim = range3) +
       theme_minimal() +
-      labs(title = "Ground truth vs kWI (linear)",
+      labs(title = "Ground truth vs k-TWI (linear)",
            x = "x_{t-1, 1}",
            y = "x_{t, 3}")
     
@@ -517,7 +517,7 @@ for (sim in 1:1000) {
       coord_cartesian(xlim = range2, 
                       ylim = range3) +
       theme_minimal() +
-      labs(title = "Ground truth vs kWI (linear)",
+      labs(title = "Ground truth vs k-TWI (linear)",
            x = "x_{t-1, 2}",
            y = "x_{t, 3}")
     
@@ -532,7 +532,7 @@ for (sim in 1:1000) {
       coord_cartesian(xlim = range1, 
                       ylim = range2) +
       theme_minimal() +
-      labs(title = "Ground truth vs WI (Kalman)",
+      labs(title = "Ground truth vs TWI (Kalman)",
            x = "x_{t-1, 1}",
            y = "x_{t, 2}")
     
@@ -547,7 +547,7 @@ for (sim in 1:1000) {
       coord_cartesian(xlim = range1, 
                       ylim = range3) +
       theme_minimal() +
-      labs(title = "Ground truth vs WI (Kalman)",
+      labs(title = "Ground truth vs TWI (Kalman)",
            x = "x_{t-1, 1}",
            y = "x_{t, 3}")
     
@@ -562,7 +562,7 @@ for (sim in 1:1000) {
       coord_cartesian(xlim = range2, 
                       ylim = range3) +
       theme_minimal() +
-      labs(title = "Ground truth vs WI (Kalman)",
+      labs(title = "Ground truth vs TWI (Kalman)",
            x = "x_{t-1, 2}",
            y = "x_{t, 3}")
     
@@ -577,7 +577,7 @@ for (sim in 1:1000) {
       coord_cartesian(xlim = range1, 
                       ylim = range2) +
       theme_minimal() +
-      labs(title = "Ground truth vs kWI (Kalman)",
+      labs(title = "Ground truth vs k-TWI (Kalman)",
            x = "x_{t-1, 1}",
            y = "x_{t, 2}")
     
@@ -592,7 +592,7 @@ for (sim in 1:1000) {
       coord_cartesian(xlim = range1, 
                       ylim = range3) +
       theme_minimal() +
-      labs(title = "Ground truth vs kWI (Kalman)",
+      labs(title = "Ground truth vs k-TWI (Kalman)",
            x = "x_{t-1, 1}",
            y = "x_{t, 3}")
     
@@ -607,7 +607,7 @@ for (sim in 1:1000) {
       coord_cartesian(xlim = range2, 
                       ylim = range3) +
       theme_minimal() +
-      labs(title = "Ground truth vs kWI (Kalman)",
+      labs(title = "Ground truth vs k-TWI (Kalman)",
            x = "x_{t-1, 2}",
            y = "x_{t, 3}")
     
