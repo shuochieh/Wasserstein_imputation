@@ -1,5 +1,6 @@
 sim_data/
 real_data/
+submission/
 .Rhistory
 .DS_Store
 __pycache__

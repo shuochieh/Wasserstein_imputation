@@ -68,7 +68,6 @@ colSums(is.na(monthly_data))
 gw_dta = monthly_data[,-c(1:9, 345:348)]
 n_missing = rowSums(is.na(gw_dta))
 
-# select_stations = which(n_missing <= 63)
 select_stations = which(n_missing <= 127)
 
 # Plot the stations geographic locations

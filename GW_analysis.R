@@ -1,6 +1,8 @@
 library(TSA)
 library(glmnet)
 library(reshape2)
+library(ggplot2)
+library(fastICA)
 
 LYB_FM = function (x, r, h, demean = TRUE) {
   # x: (n by d) matrix
@@ -164,6 +166,271 @@ for (ii in 1:r) {
   abline(v = as.Date("2002-01-01"), col = "red", lty = 2)
 }
 
+# ICA analysis
+dev.off()
+par(mfrow = c(8, 2), mar = c(2.5, 2, 1, 0.5))
+
+add_shading <- function(start_month, end_month, x_vals, color = rgb(0.8, 0.8, 0.8, 0.5)) {
+  years <- unique(format(x_vals, "%Y"))
+  for (y in years) {
+    rect(xleft = as.Date(paste0(y, "-", start_month, "-01")),
+         xright = as.Date(paste0(y, "-", end_month, "-30")),
+         ybottom = par("usr")[3], 
+         ytop = par("usr")[4], 
+         col = color, border = NA)
+  }
+}
+
+set.seed(5566)
+# Kalman
+ica = fastICA(KS_imp, n.comp = 2)
+temp = ica$S[,order(rowSums(ica$A^2), decreasing = T)]
+temp = -temp
+plot(x = seq(from = as.Date("1992-10-01"), to = as.Date("2020-08-01"), by = "month"),
+     y = temp[,1], type = "l", lwd = 1, xlab = "", ylab = "",
+     main = paste("Estimated IC", 1, "(Kalman)"),
+     ylim = range(temp, na.rm = TRUE))
+abline(v = as.Date("2002-01-01"), col = "red", lty = 2, lwd = 2)
+add_shading("08", "09", seq(from = as.Date("1992-10-01"), to = as.Date("2020-08-01"), by = "month"),
+            color = rgb(1, 0.5, 0.5, alpha = 0.3))
+plot(x = seq(from = as.Date("1992-10-01"), to = as.Date("2020-08-01"), by = "month"),
+     y = temp[,2], type = "l", lwd = 1, xlab = "", ylab = "",
+     main = paste("Estimated IC", 2, "(Kalman)"),
+     ylim = range(temp, na.rm = TRUE))
+abline(v = as.Date("2002-01-01"), col = "red", lty = 2, lwd = 2)
+add_shading("05", "06", seq(from = as.Date("1992-10-01"), to = as.Date("2020-08-01"), by = "month"),
+            color = rgb(0.5, 0.5, 1, alpha = 0.3))
+
+# for (ii in 1:2) {
+#   plot(x = seq(from = as.Date("1992-10-01"), to = as.Date("2020-08-01"), by = "month"),
+#        y = temp[,ii], type = "l", lwd = 1, xlab = "", ylab = "",
+#        main = paste("Estimated IC", ii, "(Kalman)"),
+#        ylim = range(temp, na.rm = TRUE))
+#   abline(v = as.Date("2002-01-01"), col = "red", lty = 2, lwd = 2)
+#   add_shading("08", "09", seq(from = as.Date("1992-10-01"), to = as.Date("2020-08-01"), by = "month"),
+#               color = rgb(1, 0.5, 0.5, alpha = 0.3))
+#   add_shading("05", "06", seq(from = as.Date("1992-10-01"), to = as.Date("2020-08-01"), by = "month"),
+#               color = rgb(0.5, 0.5, 1, alpha = 0.3))
+# }
+
+# WI (Kalman)
+ica = fastICA(WI_Kalman, n.comp = 2)
+temp = ica$S[,order(rowSums(ica$A^2), decreasing = T)]
+plot(x = seq(from = as.Date("1992-10-01"), to = as.Date("2020-08-01"), by = "month"),
+     y = temp[,1], type = "l", lwd = 1, xlab = "", ylab = "",
+     main = paste("Estimated IC", 1, "(TWI - Kalman)"),
+     ylim = range(temp, na.rm = TRUE))
+abline(v = as.Date("2002-01-01"), col = "red", lty = 2, lwd = 2)
+add_shading("08", "09", seq(from = as.Date("1992-10-01"), to = as.Date("2020-08-01"), by = "month"),
+            color = rgb(1, 0.5, 0.5, alpha = 0.3))
+plot(x = seq(from = as.Date("1992-10-01"), to = as.Date("2020-08-01"), by = "month"),
+     y = temp[,2], type = "l", lwd = 1, xlab = "", ylab = "",
+     main = paste("Estimated IC", 2, "(TWI - Kalman)"),
+     ylim = range(temp, na.rm = TRUE))
+abline(v = as.Date("2002-01-01"), col = "red", lty = 2, lwd = 2)
+add_shading("05", "06", seq(from = as.Date("1992-10-01"), to = as.Date("2020-08-01"), by = "month"),
+            color = rgb(0.5, 0.5, 1, alpha = 0.3))
+
+# for (ii in 1:2) {
+#   plot(x = seq(from = as.Date("1992-10-01"), to = as.Date("2020-08-01"), by = "month"),
+#        y = temp[,ii], type = "l", lwd = 1, xlab = "", ylab = "",
+#        main = paste("Estimated IC", ii, "(TWI - Kalman)"),
+#        ylim = range(temp, na.rm = TRUE))
+#   abline(v = as.Date("2002-01-01"), col = "red", lty = 2, lwd = 2)
+#   add_shading("08", "09", seq(from = as.Date("1992-10-01"), to = as.Date("2020-08-01"), by = "month"),
+#               color = rgb(1, 0.5, 0.5, alpha = 0.3))
+#   add_shading("05", "06", seq(from = as.Date("1992-10-01"), to = as.Date("2020-08-01"), by = "month"),
+#               color = rgb(0.5, 0.5, 1, alpha = 0.3))
+# }
+
+# kWI (Kalman)
+ica = fastICA(kWI_Kalman, n.comp = 2)
+temp = ica$S[,order(rowSums(ica$A^2), decreasing = T)]
+temp[,1] = -temp[,1]
+plot(x = seq(from = as.Date("1992-10-01"), to = as.Date("2020-08-01"), by = "month"),
+     y = temp[,1], type = "l", lwd = 1, xlab = "", ylab = "",
+     main = paste("Estimated IC", 1, "(kTWI - Kalman)"),
+     ylim = range(temp, na.rm = TRUE))
+abline(v = as.Date("2002-01-01"), col = "red", lty = 2, lwd = 2)
+add_shading("08", "09", seq(from = as.Date("1992-10-01"), to = as.Date("2020-08-01"), by = "month"),
+            color = rgb(1, 0.5, 0.5, alpha = 0.3))
+plot(x = seq(from = as.Date("1992-10-01"), to = as.Date("2020-08-01"), by = "month"),
+     y = temp[,2], type = "l", lwd = 1, xlab = "", ylab = "",
+     main = paste("Estimated IC", 2, "(kTWI - Kalman)"),
+     ylim = range(temp, na.rm = TRUE))
+abline(v = as.Date("2002-01-01"), col = "red", lty = 2, lwd = 2)
+add_shading("05", "06", seq(from = as.Date("1992-10-01"), to = as.Date("2020-08-01"), by = "month"),
+            color = rgb(0.5, 0.5, 1, alpha = 0.3))
+
+# for (ii in 1:2) {
+#   plot(x = seq(from = as.Date("1992-10-01"), to = as.Date("2020-08-01"), by = "month"),
+#        y = temp[,ii], type = "l", lwd = 1, xlab = "", ylab = "",
+#        main = paste("Estimated IC", ii, "(kTWI - Kalman)"),
+#        ylim = range(temp, na.rm = TRUE))
+#   abline(v = as.Date("2002-01-01"), col = "red", lty = 2, lwd = 2)
+#   add_shading("08", "09", seq(from = as.Date("1992-10-01"), to = as.Date("2020-08-01"), by = "month"),
+#               color = rgb(1, 0.5, 0.5, alpha = 0.3))
+#   add_shading("05", "06", seq(from = as.Date("1992-10-01"), to = as.Date("2020-08-01"), by = "month"),
+#               color = rgb(0.5, 0.5, 1, alpha = 0.3))
+# }
+
+# linear 
+ica = fastICA(lin_imp, n.comp = 2)
+temp = ica$S[,order(rowSums(ica$A^2), decreasing = T)]
+temp[,1] = -temp[,1]
+plot(x = seq(from = as.Date("1992-10-01"), to = as.Date("2020-08-01"), by = "month"),
+     y = temp[,1], type = "l", lwd = 1, xlab = "", ylab = "",
+     main = paste("Estimated IC", 1, "(linear)"),
+     ylim = range(temp, na.rm = TRUE))
+abline(v = as.Date("2002-01-01"), col = "red", lty = 2, lwd = 2)
+add_shading("05", "06", seq(from = as.Date("1992-10-01"), to = as.Date("2020-08-01"), by = "month"),
+            color = rgb(0.5, 0.5, 1, alpha = 0.3))
+plot(x = seq(from = as.Date("1992-10-01"), to = as.Date("2020-08-01"), by = "month"),
+     y = temp[,2], type = "l", lwd = 1, xlab = "", ylab = "",
+     main = paste("Estimated IC", 2, "(linear)"),
+     ylim = range(temp, na.rm = TRUE))
+abline(v = as.Date("2002-01-01"), col = "red", lty = 2, lwd = 2)
+add_shading("08", "09", seq(from = as.Date("1992-10-01"), to = as.Date("2020-08-01"), by = "month"),
+            color = rgb(1, 0.5, 0.5, alpha = 0.3))
+# add_shading("05", "06", seq(from = as.Date("1992-10-01"), to = as.Date("2020-08-01"), by = "month"),
+#             color = rgb(0.5, 0.5, 1, alpha = 0.3))
+
+# for (ii in 1:2) {
+#   plot(x = seq(from = as.Date("1992-10-01"), to = as.Date("2020-08-01"), by = "month"),
+#        y = temp[,ii], type = "l", lwd = 1, xlab = "", ylab = "",
+#        main = paste("Estimated IC", ii, "(linear)"),
+#        ylim = range(temp, na.rm = TRUE))
+#   abline(v = as.Date("2002-01-01"), col = "red", lty = 2, lwd = 2)
+#   add_shading("08", "09", seq(from = as.Date("1992-10-01"), to = as.Date("2020-08-01"), by = "month"),
+#               color = rgb(1, 0.5, 0.5, alpha = 0.3))
+#   add_shading("05", "06", seq(from = as.Date("1992-10-01"), to = as.Date("2020-08-01"), by = "month"),
+#               color = rgb(0.5, 0.5, 1, alpha = 0.3))
+# }
+
+# TWI (linear)
+ica = fastICA(WI_lin, n.comp = 2)
+temp = ica$S[,order(rowSums(ica$A^2), decreasing = T)]
+temp[,1] = -temp[,1]
+plot(x = seq(from = as.Date("1992-10-01"), to = as.Date("2020-08-01"), by = "month"),
+     y = temp[,1], type = "l", lwd = 1, xlab = "", ylab = "",
+     main = paste("Estimated IC", 1, "(TWI - linear)"),
+     ylim = range(temp, na.rm = TRUE))
+abline(v = as.Date("2002-01-01"), col = "red", lty = 2, lwd = 2)
+add_shading("08", "09", seq(from = as.Date("1992-10-01"), to = as.Date("2020-08-01"), by = "month"),
+            color = rgb(1, 0.5, 0.5, alpha = 0.3))
+plot(x = seq(from = as.Date("1992-10-01"), to = as.Date("2020-08-01"), by = "month"),
+     y = temp[,2], type = "l", lwd = 1, xlab = "", ylab = "",
+     main = paste("Estimated IC", 2, "(TWI - linear)"),
+     ylim = range(temp, na.rm = TRUE))
+abline(v = as.Date("2002-01-01"), col = "red", lty = 2, lwd = 2)
+add_shading("05", "06", seq(from = as.Date("1992-10-01"), to = as.Date("2020-08-01"), by = "month"),
+            color = rgb(0.5, 0.5, 1, alpha = 0.3))
+
+# for (ii in 1:2) {
+#   plot(x = seq(from = as.Date("1992-10-01"), to = as.Date("2020-08-01"), by = "month"),
+#        y = temp[,ii], type = "l", lwd = 1, xlab = "", ylab = "",
+#        main = paste("Estimated IC", ii, "(TWI - linear)"),
+#        ylim = range(temp, na.rm = TRUE))
+#   abline(v = as.Date("2002-01-01"), col = "red", lty = 2, lwd = 2)
+#   add_shading("08", "09", seq(from = as.Date("1992-10-01"), to = as.Date("2020-08-01"), by = "month"),
+#               color = rgb(1, 0.5, 0.5, alpha = 0.3))
+#   add_shading("05", "06", seq(from = as.Date("1992-10-01"), to = as.Date("2020-08-01"), by = "month"),
+#               color = rgb(0.5, 0.5, 1, alpha = 0.3))
+# }
+
+# kTWI (linear)
+ica = fastICA(kWI_lin, n.comp = 2)
+temp = ica$S[,order(rowSums(ica$A^2), decreasing = T)]
+temp = ica$S[,order(rowSums(ica$A^2), decreasing = T)]
+temp = -temp
+plot(x = seq(from = as.Date("1992-10-01"), to = as.Date("2020-08-01"), by = "month"),
+     y = temp[,1], type = "l", lwd = 1, xlab = "", ylab = "",
+     main = paste("Estimated IC", 1, "(kTWI - linear)"),
+     ylim = range(temp, na.rm = TRUE))
+abline(v = as.Date("2002-01-01"), col = "red", lty = 2, lwd = 2)
+add_shading("08", "09", seq(from = as.Date("1992-10-01"), to = as.Date("2020-08-01"), by = "month"),
+            color = rgb(1, 0.5, 0.5, alpha = 0.3))
+plot(x = seq(from = as.Date("1992-10-01"), to = as.Date("2020-08-01"), by = "month"),
+     y = temp[,2], type = "l", lwd = 1, xlab = "", ylab = "",
+     main = paste("Estimated IC", 2, "(kTWI - linear)"),
+     ylim = range(temp, na.rm = TRUE))
+abline(v = as.Date("2002-01-01"), col = "red", lty = 2, lwd = 2)
+add_shading("05", "06", seq(from = as.Date("1992-10-01"), to = as.Date("2020-08-01"), by = "month"),
+            color = rgb(0.5, 0.5, 1, alpha = 0.3))
+# for (ii in 1:2) {
+#   plot(x = seq(from = as.Date("1992-10-01"), to = as.Date("2020-08-01"), by = "month"),
+#        y = temp[,ii], type = "l", lwd = 1, xlab = "", ylab = "",
+#        main = paste("Estimated IC", ii, "(kTWI - linear)"),
+#        ylim = range(temp, na.rm = TRUE))
+#   abline(v = as.Date("2002-01-01"), col = "red", lty = 2, lwd = 2)
+#   add_shading("08", "09", seq(from = as.Date("1992-10-01"), to = as.Date("2020-08-01"), by = "month"),
+#               color = rgb(1, 0.5, 0.5, alpha = 0.3))
+#   add_shading("05", "06", seq(from = as.Date("1992-10-01"), to = as.Date("2020-08-01"), by = "month"),
+#               color = rgb(0.5, 0.5, 1, alpha = 0.3))
+# }
+
+
+# spline 
+ica = fastICA(spl_imp, n.comp = 2)
+temp = ica$S[,order(rowSums(ica$A^2), decreasing = T)]
+#temp[,2] = -temp[,2]
+plot(x = seq(from = as.Date("1992-10-01"), to = as.Date("2020-08-01"), by = "month"),
+     y = temp[,1], type = "l", lwd = 1, xlab = "", ylab = "",
+     main = paste("Estimated IC", 1, "(spline)"),
+     ylim = range(temp, na.rm = TRUE))
+abline(v = as.Date("2002-01-01"), col = "red", lty = 2, lwd = 2)
+add_shading("05", "06", seq(from = as.Date("1992-10-01"), to = as.Date("2020-08-01"), by = "month"),
+            color = rgb(0.5, 0.5, 1, alpha = 0.3))
+plot(x = seq(from = as.Date("1992-10-01"), to = as.Date("2020-08-01"), by = "month"),
+     y = temp[,2], type = "l", lwd = 1, xlab = "", ylab = "",
+     main = paste("Estimated IC", 2, "(spline)"),
+     ylim = range(temp, na.rm = TRUE))
+abline(v = as.Date("2002-01-01"), col = "red", lty = 2, lwd = 2)
+add_shading("08", "09", seq(from = as.Date("1992-10-01"), to = as.Date("2020-08-01"), by = "month"),
+            color = rgb(1, 0.5, 0.5, alpha = 0.3))
+# for (ii in 1:2) {
+#   plot(x = seq(from = as.Date("1992-10-01"), to = as.Date("2020-08-01"), by = "month"),
+#        y = temp[,ii], type = "l", lwd = 1, xlab = "", ylab = "",
+#        main = paste("Estimated IC", ii, "(spline)"),
+#        ylim = range(temp, na.rm = TRUE))
+#   abline(v = as.Date("2002-01-01"), col = "red", lty = 2, lwd = 2)
+#   add_shading("08", "09", seq(from = as.Date("1992-10-01"), to = as.Date("2020-08-01"), by = "month"),
+#               color = rgb(1, 0.5, 0.5, alpha = 0.3))
+#   add_shading("05", "06", seq(from = as.Date("1992-10-01"), to = as.Date("2020-08-01"), by = "month"),
+#               color = rgb(0.5, 0.5, 1, alpha = 0.3))
+# }
+
+# scalar filter
+ica = fastICA(SF_imp, n.comp = 2)
+temp = ica$S[,order(rowSums(ica$A^2), decreasing = T)]
+temp[,1] = -temp[,1]
+plot(x = seq(from = as.Date("1992-10-01"), to = as.Date("2020-08-01"), by = "month"),
+     y = temp[,1], type = "l", lwd = 1, xlab = "", ylab = "",
+     main = paste("Estimated IC", 1, "(scalar filter)"),
+     ylim = range(temp, na.rm = TRUE))
+abline(v = as.Date("2002-01-01"), col = "red", lty = 2, lwd = 2)
+add_shading("08", "09", seq(from = as.Date("1992-10-01"), to = as.Date("2020-08-01"), by = "month"),
+            color = rgb(1, 0.5, 0.5, alpha = 0.3))
+plot(x = seq(from = as.Date("1992-10-01"), to = as.Date("2020-08-01"), by = "month"),
+     y = temp[,2], type = "l", lwd = 1, xlab = "", ylab = "",
+     main = paste("Estimated IC", 2, "(scalar filter)"),
+     ylim = range(temp, na.rm = TRUE))
+abline(v = as.Date("2002-01-01"), col = "red", lty = 2, lwd = 2)
+add_shading("05", "06", seq(from = as.Date("1992-10-01"), to = as.Date("2020-08-01"), by = "month"),
+            color = rgb(0.5, 0.5, 1, alpha = 0.3))
+# for (ii in 1:2) {
+#   plot(x = seq(from = as.Date("1992-10-01"), to = as.Date("2020-08-01"), by = "month"),
+#        y = temp[,ii], type = "l", lwd = 1, xlab = "", ylab = "",
+#        main = paste("Estimated IC", ii, "(scalar filter)"),
+#        ylim = range(temp, na.rm = TRUE))
+#   abline(v = as.Date("2002-01-01"), col = "red", lty = 2, lwd = 2)
+#   add_shading("08", "09", seq(from = as.Date("1992-10-01"), to = as.Date("2020-08-01"), by = "month"),
+#               color = rgb(1, 0.5, 0.5, alpha = 0.3))
+#   add_shading("05", "06", seq(from = as.Date("1992-10-01"), to = as.Date("2020-08-01"), by = "month"),
+#               color = rgb(0.5, 0.5, 1, alpha = 0.3))
+# }
+
+
 
 # Prediction analysis
 n_training = 120
@@ -253,28 +520,23 @@ errors[8,] = sqrt(colMeans((raw_clip[-c(1:n_training),] - pred_kWI_Kalman)^2, na
 
 
 
-
-errors = errors[c(2, 4, 1, 5, 7, 3, 6, 8),]
-data_long <- melt(errors)
+method_names = c("Linear", "Spline", "Kalman", "Scalar filter", "TWI (lin)", "kTWI (lin)",
+                 "TWI (Kal)", "kTWI (Kal)")
+method_names = method_names[order(apply(errors, 1, median), decreasing = T)]
+errors = errors[order(apply(errors, 1, median), decreasing = T),]
+data_long <- melt(log(errors))
 colnames(data_long) <- c("Method", "Observation", "RMSE")
 
 # Convert Method to a factor with appropriate labels
 data_long$Method <- factor(data_long$Method, 
-                           labels = c("Spline", 
-                                      "Scalar filter",
-                                      "Linear", 
-                                      "TWI (lin)", 
-                                      "TWI (Kal)", 
-                                      "Kalman",
-                                      "k-TWI (lin)",
-                                      "k-TWI (Kal)"))
+                           labels = method_names)
 
 # Create the violin plot
 p <- ggplot(data_long, aes(x = Method, y = RMSE, fill = Method)) +
   geom_violin(trim = FALSE, color = "black") +  # Violin plot
   geom_boxplot(width = 0.1, position = position_dodge(0.9), fill = "white") +  
   scale_fill_brewer(palette = "Set3") +  
-  labs(title = "", x = "", y = "Root Mean Squared Error (RMSE)") +  
+  labs(title = "", x = "", y = "log RMSE") +  
   theme_minimal(base_size = 18) +  
   theme(legend.position = "none")  
 

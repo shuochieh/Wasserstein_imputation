@@ -46,33 +46,6 @@ s_filter = function (x, ar_order = 2, lambda = 0.001) {
   
   return (xmis)
 }
-LYB_FM = function (x, r, h, demean = TRUE) {
-  # x: (n by d) matrix
-  # r: number of factors
-  # h: maximum lags to use
-  
-  if (demean) {
-    x = t(t(x) - colMeans(x))
-  }
-  
-  pd = 0
-  H = h + 1
-  n = nrow(x)
-  for (i in 1:h) {
-    temp = (t(x[H:n,]) %*% x[(H - i):(n - i),]) / n
-    pd = pd + temp %*% t(temp)
-  }
-  
-  # Eigenanalysis
-  Evec = eigen(pd)$vectors
-  V = Evec[,1:r]
-  
-  # Extract factors and residuals
-  f_hat = x %*% V
-  e_hat = x - f_hat %*% t(V)
-  
-  return (list("V" = V, "f_hat" = f_hat, "e_hat" = e_hat))
-}
 
 dta = unname(as.matrix(read.csv("./real_data/GW_select.csv", header = F)))
 dta = (dta - rowMeans(dta, na.rm = TRUE)) / apply(dta, 1, sd, na.rm = TRUE)
@@ -86,6 +59,20 @@ for (j in 1:nrow(dta)) {
       dta[j,i] = NA
     }
   }
+}
+
+# de-trend each row
+detrend = function (x) {
+  n = length(x)
+  model = lm(x~c(1:n))
+  b0 = model$coefficients[1]
+  b1 = model$coefficients[2]
+  
+  return (x - b0 - b1 * c(1:n))
+}
+
+for (j in 1:nrow(dta)) {
+  dta[j,] = detrend(dta[j,])
 }
 
 # linear interpolation
