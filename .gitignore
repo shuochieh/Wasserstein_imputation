@@ -1,5 +1,5 @@
-sim_data/
-real_data/
+./reproducible/real_data/
+./reproducible/sim_data/
 submission/
 .Rhistory
 .DS_Store
