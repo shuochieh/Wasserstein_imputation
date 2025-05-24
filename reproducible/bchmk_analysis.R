@@ -3,6 +3,7 @@ library(MTS)
 library(ggplot2)
 library(gridExtra)
 library(glmnet)
+library(Rssa)
 
 # Remember to specify model_name
 # model_name = "ARMA"
@@ -11,7 +12,7 @@ library(glmnet)
 # show_plot = FALSE (whether to plot some marginal distributions)
 
 
-# Some utilities
+### Utilities and other methods
 na_lag_pairs = function (x, missing_idx) {
   res = matrix(NA, nrow = length(missing_idx) * 2, ncol = 2)
   counter = 1
@@ -27,7 +28,7 @@ na_lag_pairs = function (x, missing_idx) {
   return(res)
 }
 
-### scalar filter algorithm of Pena and Tsay (2021)
+# scalar filter algorithm of Pena and Tsay (2021)
 s_filter = function (x, ar_order = 2, lambda = 0.001) {
   x = as.matrix(x)
   k = ncol(x)
@@ -72,6 +73,21 @@ s_filter = function (x, ar_order = 2, lambda = 0.001) {
 
 
   return (xmis)
+}
+
+# iterative singular spectrum analysis
+issa = function (x, d) {
+  if (d > 1) {
+    x = as.matrix(x)
+    model = ssa(x, L = 6, kind = "mssa")
+  } else {
+    x = as.vector(x)
+    model = ssa(x, L = 6)
+  }
+  
+  res = igapfill(model, groups = list(c(1:6)), maxiter = 10)
+  
+  return (res)
 }
 
 ### Missing pattern 1
@@ -133,6 +149,16 @@ for (sim in 1:n_exper) {
   }
 }
 
+# iterative SSA
+cat("\n======= iterative SSA =============================\n")
+iSSA_imp = matrix(NA, nrow = nrow(dta), ncol = ncol(dta))
+for (sim in 1:n_exper) {
+  iSSA_imp[,((sim - 1) * d + 1):(sim * d)] = issa(dta[,((sim - 1) * d + 1):(sim * d)], d = d)
+  if (sim %% 100 == 0 && sim > 99) {
+    cat("Iteration", sim, "\n")
+  }
+}
+
 if (show_plot) {
   temp = na_lag_pairs(lin_imp[,1], which(is.na(dta[,1])))
   temp = data.frame(x = temp[,1],
@@ -186,7 +212,7 @@ if (show_plot) {
   plot(SF_imp[1:300,1], type = "l")
 }
 
-output = cbind(lin_imp, spl_imp, KS_imp, SF_imp)
+output = cbind(lin_imp, spl_imp, KS_imp, SF_imp, iSSA_imp)
 write.csv(output, paste0("./sim_data/", model_name, "/benchmarks_miss1.csv"), row.names = F)
 
 
@@ -253,6 +279,17 @@ for (sim in 1:n_exper) {
   }
 }
 
+# iterative SSA
+cat("\n======= iterative SSA =============================\n")
+iSSA_imp = matrix(NA, nrow = nrow(dta), ncol = ncol(dta))
+for (sim in 1:n_exper) {
+  iSSA_imp[,((sim - 1) * d + 1):(sim * d)] = issa(dta[,((sim - 1) * d + 1):(sim * d)], d = d)
+  if (sim %% 100 == 0 && sim > 99) {
+    cat("Iteration", sim, "\n")
+  }
+}
+
+
 if (show_plot) {
   temp = na_lag_pairs(lin_imp[,1], which(is.na(dta[,1])))
   temp = data.frame(x = temp[,1],
@@ -306,7 +343,7 @@ if (show_plot) {
   plot(SF_imp[,1], type = "l")
 }
 
-output = cbind(lin_imp, spl_imp, KS_imp, SF_imp)
+output = cbind(lin_imp, spl_imp, KS_imp, SF_imp, iSSA_imp)
 write.csv(output, paste0("./sim_data/", model_name, "/benchmarks_miss2.csv"), row.names = F)
 
 

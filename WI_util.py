@@ -13,25 +13,6 @@ import numpy as np
 
 #%%
 
-#def ts2stack(x, p = 2):
-#    """
-#    stride trick is too low-level; can be dangerous.
-#    Return an numpy array consisting of lagged realizations of x
-#    
-#    Parameters
-#    ----------
-#    x : (n, 1) numpy array of time series
-#    p : dimension of the lagged time series; must be >= 2
-#
-#    Returns
-#    -------
-#    A numpy array of size (n - p + 1, p)
-#    """
-    
-#    n = len(x) - p + 1
-#    return np.lib.stride_tricks.as_strided(x, shape = (n, p), 
-#                                           strides = (x.itemsize, x.itemsize))
-
 def ts2stack(x, p = 2):
     """
     Return an numpy array consisting of lagged realizations of x
@@ -53,7 +34,6 @@ def ts2stack(x, p = 2):
         
     return res
     
-
 def slide_sum(A, d):
     """
     Parameters
