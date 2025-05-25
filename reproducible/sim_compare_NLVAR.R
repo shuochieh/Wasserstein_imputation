@@ -46,8 +46,8 @@ benchmarks = as.matrix(read.csv(paste0(base_dir, "benchmarks_miss1.csv")))
 WI_lin = as.matrix(read.csv(paste0(base_dir, model_name, "_WI_lin_miss1.csv"), header = F))
 WI_Kalman = as.matrix(read.csv(paste0(base_dir, model_name, "_WI_Kalman_miss1.csv"), header = F))
 
-wass_d = matrix(0, nrow = 1000, ncol = 8)
-model_coef = vector(mode = "list", length = 9)
+wass_d = matrix(0, nrow = 1000, ncol = 9)
+model_coef = vector(mode = "list", length = 10)
 
 for (sim in 1:1000) {
   dta = truth[,((sim - 1) * 2 + 1):(sim * 2)]
@@ -56,6 +56,7 @@ for (sim in 1:1000) {
   spl = benchmarks[,2000 + ((sim - 1) * 2 + 1):(sim * 2)]
   Kalman = benchmarks[,4000 + ((sim - 1) * 2 + 1):(sim * 2)]
   PT = benchmarks[,6000 + ((sim - 1) * 2 + 1):(sim * 2)]
+  SSA = benchmarks[,8000 + ((sim - 1) * 2 + 1):(sim * 2)]
   wass = WI_lin[,((sim - 1) * 2 + 1):(sim * 2)]
   kwass = WI_lin[,2000 + ((sim - 1) * 2 + 1):(sim * 2)]
   wass_Kalman = WI_Kalman[,((sim - 1) * 2 + 1):(sim * 2)]
@@ -65,10 +66,11 @@ for (sim in 1:1000) {
   wass_d[sim, 2] = wasserstein(pp(embed(dta, 3)), pp(embed(spl, 3)), p = 2)
   wass_d[sim, 3] = wasserstein(pp(embed(dta, 3)), pp(embed(Kalman, 3)), p = 2)
   wass_d[sim, 4] = wasserstein(pp(embed(dta, 3)), pp(embed(PT, 3)), p = 2)
-  wass_d[sim, 5] = wasserstein(pp(embed(dta, 3)), pp(embed(wass, 3)), p = 2)
-  wass_d[sim, 6] = wasserstein(pp(embed(dta, 3)), pp(embed(kwass, 3)), p = 2)
-  wass_d[sim, 7] = wasserstein(pp(embed(dta, 3)), pp(embed(wass_Kalman, 3)), p = 2)
-  wass_d[sim, 8] = wasserstein(pp(embed(dta, 3)), pp(embed(kwass_Kalman, 3)), p = 2)
+  wass_d[sim, 5] = wasserstein(pp(embed(dta, 3)), pp(embed(SSA, 3)), p = 2)
+  wass_d[sim, 6] = wasserstein(pp(embed(dta, 3)), pp(embed(wass, 3)), p = 2)
+  wass_d[sim, 7] = wasserstein(pp(embed(dta, 3)), pp(embed(kwass, 3)), p = 2)
+  wass_d[sim, 8] = wasserstein(pp(embed(dta, 3)), pp(embed(wass_Kalman, 3)), p = 2)
+  wass_d[sim, 9] = wasserstein(pp(embed(dta, 3)), pp(embed(kwass_Kalman, 3)), p = 2)
   
   if (sim == 1) {
     model_coef[[1]] = model_estimate(dta, model_name)
@@ -76,20 +78,22 @@ for (sim in 1:1000) {
     model_coef[[3]] = model_estimate(spl, model_name)
     model_coef[[4]] = model_estimate(Kalman, model_name)
     model_coef[[5]] = model_estimate(PT, model_name)
-    model_coef[[6]] = model_estimate(wass, model_name)
-    model_coef[[7]] = model_estimate(kwass, model_name)
-    model_coef[[8]] = model_estimate(wass_Kalman, model_name)
-    model_coef[[9]] = model_estimate(kwass_Kalman, model_name)
+    model_coef[[6]] = model_estimate(SSA, model_name)
+    model_coef[[7]] = model_estimate(wass, model_name)
+    model_coef[[8]] = model_estimate(kwass, model_name)
+    model_coef[[9]] = model_estimate(wass_Kalman, model_name)
+    model_coef[[10]] = model_estimate(kwass_Kalman, model_name)
   } else {
     model_coef[[1]] = rbind(model_coef[[1]], model_estimate(dta, model_name))
     model_coef[[2]] = rbind(model_coef[[2]], model_estimate(lin, model_name))
     model_coef[[3]] = rbind(model_coef[[3]], model_estimate(spl, model_name))
     model_coef[[4]] = rbind(model_coef[[4]], model_estimate(Kalman, model_name))
     model_coef[[5]] = rbind(model_coef[[5]], model_estimate(PT, model_name))
-    model_coef[[6]] = rbind(model_coef[[6]], model_estimate(wass, model_name))
-    model_coef[[7]] = rbind(model_coef[[7]], model_estimate(kwass, model_name))
-    model_coef[[8]] = rbind(model_coef[[8]], model_estimate(wass_Kalman, model_name))
-    model_coef[[9]] = rbind(model_coef[[9]], model_estimate(kwass_Kalman, model_name))
+    model_coef[[6]] = rbind(model_coef[[6]], model_estimate(SSA, model_name))
+    model_coef[[7]] = rbind(model_coef[[7]], model_estimate(wass, model_name))
+    model_coef[[8]] = rbind(model_coef[[8]], model_estimate(kwass, model_name))
+    model_coef[[9]] = rbind(model_coef[[9]], model_estimate(wass_Kalman, model_name))
+    model_coef[[10]] = rbind(model_coef[[10]], model_estimate(kwass_Kalman, model_name))
   }
   
   if (sim == 1) {
@@ -120,17 +124,28 @@ for (sim in 1:1000) {
            y = paste0("x_{t,", y_coord,"}")) +
       theme(plot.title = element_text(size = 16))
     
-    temp = data.frame(x = na_lag_pairs(spl[,x_coord], which(is.na(x_obs[,1])))[,1],
-                      y = na_lag_pairs(spl[,y_coord], which(is.na(x_obs[,1])))[,2])
+    # temp = data.frame(x = na_lag_pairs(spl[,x_coord], which(is.na(x_obs[,1])))[,1],
+    #                   y = na_lag_pairs(spl[,y_coord], which(is.na(x_obs[,1])))[,2])
+    # p3 = ggplot(temp, aes(x = x, y = y)) + 
+    #   geom_point(color = "steelblue1", size = 1) +
+    #   coord_cartesian(xlim = plot_range, ylim = plot_range) +
+    #   theme_minimal() +
+    #   labs(title = "Spline smoothing", 
+    #        x = paste0("x_{t-1,", x_coord, "}"), 
+    #        y = paste0("x_{t,", y_coord,"}")) +
+    #   theme(plot.title = element_text(size = 16))
+    
+    temp = data.frame(x = na_lag_pairs(SSA[,x_coord], which(is.na(x_obs[,1])))[,1],
+                      y = na_lag_pairs(SSA[,y_coord], which(is.na(x_obs[,1])))[,2])
     p3 = ggplot(temp, aes(x = x, y = y)) + 
       geom_point(color = "steelblue1", size = 1) +
       coord_cartesian(xlim = plot_range, ylim = plot_range) +
       theme_minimal() +
-      labs(title = "Spline smoothing", 
+      labs(title = "iSSA", 
            x = paste0("x_{t-1,", x_coord, "}"), 
            y = paste0("x_{t,", y_coord,"}")) +
       theme(plot.title = element_text(size = 16))
-    
+
     temp = data.frame(x = na_lag_pairs(Kalman[,x_coord], which(is.na(x_obs[,1])))[,1],
                       y = na_lag_pairs(Kalman[,y_coord], which(is.na(x_obs[,1])))[,2])
     p4 = ggplot(temp, aes(x = x, y = y)) + 
@@ -222,13 +237,23 @@ for (sim in 1:1000) {
            y = paste0("x_{t,", y_coord,"}")) +
       theme(plot.title = element_text(size = 16))
     
-    temp = data.frame(x = na_lag_pairs(spl[,x_coord], which(is.na(x_obs[,1])))[,1],
-                      y = na_lag_pairs(spl[,y_coord], which(is.na(x_obs[,1])))[,2])
+    # temp = data.frame(x = na_lag_pairs(spl[,x_coord], which(is.na(x_obs[,1])))[,1],
+    #                   y = na_lag_pairs(spl[,y_coord], which(is.na(x_obs[,1])))[,2])
+    # p3 = ggplot(temp, aes(x = x, y = y)) + 
+    #   geom_point(color = "steelblue1", size = 1) +
+    #   coord_cartesian(xlim = plot_range, ylim = plot_range) +
+    #   theme_minimal() +
+    #   labs(title = "Spline smoothing", 
+    #        x = paste0("x_{t-1,", x_coord, "}"), 
+    #        y = paste0("x_{t,", y_coord,"}")) +
+    #   theme(plot.title = element_text(size = 16))
+    temp = data.frame(x = na_lag_pairs(SSA[,x_coord], which(is.na(x_obs[,1])))[,1],
+                      y = na_lag_pairs(SSA[,y_coord], which(is.na(x_obs[,1])))[,2])
     p3 = ggplot(temp, aes(x = x, y = y)) + 
       geom_point(color = "steelblue1", size = 1) +
       coord_cartesian(xlim = plot_range, ylim = plot_range) +
       theme_minimal() +
-      labs(title = "Spline smoothing", 
+      labs(title = "iSSA", 
            x = paste0("x_{t-1,", x_coord, "}"), 
            y = paste0("x_{t,", y_coord,"}")) +
       theme(plot.title = element_text(size = 16))
@@ -324,13 +349,23 @@ for (sim in 1:1000) {
            y = paste0("x_{t,", y_coord,"}")) +
       theme(plot.title = element_text(size = 16))
     
-    temp = data.frame(x = na_lag_pairs(spl[,x_coord], which(is.na(x_obs[,1])))[,1],
-                      y = na_lag_pairs(spl[,y_coord], which(is.na(x_obs[,1])))[,2])
+    # temp = data.frame(x = na_lag_pairs(spl[,x_coord], which(is.na(x_obs[,1])))[,1],
+    #                   y = na_lag_pairs(spl[,y_coord], which(is.na(x_obs[,1])))[,2])
+    # p3 = ggplot(temp, aes(x = x, y = y)) + 
+    #   geom_point(color = "steelblue1", size = 1) +
+    #   coord_cartesian(xlim = plot_range, ylim = plot_range) +
+    #   theme_minimal() +
+    #   labs(title = "Spline smoothing", 
+    #        x = paste0("x_{t-1,", x_coord, "}"), 
+    #        y = paste0("x_{t,", y_coord,"}")) +
+    #   theme(plot.title = element_text(size = 16))
+    temp = data.frame(x = na_lag_pairs(SSA[,x_coord], which(is.na(x_obs[,1])))[,1],
+                      y = na_lag_pairs(SSA[,y_coord], which(is.na(x_obs[,1])))[,2])
     p3 = ggplot(temp, aes(x = x, y = y)) + 
       geom_point(color = "steelblue1", size = 1) +
       coord_cartesian(xlim = plot_range, ylim = plot_range) +
       theme_minimal() +
-      labs(title = "Spline smoothing", 
+      labs(title = "iSSA", 
            x = paste0("x_{t-1,", x_coord, "}"), 
            y = paste0("x_{t,", y_coord,"}")) +
       theme(plot.title = element_text(size = 16))
@@ -426,13 +461,23 @@ for (sim in 1:1000) {
            y = paste0("x_{t,", y_coord,"}")) +
       theme(plot.title = element_text(size = 16))
     
-    temp = data.frame(x = na_lag_pairs(spl[,x_coord], which(is.na(x_obs[,1])))[,1],
-                      y = na_lag_pairs(spl[,y_coord], which(is.na(x_obs[,1])))[,2])
+    # temp = data.frame(x = na_lag_pairs(spl[,x_coord], which(is.na(x_obs[,1])))[,1],
+    #                   y = na_lag_pairs(spl[,y_coord], which(is.na(x_obs[,1])))[,2])
+    # p3 = ggplot(temp, aes(x = x, y = y)) + 
+    #   geom_point(color = "steelblue1", size = 1) +
+    #   coord_cartesian(xlim = plot_range, ylim = plot_range) +
+    #   theme_minimal() +
+    #   labs(title = "Spline smoothing", 
+    #        x = paste0("x_{t-1,", x_coord, "}"), 
+    #        y = paste0("x_{t,", y_coord,"}")) +
+    #   theme(plot.title = element_text(size = 16))
+    temp = data.frame(x = na_lag_pairs(SSA[,x_coord], which(is.na(x_obs[,1])))[,1],
+                      y = na_lag_pairs(SSA[,y_coord], which(is.na(x_obs[,1])))[,2])
     p3 = ggplot(temp, aes(x = x, y = y)) + 
       geom_point(color = "steelblue1", size = 1) +
       coord_cartesian(xlim = plot_range, ylim = plot_range) +
       theme_minimal() +
-      labs(title = "Spline smoothing", 
+      labs(title = "iSSA", 
            x = paste0("x_{t-1,", x_coord, "}"), 
            y = paste0("x_{t,", y_coord,"}")) +
       theme(plot.title = element_text(size = 16))
@@ -510,7 +555,7 @@ for (sim in 1:1000) {
 }
 
 par(mfrow = c(3, 3))
-for (i in 1:9) {
+for (i in 1:10) {
   if (i == 1) {
     hist(model_coef[[1]][,1], prob = TRUE, col = "lightblue", 
          main = "Ground truth", xlab = "", xlim = c(0.2, 0.65))
@@ -520,15 +565,18 @@ for (i in 1:9) {
       method = "Linear"
     } else if (i == 3) {
       method = "Spline"
+      next
     } else if (i == 4) {
       method = "Kalman"
     } else if (i == 5) {
       method = "Scalar filter"
     } else if (i == 6) {
-      method = "WI (linear)"
+      method = "iSSA" 
     } else if (i == 7) {
-      method = "kWI (linear)"
+      method = "WI (linear)"
     } else if (i == 8) {
+      method = "kWI (linear)"
+    } else if (i == 9) {
       method = "WI (Kalman)"
     } else {
       method = "kWI (Kalman)"
@@ -540,7 +588,7 @@ for (i in 1:9) {
     lines(density(model_coef[[1]][,1]), col = "blue", lwd = 2) 
   }
 }
-for (i in 1:9) {
+for (i in 1:10) {
   if (i == 1) {
     hist(model_coef[[1]][,2], prob = TRUE, col = "lightblue", 
          main = "Ground truth", xlab = "", xlim = c(4.2, 8.1))
@@ -550,15 +598,18 @@ for (i in 1:9) {
       method = "Linear"
     } else if (i == 3) {
       method = "Spline"
+      next
     } else if (i == 4) {
       method = "Kalman"
     } else if (i == 5) {
       method = "Scalar filter"
     } else if (i == 6) {
-      method = "WI (linear)"
+      method = "iSSA" 
     } else if (i == 7) {
-      method = "kWI (linear)"
+      method = "WI (linear)"
     } else if (i == 8) {
+      method = "kWI (linear)"
+    } else if (i == 9) {
       method = "WI (Kalman)"
     } else {
       method = "kWI (Kalman)"
@@ -570,7 +621,7 @@ for (i in 1:9) {
     lines(density(model_coef[[1]][,2]), col = "blue", lwd = 2)
   }
 }
-for (i in 1:9) {
+for (i in 1:10) {
   if (i == 1) {
     hist(model_coef[[1]][,3], prob = TRUE, col = "lightblue", 
          main = "Ground truth", xlab = "", xlim = c(-0.1, 0.1))
@@ -580,15 +631,18 @@ for (i in 1:9) {
       method = "Linear"
     } else if (i == 3) {
       method = "Spline"
+      next
     } else if (i == 4) {
       method = "Kalman"
     } else if (i == 5) {
       method = "Scalar filter"
     } else if (i == 6) {
-      method = "WI (linear)"
+      method = "iSSA" 
     } else if (i == 7) {
-      method = "kWI (linear)"
+      method = "WI (linear)"
     } else if (i == 8) {
+      method = "kWI (linear)"
+    } else if (i == 9) {
       method = "WI (Kalman)"
     } else {
       method = "kWI (Kalman)"
@@ -600,7 +654,7 @@ for (i in 1:9) {
     lines(density(model_coef[[1]][,3]), col = "blue", lwd = 2)
   }
 }
-for (i in 1:9) {
+for (i in 1:10) {
   if (i == 1) {
     hist(model_coef[[1]][,4], prob = TRUE, col = "lightblue", 
          main = "Ground truth", xlab = "", xlim = c(0.2, 0.75))
@@ -610,15 +664,18 @@ for (i in 1:9) {
       method = "Linear"
     } else if (i == 3) {
       method = "Spline"
+      next
     } else if (i == 4) {
       method = "Kalman"
     } else if (i == 5) {
       method = "Scalar filter"
     } else if (i == 6) {
-      method = "WI (linear)"
+      method = "iSSA" 
     } else if (i == 7) {
-      method = "kWI (linear)"
+      method = "WI (linear)"
     } else if (i == 8) {
+      method = "kWI (linear)"
+    } else if (i == 9) {
       method = "WI (Kalman)"
     } else {
       method = "kWI (Kalman)"
@@ -631,27 +688,49 @@ for (i in 1:9) {
   }
 }
 
-print(round(colMeans(wass_d), 4))
+for (j in 1:9) {
+  if (j == 1) {
+    cat("Wasserstein loss for", "Linear:", round(mean(wass_d[,1]), 2), "\n")
+  } else if (j == 2) {
+    cat("Wasserstein loss for", "Spline:", round(mean(wass_d[,2]), 2), "\n")
+  } else if (j == 3) {
+    cat("Wasserstein loss for", "Kalman:", round(mean(wass_d[,3]), 2), "\n")
+  } else if (j == 4) {
+    cat("Wasserstein loss for", "PT:", round(mean(wass_d[,4]), 2), "\n")
+  } else if (j == 5) {
+    cat("Wasserstein loss for", "iSSA:", round(mean(wass_d[,5]), 2), "\n")
+  } else if (j == 6) {
+    cat("Wasserstein loss for", "WI (linear):", round(mean(wass_d[,6]), 2), "\n")
+  } else if (j == 7) {
+    cat("Wasserstein loss for", "kWI (linear):", round(mean(wass_d[,7]), 2), "\n")
+  } else if (j == 8) {
+    cat("Wasserstein loss for", "WI (Kalman):", round(mean(wass_d[,8]), 2), "\n")
+  } else {
+    cat("Wasserstein loss for", "kWI (Kalman):", round(mean(wass_d[,9]), 2), "\n")
+  }
+}
 GT_arcoef = colMeans(model_coef[[1]])
-for (j in 1:8) {
+for (j in 1:9) {
   sub_arcoef = model_coef[[j+1]]
   temp = t(t(sub_arcoef) - GT_arcoef)
   if (j == 1) {
-    cat("estimation error for", "Linear:", round(sqrt(colMeans(temp^2)), 3), "\n")
+    cat("estimation error for", "Linear:", round(sqrt(colMeans(temp^2)), 2), "\n")
   } else if (j == 2) {
-    cat("estimation error for", "Spline:", round(sqrt(colMeans(temp^2)), 3), "\n")
+    cat("estimation error for", "Spline:", round(sqrt(colMeans(temp^2)), 2), "\n")
   } else if (j == 3) {
-    cat("estimation error for", "Kalman:", round(sqrt(colMeans(temp^2)), 3), "\n")
+    cat("estimation error for", "Kalman:", round(sqrt(colMeans(temp^2)), 2), "\n")
   } else if (j == 4) {
-    cat("estimation error for", "PT:", round(sqrt(colMeans(temp^2)), 3), "\n")
+    cat("estimation error for", "PT:", round(sqrt(colMeans(temp^2)), 2), "\n")
   } else if (j == 5) {
-    cat("estimation error for", "WI (linear):", round(sqrt(colMeans(temp^2)), 3), "\n")
+    cat("estimation error for", "iSSA:", round(sqrt(colMeans(temp^2)), 2), "\n")
   } else if (j == 6) {
-    cat("estimation error for", "kWI (linear):", round(sqrt(colMeans(temp^2)), 3), "\n")
+    cat("estimation error for", "WI (linear):", round(sqrt(colMeans(temp^2)), 2), "\n")
   } else if (j == 7) {
-    cat("estimation error for", "WI (Kalman):", round(sqrt(colMeans(temp^2)), 3), "\n")
+    cat("estimation error for", "kWI (linear):", round(sqrt(colMeans(temp^2)), 2), "\n")
+  } else if (j == 8) {
+    cat("estimation error for", "WI (Kalman):", round(sqrt(colMeans(temp^2)), 2), "\n")
   } else {
-    cat("estimation error for", "kWI (Kalman):", round(sqrt(colMeans(temp^2)), 3), "\n")
+    cat("estimation error for", "kWI (Kalman):", round(sqrt(colMeans(temp^2)), 2), "\n")
   }
 }
 
@@ -667,8 +746,8 @@ benchmarks = as.matrix(read.csv(paste0(base_dir, "benchmarks_miss2.csv")))
 WI_lin = as.matrix(read.csv(paste0(base_dir, model_name, "_WI_lin_miss2.csv"), header = F))
 WI_Kalman = as.matrix(read.csv(paste0(base_dir, model_name, "_WI_Kalman_miss2.csv"), header = F))
 
-wass_d = matrix(0, nrow = 1000, ncol = 8)
-model_coef = vector(mode = "list", length = 9)
+wass_d = matrix(0, nrow = 1000, ncol = 9)
+model_coef = vector(mode = "list", length = 10)
 
 for (sim in 1:1000) {
   dta = truth[,((sim - 1) * 2 + 1):(sim * 2)]
@@ -677,6 +756,7 @@ for (sim in 1:1000) {
   spl = benchmarks[,2000 + ((sim - 1) * 2 + 1):(sim * 2)]
   Kalman = benchmarks[,4000 + ((sim - 1) * 2 + 1):(sim * 2)]
   PT = benchmarks[,6000 + ((sim - 1) * 2 + 1):(sim * 2)]
+  SSA = benchmarks[,8000 + ((sim - 1) * 2 + 1):(sim * 2)]
   wass = WI_lin[,((sim - 1) * 2 + 1):(sim * 2)]
   kwass = WI_lin[,2000 + ((sim - 1) * 2 + 1):(sim * 2)]
   wass_Kalman = WI_Kalman[,((sim - 1) * 2 + 1):(sim * 2)]
@@ -686,10 +766,11 @@ for (sim in 1:1000) {
   wass_d[sim, 2] = wasserstein(pp(embed(dta, 3)), pp(embed(spl, 3)), p = 2)
   wass_d[sim, 3] = wasserstein(pp(embed(dta, 3)), pp(embed(Kalman, 3)), p = 2)
   wass_d[sim, 4] = wasserstein(pp(embed(dta, 3)), pp(embed(PT, 3)), p = 2)
-  wass_d[sim, 5] = wasserstein(pp(embed(dta, 3)), pp(embed(wass, 3)), p = 2)
-  wass_d[sim, 6] = wasserstein(pp(embed(dta, 3)), pp(embed(kwass, 3)), p = 2)
-  wass_d[sim, 7] = wasserstein(pp(embed(dta, 3)), pp(embed(wass_Kalman, 3)), p = 2)
-  wass_d[sim, 8] = wasserstein(pp(embed(dta, 3)), pp(embed(kwass_Kalman, 3)), p = 2)
+  wass_d[sim, 5] = wasserstein(pp(embed(dta, 3)), pp(embed(SSA, 3)), p = 2)
+  wass_d[sim, 6] = wasserstein(pp(embed(dta, 3)), pp(embed(wass, 3)), p = 2)
+  wass_d[sim, 7] = wasserstein(pp(embed(dta, 3)), pp(embed(kwass, 3)), p = 2)
+  wass_d[sim, 8] = wasserstein(pp(embed(dta, 3)), pp(embed(wass_Kalman, 3)), p = 2)
+  wass_d[sim, 9] = wasserstein(pp(embed(dta, 3)), pp(embed(kwass_Kalman, 3)), p = 2)
   
   if (sim == 1) {
     model_coef[[1]] = model_estimate(dta, model_name)
@@ -697,20 +778,22 @@ for (sim in 1:1000) {
     model_coef[[3]] = model_estimate(spl, model_name)
     model_coef[[4]] = model_estimate(Kalman, model_name)
     model_coef[[5]] = model_estimate(PT, model_name)
-    model_coef[[6]] = model_estimate(wass, model_name)
-    model_coef[[7]] = model_estimate(kwass, model_name)
-    model_coef[[8]] = model_estimate(wass_Kalman, model_name)
-    model_coef[[9]] = model_estimate(kwass_Kalman, model_name)
+    model_coef[[6]] = model_estimate(SSA, model_name)
+    model_coef[[7]] = model_estimate(wass, model_name)
+    model_coef[[8]] = model_estimate(kwass, model_name)
+    model_coef[[9]] = model_estimate(wass_Kalman, model_name)
+    model_coef[[10]] = model_estimate(kwass_Kalman, model_name)
   } else {
     model_coef[[1]] = rbind(model_coef[[1]], model_estimate(dta, model_name))
     model_coef[[2]] = rbind(model_coef[[2]], model_estimate(lin, model_name))
     model_coef[[3]] = rbind(model_coef[[3]], model_estimate(spl, model_name))
     model_coef[[4]] = rbind(model_coef[[4]], model_estimate(Kalman, model_name))
     model_coef[[5]] = rbind(model_coef[[5]], model_estimate(PT, model_name))
-    model_coef[[6]] = rbind(model_coef[[6]], model_estimate(wass, model_name))
-    model_coef[[7]] = rbind(model_coef[[7]], model_estimate(kwass, model_name))
-    model_coef[[8]] = rbind(model_coef[[8]], model_estimate(wass_Kalman, model_name))
-    model_coef[[9]] = rbind(model_coef[[9]], model_estimate(kwass_Kalman, model_name))
+    model_coef[[6]] = rbind(model_coef[[6]], model_estimate(SSA, model_name))
+    model_coef[[7]] = rbind(model_coef[[7]], model_estimate(wass, model_name))
+    model_coef[[8]] = rbind(model_coef[[8]], model_estimate(kwass, model_name))
+    model_coef[[9]] = rbind(model_coef[[9]], model_estimate(wass_Kalman, model_name))
+    model_coef[[10]] = rbind(model_coef[[10]], model_estimate(kwass_Kalman, model_name))
   }
   
   if (sim == 1) {
@@ -729,6 +812,7 @@ for (sim in 1:1000) {
            y = paste0("x_{t,", y_coord,"}")) +
       theme(plot.title = element_text(size = 16))
     
+    
     temp = data.frame(x = na_lag_pairs(lin[,x_coord], which(is.na(x_obs[,1])))[,1],
                       y = na_lag_pairs(lin[,y_coord], which(is.na(x_obs[,1])))[,2])
     p2 = ggplot(temp, aes(x = x, y = y)) + 
@@ -740,13 +824,24 @@ for (sim in 1:1000) {
            y = paste0("x_{t,", y_coord,"}")) +
       theme(plot.title = element_text(size = 16))
     
-    temp = data.frame(x = na_lag_pairs(spl[,x_coord], which(is.na(x_obs[,1])))[,1],
-                      y = na_lag_pairs(spl[,y_coord], which(is.na(x_obs[,1])))[,2])
+    # temp = data.frame(x = na_lag_pairs(spl[,x_coord], which(is.na(x_obs[,1])))[,1],
+    #                   y = na_lag_pairs(spl[,y_coord], which(is.na(x_obs[,1])))[,2])
+    # p3 = ggplot(temp, aes(x = x, y = y)) + 
+    #   geom_point(color = "steelblue1", size = 1) +
+    #   coord_cartesian(xlim = plot_range, ylim = plot_range) +
+    #   theme_minimal() +
+    #   labs(title = "Spline smoothing", 
+    #        x = paste0("x_{t-1,", x_coord, "}"), 
+    #        y = paste0("x_{t,", y_coord,"}")) +
+    #   theme(plot.title = element_text(size = 16))
+    
+    temp = data.frame(x = na_lag_pairs(SSA[,x_coord], which(is.na(x_obs[,1])))[,1],
+                      y = na_lag_pairs(SSA[,y_coord], which(is.na(x_obs[,1])))[,2])
     p3 = ggplot(temp, aes(x = x, y = y)) + 
       geom_point(color = "steelblue1", size = 1) +
       coord_cartesian(xlim = plot_range, ylim = plot_range) +
       theme_minimal() +
-      labs(title = "Spline smoothing", 
+      labs(title = "iSSA", 
            x = paste0("x_{t-1,", x_coord, "}"), 
            y = paste0("x_{t,", y_coord,"}")) +
       theme(plot.title = element_text(size = 16))
@@ -842,13 +937,23 @@ for (sim in 1:1000) {
            y = paste0("x_{t,", y_coord,"}")) +
       theme(plot.title = element_text(size = 16))
     
-    temp = data.frame(x = na_lag_pairs(spl[,x_coord], which(is.na(x_obs[,1])))[,1],
-                      y = na_lag_pairs(spl[,y_coord], which(is.na(x_obs[,1])))[,2])
+    # temp = data.frame(x = na_lag_pairs(spl[,x_coord], which(is.na(x_obs[,1])))[,1],
+    #                   y = na_lag_pairs(spl[,y_coord], which(is.na(x_obs[,1])))[,2])
+    # p3 = ggplot(temp, aes(x = x, y = y)) + 
+    #   geom_point(color = "steelblue1", size = 1) +
+    #   coord_cartesian(xlim = plot_range, ylim = plot_range) +
+    #   theme_minimal() +
+    #   labs(title = "Spline smoothing", 
+    #        x = paste0("x_{t-1,", x_coord, "}"), 
+    #        y = paste0("x_{t,", y_coord,"}")) +
+    #   theme(plot.title = element_text(size = 16))
+    temp = data.frame(x = na_lag_pairs(SSA[,x_coord], which(is.na(x_obs[,1])))[,1],
+                      y = na_lag_pairs(SSA[,y_coord], which(is.na(x_obs[,1])))[,2])
     p3 = ggplot(temp, aes(x = x, y = y)) + 
       geom_point(color = "steelblue1", size = 1) +
       coord_cartesian(xlim = plot_range, ylim = plot_range) +
       theme_minimal() +
-      labs(title = "Spline smoothing", 
+      labs(title = "iSSA", 
            x = paste0("x_{t-1,", x_coord, "}"), 
            y = paste0("x_{t,", y_coord,"}")) +
       theme(plot.title = element_text(size = 16))
@@ -944,13 +1049,23 @@ for (sim in 1:1000) {
            y = paste0("x_{t,", y_coord,"}")) +
       theme(plot.title = element_text(size = 16))
     
-    temp = data.frame(x = na_lag_pairs(spl[,x_coord], which(is.na(x_obs[,1])))[,1],
-                      y = na_lag_pairs(spl[,y_coord], which(is.na(x_obs[,1])))[,2])
+    # temp = data.frame(x = na_lag_pairs(spl[,x_coord], which(is.na(x_obs[,1])))[,1],
+    #                   y = na_lag_pairs(spl[,y_coord], which(is.na(x_obs[,1])))[,2])
+    # p3 = ggplot(temp, aes(x = x, y = y)) + 
+    #   geom_point(color = "steelblue1", size = 1) +
+    #   coord_cartesian(xlim = plot_range, ylim = plot_range) +
+    #   theme_minimal() +
+    #   labs(title = "Spline smoothing", 
+    #        x = paste0("x_{t-1,", x_coord, "}"), 
+    #        y = paste0("x_{t,", y_coord,"}")) +
+    #   theme(plot.title = element_text(size = 16))
+    temp = data.frame(x = na_lag_pairs(SSA[,x_coord], which(is.na(x_obs[,1])))[,1],
+                      y = na_lag_pairs(SSA[,y_coord], which(is.na(x_obs[,1])))[,2])
     p3 = ggplot(temp, aes(x = x, y = y)) + 
       geom_point(color = "steelblue1", size = 1) +
       coord_cartesian(xlim = plot_range, ylim = plot_range) +
       theme_minimal() +
-      labs(title = "Spline smoothing", 
+      labs(title = "iSSA", 
            x = paste0("x_{t-1,", x_coord, "}"), 
            y = paste0("x_{t,", y_coord,"}")) +
       theme(plot.title = element_text(size = 16))
@@ -1046,13 +1161,23 @@ for (sim in 1:1000) {
            y = paste0("x_{t,", y_coord,"}")) +
       theme(plot.title = element_text(size = 16))
     
-    temp = data.frame(x = na_lag_pairs(spl[,x_coord], which(is.na(x_obs[,1])))[,1],
-                      y = na_lag_pairs(spl[,y_coord], which(is.na(x_obs[,1])))[,2])
+    # temp = data.frame(x = na_lag_pairs(spl[,x_coord], which(is.na(x_obs[,1])))[,1],
+    #                   y = na_lag_pairs(spl[,y_coord], which(is.na(x_obs[,1])))[,2])
+    # p3 = ggplot(temp, aes(x = x, y = y)) + 
+    #   geom_point(color = "steelblue1", size = 1) +
+    #   coord_cartesian(xlim = plot_range, ylim = plot_range) +
+    #   theme_minimal() +
+    #   labs(title = "Spline smoothing", 
+    #        x = paste0("x_{t-1,", x_coord, "}"), 
+    #        y = paste0("x_{t,", y_coord,"}")) +
+    #   theme(plot.title = element_text(size = 16))
+    temp = data.frame(x = na_lag_pairs(SSA[,x_coord], which(is.na(x_obs[,1])))[,1],
+                      y = na_lag_pairs(SSA[,y_coord], which(is.na(x_obs[,1])))[,2])
     p3 = ggplot(temp, aes(x = x, y = y)) + 
       geom_point(color = "steelblue1", size = 1) +
       coord_cartesian(xlim = plot_range, ylim = plot_range) +
       theme_minimal() +
-      labs(title = "Spline smoothing", 
+      labs(title = "iSSA", 
            x = paste0("x_{t-1,", x_coord, "}"), 
            y = paste0("x_{t,", y_coord,"}")) +
       theme(plot.title = element_text(size = 16))
@@ -1130,7 +1255,7 @@ for (sim in 1:1000) {
 }
 
 par(mfrow = c(3, 3))
-for (i in 1:9) {
+for (i in 1:10) {
   if (i == 1) {
     hist(model_coef[[1]][,1], prob = TRUE, col = "lightblue", 
          main = "Ground truth", xlab = "", xlim = c(0.2, 0.65))
@@ -1140,15 +1265,18 @@ for (i in 1:9) {
       method = "Linear"
     } else if (i == 3) {
       method = "Spline"
+      next
     } else if (i == 4) {
       method = "Kalman"
     } else if (i == 5) {
       method = "Scalar filter"
     } else if (i == 6) {
-      method = "WI (linear)"
+      method = "iSSA" 
     } else if (i == 7) {
-      method = "kWI (linear)"
+      method = "WI (linear)"
     } else if (i == 8) {
+      method = "kWI (linear)"
+    } else if (i == 9) {
       method = "WI (Kalman)"
     } else {
       method = "kWI (Kalman)"
@@ -1160,7 +1288,7 @@ for (i in 1:9) {
     lines(density(model_coef[[1]][,1]), col = "blue", lwd = 2) 
   }
 }
-for (i in 1:9) {
+for (i in 1:10) {
   if (i == 1) {
     hist(model_coef[[1]][,2], prob = TRUE, col = "lightblue", 
          main = "Ground truth", xlab = "", xlim = c(4.2, 8.1))
@@ -1170,15 +1298,18 @@ for (i in 1:9) {
       method = "Linear"
     } else if (i == 3) {
       method = "Spline"
+      next
     } else if (i == 4) {
       method = "Kalman"
     } else if (i == 5) {
       method = "Scalar filter"
     } else if (i == 6) {
-      method = "WI (linear)"
+      method = "iSSA" 
     } else if (i == 7) {
-      method = "kWI (linear)"
+      method = "WI (linear)"
     } else if (i == 8) {
+      method = "kWI (linear)"
+    } else if (i == 9) {
       method = "WI (Kalman)"
     } else {
       method = "kWI (Kalman)"
@@ -1190,7 +1321,7 @@ for (i in 1:9) {
     lines(density(model_coef[[1]][,2]), col = "blue", lwd = 2)
   }
 }
-for (i in 1:9) {
+for (i in 1:10) {
   if (i == 1) {
     hist(model_coef[[1]][,3], prob = TRUE, col = "lightblue", 
          main = "Ground truth", xlab = "", xlim = c(-0.1, 0.1))
@@ -1200,15 +1331,18 @@ for (i in 1:9) {
       method = "Linear"
     } else if (i == 3) {
       method = "Spline"
+      next
     } else if (i == 4) {
       method = "Kalman"
     } else if (i == 5) {
       method = "Scalar filter"
     } else if (i == 6) {
-      method = "WI (linear)"
+      method = "iSSA" 
     } else if (i == 7) {
-      method = "kWI (linear)"
+      method = "WI (linear)"
     } else if (i == 8) {
+      method = "kWI (linear)"
+    } else if (i == 9) {
       method = "WI (Kalman)"
     } else {
       method = "kWI (Kalman)"
@@ -1220,7 +1354,7 @@ for (i in 1:9) {
     lines(density(model_coef[[1]][,3]), col = "blue", lwd = 2)
   }
 }
-for (i in 1:9) {
+for (i in 1:10) {
   if (i == 1) {
     hist(model_coef[[1]][,4], prob = TRUE, col = "lightblue", 
          main = "Ground truth", xlab = "", xlim = c(0.2, 0.75))
@@ -1230,15 +1364,18 @@ for (i in 1:9) {
       method = "Linear"
     } else if (i == 3) {
       method = "Spline"
+      next
     } else if (i == 4) {
       method = "Kalman"
     } else if (i == 5) {
       method = "Scalar filter"
     } else if (i == 6) {
-      method = "WI (linear)"
+      method = "iSSA" 
     } else if (i == 7) {
-      method = "kWI (linear)"
+      method = "WI (linear)"
     } else if (i == 8) {
+      method = "kWI (linear)"
+    } else if (i == 9) {
       method = "WI (Kalman)"
     } else {
       method = "kWI (Kalman)"
@@ -1251,27 +1388,48 @@ for (i in 1:9) {
   }
 }
 
-print(round(colMeans(wass_d), 4))
+for (j in 1:9) {
+  if (j == 1) {
+    cat("Wasserstein loss for", "Linear:", round(mean(wass_d[,1]), 2), "\n")
+  } else if (j == 2) {
+    cat("Wasserstein loss for", "Spline:", round(mean(wass_d[,2]), 2), "\n")
+  } else if (j == 3) {
+    cat("Wasserstein loss for", "Kalman:", round(mean(wass_d[,3]), 2), "\n")
+  } else if (j == 4) {
+    cat("Wasserstein loss for", "PT:", round(mean(wass_d[,4]), 2), "\n")
+  } else if (j == 5) {
+    cat("Wasserstein loss for", "iSSA:", round(mean(wass_d[,5]), 2), "\n")
+  } else if (j == 6) {
+    cat("Wasserstein loss for", "WI (linear):", round(mean(wass_d[,6]), 2), "\n")
+  } else if (j == 7) {
+    cat("Wasserstein loss for", "kWI (linear):", round(mean(wass_d[,7]), 2), "\n")
+  } else if (j == 8) {
+    cat("Wasserstein loss for", "WI (Kalman):", round(mean(wass_d[,8]), 2), "\n")
+  } else {
+    cat("Wasserstein loss for", "kWI (Kalman):", round(mean(wass_d[,9]), 2), "\n")
+  }
+}
 GT_arcoef = colMeans(model_coef[[1]])
-for (j in 1:8) {
+for (j in 1:9) {
   sub_arcoef = model_coef[[j+1]]
   temp = t(t(sub_arcoef) - GT_arcoef)
   if (j == 1) {
-    cat("estimation error for", "Linear:", round(sqrt(colMeans(temp^2)), 3), "\n")
+    cat("estimation error for", "Linear:", round(sqrt(colMeans(temp^2)), 2), "\n")
   } else if (j == 2) {
-    cat("estimation error for", "Spline:", round(sqrt(colMeans(temp^2)), 3), "\n")
+    cat("estimation error for", "Spline:", round(sqrt(colMeans(temp^2)), 2), "\n")
   } else if (j == 3) {
-    cat("estimation error for", "Kalman:", round(sqrt(colMeans(temp^2)), 3), "\n")
+    cat("estimation error for", "Kalman:", round(sqrt(colMeans(temp^2)), 2), "\n")
   } else if (j == 4) {
-    cat("estimation error for", "PT:", round(sqrt(colMeans(temp^2)), 3), "\n")
+    cat("estimation error for", "PT:", round(sqrt(colMeans(temp^2)), 2), "\n")
   } else if (j == 5) {
-    cat("estimation error for", "WI (linear):", round(sqrt(colMeans(temp^2)), 3), "\n")
+    cat("estimation error for", "iSSA:", round(sqrt(colMeans(temp^2)), 2), "\n")
   } else if (j == 6) {
-    cat("estimation error for", "kWI (linear):", round(sqrt(colMeans(temp^2)), 3), "\n")
+    cat("estimation error for", "WI (linear):", round(sqrt(colMeans(temp^2)), 2), "\n")
   } else if (j == 7) {
-    cat("estimation error for", "WI (Kalman):", round(sqrt(colMeans(temp^2)), 3), "\n")
+    cat("estimation error for", "kWI (linear):", round(sqrt(colMeans(temp^2)), 2), "\n")
+  } else if (j == 8) {
+    cat("estimation error for", "WI (Kalman):", round(sqrt(colMeans(temp^2)), 2), "\n")
   } else {
-    cat("estimation error for", "kWI (Kalman):", round(sqrt(colMeans(temp^2)), 3), "\n")
+    cat("estimation error for", "kWI (Kalman):", round(sqrt(colMeans(temp^2)), 2), "\n")
   }
 }
-
