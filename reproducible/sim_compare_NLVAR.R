@@ -573,13 +573,13 @@ for (i in 1:10) {
     } else if (i == 6) {
       method = "iSSA" 
     } else if (i == 7) {
-      method = "WI (linear)"
+      method = "TWI (linear)"
     } else if (i == 8) {
-      method = "kWI (linear)"
+      method = "k-TWI (linear)"
     } else if (i == 9) {
-      method = "WI (Kalman)"
+      method = "TWI (Kalman)"
     } else {
-      method = "kWI (Kalman)"
+      method = "k-TWI (Kalman)"
     }
     hist(model_coef[[i]][,1], prob = TRUE, col = "lightblue", 
          main = paste0(method, ": phi11"),
@@ -606,13 +606,13 @@ for (i in 1:10) {
     } else if (i == 6) {
       method = "iSSA" 
     } else if (i == 7) {
-      method = "WI (linear)"
+      method = "TWI (linear)"
     } else if (i == 8) {
-      method = "kWI (linear)"
+      method = "k-TWI (linear)"
     } else if (i == 9) {
-      method = "WI (Kalman)"
+      method = "TWI (Kalman)"
     } else {
-      method = "kWI (Kalman)"
+      method = "k-TWI (Kalman)"
     }
     hist(model_coef[[i]][,2], prob = TRUE, col = "lightblue", 
          main = paste0(method, ": phi12"),
@@ -639,13 +639,13 @@ for (i in 1:10) {
     } else if (i == 6) {
       method = "iSSA" 
     } else if (i == 7) {
-      method = "WI (linear)"
+      method = "TWI (linear)"
     } else if (i == 8) {
-      method = "kWI (linear)"
+      method = "k-TWI (linear)"
     } else if (i == 9) {
-      method = "WI (Kalman)"
+      method = "TWI (Kalman)"
     } else {
-      method = "kWI (Kalman)"
+      method = "k-TWI (Kalman)"
     }
     hist(model_coef[[i]][,3], prob = TRUE, col = "lightblue", 
          main = paste0(method, ": phi21"),
@@ -672,13 +672,13 @@ for (i in 1:10) {
     } else if (i == 6) {
       method = "iSSA" 
     } else if (i == 7) {
-      method = "WI (linear)"
+      method = "TWI (linear)"
     } else if (i == 8) {
-      method = "kWI (linear)"
+      method = "k-TWI (linear)"
     } else if (i == 9) {
-      method = "WI (Kalman)"
+      method = "TWI (Kalman)"
     } else {
-      method = "kWI (Kalman)"
+      method = "k-TWI (Kalman)"
     }
     hist(model_coef[[i]][,4], prob = TRUE, col = "lightblue", 
          main = paste0(method, ": phi22"),
@@ -700,13 +700,13 @@ for (j in 1:9) {
   } else if (j == 5) {
     cat("Wasserstein loss for", "iSSA:", round(mean(wass_d[,5]), 2), "\n")
   } else if (j == 6) {
-    cat("Wasserstein loss for", "WI (linear):", round(mean(wass_d[,6]), 2), "\n")
+    cat("Wasserstein loss for", "TWI (linear):", round(mean(wass_d[,6]), 2), "\n")
   } else if (j == 7) {
-    cat("Wasserstein loss for", "kWI (linear):", round(mean(wass_d[,7]), 2), "\n")
+    cat("Wasserstein loss for", "k-TWI (linear):", round(mean(wass_d[,7]), 2), "\n")
   } else if (j == 8) {
-    cat("Wasserstein loss for", "WI (Kalman):", round(mean(wass_d[,8]), 2), "\n")
+    cat("Wasserstein loss for", "TWI (Kalman):", round(mean(wass_d[,8]), 2), "\n")
   } else {
-    cat("Wasserstein loss for", "kWI (Kalman):", round(mean(wass_d[,9]), 2), "\n")
+    cat("Wasserstein loss for", "k-TWI (Kalman):", round(mean(wass_d[,9]), 2), "\n")
   }
 }
 GT_arcoef = colMeans(model_coef[[1]])
@@ -724,13 +724,13 @@ for (j in 1:9) {
   } else if (j == 5) {
     cat("estimation error for", "iSSA:", round(sqrt(colMeans(temp^2)), 2), "\n")
   } else if (j == 6) {
-    cat("estimation error for", "WI (linear):", round(sqrt(colMeans(temp^2)), 2), "\n")
+    cat("estimation error for", "TWI (linear):", round(sqrt(colMeans(temp^2)), 2), "\n")
   } else if (j == 7) {
-    cat("estimation error for", "kWI (linear):", round(sqrt(colMeans(temp^2)), 2), "\n")
+    cat("estimation error for", "k-TWI (linear):", round(sqrt(colMeans(temp^2)), 2), "\n")
   } else if (j == 8) {
-    cat("estimation error for", "WI (Kalman):", round(sqrt(colMeans(temp^2)), 2), "\n")
+    cat("estimation error for", "TWI (Kalman):", round(sqrt(colMeans(temp^2)), 2), "\n")
   } else {
-    cat("estimation error for", "kWI (Kalman):", round(sqrt(colMeans(temp^2)), 2), "\n")
+    cat("estimation error for", "k-TWI (Kalman):", round(sqrt(colMeans(temp^2)), 2), "\n")
   }
 }
 
@@ -1273,13 +1273,13 @@ for (i in 1:10) {
     } else if (i == 6) {
       method = "iSSA" 
     } else if (i == 7) {
-      method = "WI (linear)"
+      method = "TWI (linear)"
     } else if (i == 8) {
-      method = "kWI (linear)"
+      method = "k-TWI (linear)"
     } else if (i == 9) {
-      method = "WI (Kalman)"
+      method = "TWI (Kalman)"
     } else {
-      method = "kWI (Kalman)"
+      method = "k-TWI (Kalman)"
     }
     hist(model_coef[[i]][,1], prob = TRUE, col = "lightblue", 
          main = paste0(method, ": phi11"),
@@ -1306,13 +1306,13 @@ for (i in 1:10) {
     } else if (i == 6) {
       method = "iSSA" 
     } else if (i == 7) {
-      method = "WI (linear)"
+      method = "TWI (linear)"
     } else if (i == 8) {
-      method = "kWI (linear)"
+      method = "k-TWI (linear)"
     } else if (i == 9) {
-      method = "WI (Kalman)"
+      method = "TWI (Kalman)"
     } else {
-      method = "kWI (Kalman)"
+      method = "k-TWI (Kalman)"
     }
     hist(model_coef[[i]][,2], prob = TRUE, col = "lightblue", 
          main = paste0(method, ": phi12"),
@@ -1339,13 +1339,13 @@ for (i in 1:10) {
     } else if (i == 6) {
       method = "iSSA" 
     } else if (i == 7) {
-      method = "WI (linear)"
+      method = "TWI (linear)"
     } else if (i == 8) {
-      method = "kWI (linear)"
+      method = "k-TWI (linear)"
     } else if (i == 9) {
-      method = "WI (Kalman)"
+      method = "TWI (Kalman)"
     } else {
-      method = "kWI (Kalman)"
+      method = "k-TWI (Kalman)"
     }
     hist(model_coef[[i]][,3], prob = TRUE, col = "lightblue", 
          main = paste0(method, ": phi21"),
@@ -1372,13 +1372,13 @@ for (i in 1:10) {
     } else if (i == 6) {
       method = "iSSA" 
     } else if (i == 7) {
-      method = "WI (linear)"
+      method = "TWI (linear)"
     } else if (i == 8) {
-      method = "kWI (linear)"
+      method = "k-TWI (linear)"
     } else if (i == 9) {
-      method = "WI (Kalman)"
+      method = "TWI (Kalman)"
     } else {
-      method = "kWI (Kalman)"
+      method = "k-TWI (Kalman)"
     }
     hist(model_coef[[i]][,4], prob = TRUE, col = "lightblue", 
          main = paste0(method, ": phi22"),
@@ -1400,13 +1400,13 @@ for (j in 1:9) {
   } else if (j == 5) {
     cat("Wasserstein loss for", "iSSA:", round(mean(wass_d[,5]), 2), "\n")
   } else if (j == 6) {
-    cat("Wasserstein loss for", "WI (linear):", round(mean(wass_d[,6]), 2), "\n")
+    cat("Wasserstein loss for", "TWI (linear):", round(mean(wass_d[,6]), 2), "\n")
   } else if (j == 7) {
-    cat("Wasserstein loss for", "kWI (linear):", round(mean(wass_d[,7]), 2), "\n")
+    cat("Wasserstein loss for", "k-TWI (linear):", round(mean(wass_d[,7]), 2), "\n")
   } else if (j == 8) {
-    cat("Wasserstein loss for", "WI (Kalman):", round(mean(wass_d[,8]), 2), "\n")
+    cat("Wasserstein loss for", "TWI (Kalman):", round(mean(wass_d[,8]), 2), "\n")
   } else {
-    cat("Wasserstein loss for", "kWI (Kalman):", round(mean(wass_d[,9]), 2), "\n")
+    cat("Wasserstein loss for", "k-TWI (Kalman):", round(mean(wass_d[,9]), 2), "\n")
   }
 }
 GT_arcoef = colMeans(model_coef[[1]])
@@ -1424,12 +1424,12 @@ for (j in 1:9) {
   } else if (j == 5) {
     cat("estimation error for", "iSSA:", round(sqrt(colMeans(temp^2)), 2), "\n")
   } else if (j == 6) {
-    cat("estimation error for", "WI (linear):", round(sqrt(colMeans(temp^2)), 2), "\n")
+    cat("estimation error for", "TWI (linear):", round(sqrt(colMeans(temp^2)), 2), "\n")
   } else if (j == 7) {
-    cat("estimation error for", "kWI (linear):", round(sqrt(colMeans(temp^2)), 2), "\n")
+    cat("estimation error for", "k-TWI (linear):", round(sqrt(colMeans(temp^2)), 2), "\n")
   } else if (j == 8) {
-    cat("estimation error for", "WI (Kalman):", round(sqrt(colMeans(temp^2)), 2), "\n")
+    cat("estimation error for", "TWI (Kalman):", round(sqrt(colMeans(temp^2)), 2), "\n")
   } else {
-    cat("estimation error for", "kWI (Kalman):", round(sqrt(colMeans(temp^2)), 2), "\n")
+    cat("estimation error for", "k-TWI (Kalman):", round(sqrt(colMeans(temp^2)), 2), "\n")
   }
 }

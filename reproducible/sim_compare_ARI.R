@@ -191,7 +191,7 @@ for (sim in 1:1000) {
       geom_point(color = "steelblue1", size = 1) +
       coord_cartesian(xlim = plot_range, ylim = plot_range) +
       theme_minimal() +
-      labs(title = "WI (linear)",
+      labs(title = "TWI (linear)",
            x = "x_{t-1}",
            y = "x_t")
     
@@ -202,7 +202,7 @@ for (sim in 1:1000) {
       geom_point(color = "steelblue1", size = 1) +
       coord_cartesian(xlim = plot_range, ylim = plot_range) +
       theme_minimal() +
-      labs(title = "k-WI (linear)",
+      labs(title = "k-TWI (linear)",
            x = "x_{t-1}",
            y = "x_t")
     
@@ -213,7 +213,7 @@ for (sim in 1:1000) {
       geom_point(color = "steelblue1", size = 1) +
       coord_cartesian(xlim = plot_range, ylim = plot_range) +
       theme_minimal() +
-      labs(title = "WI (Kalman)",
+      labs(title = "TWI (Kalman)",
            x = "x_{t-1}",
            y = "x_t")
     
@@ -224,7 +224,7 @@ for (sim in 1:1000) {
       geom_point(color = "steelblue1", size = 1) +
       coord_cartesian(xlim = plot_range, ylim = plot_range) +
       theme_minimal() +
-      labs(title = "k-WI (Kalman)",
+      labs(title = "k-TWI (Kalman)",
            x = "x_{t-1}",
            y = "x_t")
     
@@ -248,13 +248,13 @@ if (is.vector(model_coef[[1]])) {
     } else if (i == 6) {
       method = "iSSA"
     } else if (i == 7) {
-      method = "WI (linear)"
+      method = "TWI (linear)"
     } else if (i == 8) {
-      method = "kWI (linear)"
+      method = "k-TWI (linear)"
     } else if (i == 9){
-      method = "WI (Kalman)"
+      method = "TWI (Kalman)"
     } else {
-      method = "kWI (Kalman)"
+      method = "k-TWI (Kalman)"
     }
     
     if (i == 1) {
@@ -283,13 +283,13 @@ if (is.vector(model_coef[[1]])) {
       } else if (i == 6) {
         method = "iSSA"
       } else if (i == 7) {
-        method = "WI (linear)"
+        method = "TWI (linear)"
       } else if (i == 8) {
-        method = "kWI (linear)"
+        method = "k-TWI (linear)"
       } else if (i == 9){
-        method = "WI (Kalman)"
+        method = "TWI (Kalman)"
       } else {
-        method = "kWI (Kalman)"
+        method = "k-TWI (Kalman)"
       }
       
       if (i == 1) {
@@ -325,13 +325,13 @@ for (j in 1:3) {
       } else if (i == 6) {
         method = "iSSA"
       } else if (i == 7) {
-        method = "WI (linear)"
+        method = "TWI (linear)"
       } else if (i == 8) {
-        method = "kWI (linear)"
+        method = "k-TWI (linear)"
       } else if (i == 9) {
-        method = "WI (Kalman)"
+        method = "TWI (Kalman)"
       } else {
-        method = "kWI (Kalman)"
+        method = "k-TWI (Kalman)"
       }
       hist(acfs[,((i - 1) * 6) + j + 1], prob = TRUE, col = "lightblue", 
            main = paste0(method, ": ACF Lag ", j),
@@ -353,13 +353,13 @@ for (j in 1:9) {
   } else if (j == 5) {
     cat("Wasserstein loss for", "iSSA:", round(mean(wass_d[,5]), 2), "\n")
   } else if (j == 6) {
-    cat("Wasserstein loss for", "WI (linear):", round(mean(wass_d[,6]), 2), "\n")
+    cat("Wasserstein loss for", "TWI (linear):", round(mean(wass_d[,6]), 2), "\n")
   } else if (j == 7) {
-    cat("Wasserstein loss for", "kWI (linear):", round(mean(wass_d[,7]), 2), "\n")
+    cat("Wasserstein loss for", "k-TWI (linear):", round(mean(wass_d[,7]), 2), "\n")
   } else if (j == 8) {
-    cat("Wasserstein loss for", "WI (Kalman):", round(mean(wass_d[,8]), 2), "\n")
+    cat("Wasserstein loss for", "TWI (Kalman):", round(mean(wass_d[,8]), 2), "\n")
   } else {
-    cat("Wasserstein loss for", "kWI (Kalman):", round(mean(wass_d[,9]), 2), "\n")
+    cat("Wasserstein loss for", "k-TWI (Kalman):", round(mean(wass_d[,9]), 2), "\n")
   }
 }
 print(matrix(round(colMeans(acfs), 2), ncol = 10))
@@ -378,13 +378,13 @@ for (j in 1:9) {
   } else if (j == 5) {
     cat("ACF loss for", "iSSA:", round(sqrt(colMeans(temp^2)), 2), "\n")
   } else if (j == 6) {
-    cat("ACF loss for", "WI (linear):", round(sqrt(colMeans(temp^2)), 2), "\n")
+    cat("ACF loss for", "TWI (linear):", round(sqrt(colMeans(temp^2)), 2), "\n")
   } else if (j == 7) {
-    cat("ACF loss for", "kWI (linear):", round(sqrt(colMeans(temp^2)), 2), "\n")
+    cat("ACF loss for", "k-TWI (linear):", round(sqrt(colMeans(temp^2)), 2), "\n")
   } else if (j == 8) {
-    cat("ACF loss for", "WI (Kalman):", round(sqrt(colMeans(temp^2)), 2), "\n")
+    cat("ACF loss for", "TWI (Kalman):", round(sqrt(colMeans(temp^2)), 2), "\n")
   } else {
-    cat("ACF loss for", "kWI (Kalman):", round(sqrt(colMeans(temp^2)), 2), "\n")
+    cat("ACF loss for", "k-TWI (Kalman):", round(sqrt(colMeans(temp^2)), 2), "\n")
   }
 }
 
@@ -403,13 +403,13 @@ for (j in 1:9) {
   } else if (j == 5) {
     cat("estimation error for", "iSSA:", round(sqrt(colMeans(temp^2)), 2), "\n")
   } else if (j == 6) {
-    cat("estimation error for", "WI (linear):", round(sqrt(colMeans(temp^2)), 2), "\n")
+    cat("estimation error for", "TWI (linear):", round(sqrt(colMeans(temp^2)), 2), "\n")
   } else if (j == 7) {
-    cat("estimation error for", "kWI (linear):", round(sqrt(colMeans(temp^2)), 2), "\n")
+    cat("estimation error for", "k-TWI (linear):", round(sqrt(colMeans(temp^2)), 2), "\n")
   } else if (j == 8) {
-    cat("estimation error for", "WI (Kalman):", round(sqrt(colMeans(temp^2)), 2), "\n")
+    cat("estimation error for", "TWI (Kalman):", round(sqrt(colMeans(temp^2)), 2), "\n")
   } else {
-    cat("estimation error for", "kWI (Kalman):", round(sqrt(colMeans(temp^2)), 2), "\n")
+    cat("estimation error for", "k-TWI (Kalman):", round(sqrt(colMeans(temp^2)), 2), "\n")
   }
 }
 
@@ -570,7 +570,7 @@ for (sim in 1:1000) {
       geom_point(color = "steelblue1", size = 1) +
       coord_cartesian(xlim = plot_range, ylim = plot_range) +
       theme_minimal() +
-      labs(title = "WI (linear)",
+      labs(title = "TWI (linear)",
            x = "x_{t-1}",
            y = "x_t")
     
@@ -581,7 +581,7 @@ for (sim in 1:1000) {
       geom_point(color = "steelblue1", size = 1) +
       coord_cartesian(xlim = plot_range, ylim = plot_range) +
       theme_minimal() +
-      labs(title = "k-WI (linear)",
+      labs(title = "k-TWI (linear)",
            x = "x_{t-1}",
            y = "x_t")
     
@@ -592,7 +592,7 @@ for (sim in 1:1000) {
       geom_point(color = "steelblue1", size = 1) +
       coord_cartesian(xlim = plot_range, ylim = plot_range) +
       theme_minimal() +
-      labs(title = "WI (Kalman)",
+      labs(title = "TWI (Kalman)",
            x = "x_{t-1}",
            y = "x_t")
     
@@ -603,7 +603,7 @@ for (sim in 1:1000) {
       geom_point(color = "steelblue1", size = 1) +
       coord_cartesian(xlim = plot_range, ylim = plot_range) +
       theme_minimal() +
-      labs(title = "k-WI (Kalman)",
+      labs(title = "k-TWI (Kalman)",
            x = "x_{t-1}",
            y = "x_t")
     
@@ -627,13 +627,13 @@ if (is.vector(model_coef[[1]])) {
     } else if (i == 6) {
       method = "iSSA"
     } else if (i == 7) {
-      method = "WI (linear)"
+      method = "TWI (linear)"
     } else if (i == 8) {
-      method = "kWI (linear)"
+      method = "k-TWI (linear)"
     } else if (i == 9){
-      method = "WI (Kalman)"
+      method = "TWI (Kalman)"
     } else {
-      method = "kWI (Kalman)"
+      method = "k-TWI (Kalman)"
     }
     
     if (i == 1) {
@@ -662,13 +662,13 @@ if (is.vector(model_coef[[1]])) {
       } else if (i == 6) {
         method = "iSSA"
       } else if (i == 7) {
-        method = "WI (linear)"
+        method = "TWI (linear)"
       } else if (i == 8) {
-        method = "kWI (linear)"
+        method = "k-TWI (linear)"
       } else if (i == 9){
-        method = "WI (Kalman)"
+        method = "TWI (Kalman)"
       } else {
-        method = "kWI (Kalman)"
+        method = "k-TWI (Kalman)"
       }
       
       if (i == 1) {
@@ -704,13 +704,13 @@ for (j in 1:3) {
       } else if (i == 6) {
         method = "iSSA"
       } else if (i == 7) {
-        method = "WI (linear)"
+        method = "TWI (linear)"
       } else if (i == 8) {
-        method = "kWI (linear)"
+        method = "k-TWI (linear)"
       } else if (i == 9) {
-        method = "WI (Kalman)"
+        method = "TWI (Kalman)"
       } else {
-        method = "kWI (Kalman)"
+        method = "k-TWI (Kalman)"
       }
       hist(acfs[,((i - 1) * 6) + j + 1], prob = TRUE, col = "lightblue", 
            main = paste0(method, ": ACF Lag ", j),
@@ -732,13 +732,13 @@ for (j in 1:9) {
   } else if (j == 5) {
     cat("Wasserstein loss for", "iSSA:", round(mean(wass_d[,5]), 2), "\n")
   } else if (j == 6) {
-    cat("Wasserstein loss for", "WI (linear):", round(mean(wass_d[,6]), 2), "\n")
+    cat("Wasserstein loss for", "TWI (linear):", round(mean(wass_d[,6]), 2), "\n")
   } else if (j == 7) {
-    cat("Wasserstein loss for", "kWI (linear):", round(mean(wass_d[,7]), 2), "\n")
+    cat("Wasserstein loss for", "k-TWI (linear):", round(mean(wass_d[,7]), 2), "\n")
   } else if (j == 8) {
-    cat("Wasserstein loss for", "WI (Kalman):", round(mean(wass_d[,8]), 2), "\n")
+    cat("Wasserstein loss for", "TWI (Kalman):", round(mean(wass_d[,8]), 2), "\n")
   } else {
-    cat("Wasserstein loss for", "kWI (Kalman):", round(mean(wass_d[,9]), 2), "\n")
+    cat("Wasserstein loss for", "k-TWI (Kalman):", round(mean(wass_d[,9]), 2), "\n")
   }
 }
 print(matrix(round(colMeans(acfs), 2), ncol = 10))
@@ -757,13 +757,13 @@ for (j in 1:9) {
   } else if (j == 5) {
     cat("ACF loss for", "iSSA:", round(sqrt(colMeans(temp^2)), 2), "\n")
   } else if (j == 6) {
-    cat("ACF loss for", "WI (linear):", round(sqrt(colMeans(temp^2)), 2), "\n")
+    cat("ACF loss for", "TWI (linear):", round(sqrt(colMeans(temp^2)), 2), "\n")
   } else if (j == 7) {
-    cat("ACF loss for", "kWI (linear):", round(sqrt(colMeans(temp^2)), 2), "\n")
+    cat("ACF loss for", "k-TWI (linear):", round(sqrt(colMeans(temp^2)), 2), "\n")
   } else if (j == 8) {
-    cat("ACF loss for", "WI (Kalman):", round(sqrt(colMeans(temp^2)), 2), "\n")
+    cat("ACF loss for", "TWI (Kalman):", round(sqrt(colMeans(temp^2)), 2), "\n")
   } else {
-    cat("ACF loss for", "kWI (Kalman):", round(sqrt(colMeans(temp^2)), 2), "\n")
+    cat("ACF loss for", "k-TWI (Kalman):", round(sqrt(colMeans(temp^2)), 2), "\n")
   }
 }
 
@@ -782,12 +782,12 @@ for (j in 1:9) {
   } else if (j == 5) {
     cat("estimation error for", "iSSA:", round(sqrt(colMeans(temp^2)), 2), "\n")
   } else if (j == 6) {
-    cat("estimation error for", "WI (linear):", round(sqrt(colMeans(temp^2)), 2), "\n")
+    cat("estimation error for", "TWI (linear):", round(sqrt(colMeans(temp^2)), 2), "\n")
   } else if (j == 7) {
-    cat("estimation error for", "kWI (linear):", round(sqrt(colMeans(temp^2)), 2), "\n")
+    cat("estimation error for", "k-TWI (linear):", round(sqrt(colMeans(temp^2)), 2), "\n")
   } else if (j == 8) {
-    cat("estimation error for", "WI (Kalman):", round(sqrt(colMeans(temp^2)), 2), "\n")
+    cat("estimation error for", "TWI (Kalman):", round(sqrt(colMeans(temp^2)), 2), "\n")
   } else {
-    cat("estimation error for", "kWI (Kalman):", round(sqrt(colMeans(temp^2)), 2), "\n")
+    cat("estimation error for", "k-TWI (Kalman):", round(sqrt(colMeans(temp^2)), 2), "\n")
   }
 }

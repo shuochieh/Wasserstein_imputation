@@ -5,7 +5,6 @@ library(gridExtra)
 library(glmnet)
 library(Rssa)
 
-# Remember to specify model_name
 # model_name = "ARMA"
 # d = 1 (dimension of the target series)
 # n_exper = 1000 (# of monte carlo simulations)
@@ -75,7 +74,7 @@ s_filter = function (x, ar_order = 2, lambda = 0.001) {
   return (xmis)
 }
 
-# iterative singular spectrum analysis
+# iterative singular spectrum analysis (with linear interpolation as initialization)
 issa = function (x, d) {
   if (d > 1) {
     x = as.matrix(x)
@@ -85,7 +84,8 @@ issa = function (x, d) {
     model = ssa(x, L = 6)
   }
   
-  res = igapfill(model, groups = list(c(1:6)), maxiter = 10)
+  res = igapfill(model, groups = list(c(1:3)), maxiter = 100,
+                 fill = na_interpolation(x, "linear"))
   
   return (res)
 }

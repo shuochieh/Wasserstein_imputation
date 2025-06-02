@@ -192,10 +192,10 @@ benchmarks = as.matrix(read.csv(paste0(base_dir, "benchmarks_miss1.csv")))
 WI_lin = as.matrix(read.csv(paste0(base_dir, model_name, "_WI_lin_miss1.csv"), header = F))
 WI_Kalman = as.matrix(read.csv(paste0(base_dir, model_name, "_WI_Kalman_miss1.csv"), header = F))
 
-wass_d = matrix(0, nrow = 1000, ncol = 8)
+wass_d = matrix(0, nrow = 1000, ncol = 9)
 ccf_gt = array(0, dim = c(3, 3, 5))
-ccfs = array(0, dim = c(3, 3, 5, 8))
-ccf_loss = matrix(0, nrow = 5, ncol = 8)
+ccfs = array(0, dim = c(3, 3, 5, 9))
+ccf_loss = matrix(0, nrow = 5, ncol = 9)
 
 for (sim in 1:1000) {
   dta = truth[,((sim - 1) * 3 + 1):(sim * 3)]
@@ -209,6 +209,7 @@ for (sim in 1:1000) {
   spl = benchmarks[,3000 + ((sim - 1) * 3 + 1):(sim * 3)]
   Kalman = benchmarks[,6000 + ((sim - 1) * 3 + 1):(sim * 3)]
   PT = benchmarks[,9000 + ((sim - 1) * 3 + 1):(sim * 3)]
+  SSA = benchmarks[,12000 + ((sim - 1) * 3 + 1):(sim * 3)]
   wass = WI_lin[,((sim - 1) * 3 + 1):(sim * 3)]
   kwass = WI_lin[,3000 + ((sim - 1) * 3 + 1):(sim * 3)]
   wass_Kalman = WI_Kalman[,((sim - 1) * 3 + 1):(sim * 3)]
@@ -218,28 +219,31 @@ for (sim in 1:1000) {
   wass_d[sim, 2] = wasserstein(pp(embed(dta, 3)), pp(embed(spl, 3)), p = 2)
   wass_d[sim, 3] = wasserstein(pp(embed(dta, 3)), pp(embed(Kalman, 3)), p = 2)
   wass_d[sim, 4] = wasserstein(pp(embed(dta, 3)), pp(embed(PT, 3)), p = 2)
-  wass_d[sim, 5] = wasserstein(pp(embed(dta, 3)), pp(embed(wass, 3)), p = 2)
-  wass_d[sim, 6] = wasserstein(pp(embed(dta, 3)), pp(embed(kwass, 3)), p = 2)
-  wass_d[sim, 7] = wasserstein(pp(embed(dta, 3)), pp(embed(wass_Kalman, 3)), p = 2)
-  wass_d[sim, 8] = wasserstein(pp(embed(dta, 3)), pp(embed(kwass_Kalman, 3)), p = 2)
+  wass_d[sim, 5] = wasserstein(pp(embed(dta, 3)), pp(embed(SSA, 3)), p = 2) 
+  wass_d[sim, 6] = wasserstein(pp(embed(dta, 3)), pp(embed(wass, 3)), p = 2)
+  wass_d[sim, 7] = wasserstein(pp(embed(dta, 3)), pp(embed(kwass, 3)), p = 2)
+  wass_d[sim, 8] = wasserstein(pp(embed(dta, 3)), pp(embed(wass_Kalman, 3)), p = 2)
+  wass_d[sim, 9] = wasserstein(pp(embed(dta, 3)), pp(embed(kwass_Kalman, 3)), p = 2)
   
   ccfs[,,,1] = ccfs[,,,1] + ccf_summary(lin) / 1000
   ccfs[,,,2] = ccfs[,,,2] + ccf_summary(spl) / 1000
   ccfs[,,,3] = ccfs[,,,3] + ccf_summary(Kalman) / 1000
   ccfs[,,,4] = ccfs[,,,4] + ccf_summary(PT) / 1000
-  ccfs[,,,5] = ccfs[,,,5] + ccf_summary(wass) / 1000
-  ccfs[,,,6] = ccfs[,,,6] + ccf_summary(kwass) / 1000
-  ccfs[,,,7] = ccfs[,,,7] + ccf_summary(wass_Kalman) / 1000
-  ccfs[,,,8] = ccfs[,,,8] + ccf_summary(kwass_Kalman) / 1000
+  ccfs[,,,5] = ccfs[,,,5] + ccf_summary(SSA) / 1000
+  ccfs[,,,6] = ccfs[,,,6] + ccf_summary(wass) / 1000
+  ccfs[,,,7] = ccfs[,,,7] + ccf_summary(kwass) / 1000
+  ccfs[,,,8] = ccfs[,,,8] + ccf_summary(wass_Kalman) / 1000
+  ccfs[,,,9] = ccfs[,,,9] + ccf_summary(kwass_Kalman) / 1000
   
   ccf_loss[,1] = ccf_loss[,1] + apply((ccf_summary(lin) - ccf_gt)^2, MARGIN = 3, FUN = sum)
   ccf_loss[,2] = ccf_loss[,2] + apply((ccf_summary(spl) - ccf_gt)^2, MARGIN = 3, FUN = sum)
   ccf_loss[,3] = ccf_loss[,3] + apply((ccf_summary(Kalman) - ccf_gt)^2, MARGIN = 3, FUN = sum)
   ccf_loss[,4] = ccf_loss[,4] + apply((ccf_summary(PT) - ccf_gt)^2, MARGIN = 3, FUN = sum)
-  ccf_loss[,5] = ccf_loss[,5] + apply((ccf_summary(wass) - ccf_gt)^2, MARGIN = 3, FUN = sum)
-  ccf_loss[,6] = ccf_loss[,6] + apply((ccf_summary(kwass) - ccf_gt)^2, MARGIN = 3, FUN = sum)
-  ccf_loss[,7] = ccf_loss[,7] + apply((ccf_summary(wass_Kalman) - ccf_gt)^2, MARGIN = 3, FUN = sum)
-  ccf_loss[,8] = ccf_loss[,8] + apply((ccf_summary(kwass_Kalman) - ccf_gt)^2, MARGIN = 3, FUN = sum)
+  ccf_loss[,5] = ccf_loss[,5] + apply((ccf_summary(SSA) - ccf_gt)^2, MARGIN = 3, FUN = sum)
+  ccf_loss[,6] = ccf_loss[,6] + apply((ccf_summary(wass) - ccf_gt)^2, MARGIN = 3, FUN = sum)
+  ccf_loss[,7] = ccf_loss[,7] + apply((ccf_summary(kwass) - ccf_gt)^2, MARGIN = 3, FUN = sum)
+  ccf_loss[,8] = ccf_loss[,8] + apply((ccf_summary(wass_Kalman) - ccf_gt)^2, MARGIN = 3, FUN = sum)
+  ccf_loss[,9] = ccf_loss[,9] + apply((ccf_summary(kwass_Kalman) - ccf_gt)^2, MARGIN = 3, FUN = sum)
   
   if (sim == 1) {
     col_gt = "steelblue"
@@ -297,8 +301,8 @@ for (sim in 1:1000) {
            y = "x_{t, 3}")
     
     df1 = data.frame(x = dta[1:(nrow(dta) - 1),1], y = dta[2:nrow(dta),2])
-    temp = data.frame(x = na_lag_pairs(spl[,1], which(is.na(x_obs[,1])))[,1],
-                      y = na_lag_pairs(spl[,2], which(is.na(x_obs[,1])))[,2])
+    temp = data.frame(x = na_lag_pairs(SSA[,1], which(is.na(x_obs[,1])))[,1],
+                      y = na_lag_pairs(SSA[,2], which(is.na(x_obs[,1])))[,2])
     p4 = ggplot() +
       geom_point(data = df1, aes(x = x, y = y), color = col_gt, size = 1) + 
       geom_point(data = temp, aes(x = x, y = y), color = col_imp, size = 1, shape = 17) +
@@ -307,13 +311,13 @@ for (sim in 1:1000) {
       coord_cartesian(xlim = range1,
                       ylim = range2) +
       theme_minimal() +
-      labs(title = "Ground truth vs spline",
+      labs(title = "Ground truth vs iSSA",
            x = "x_{t-1, 1}",
            y = "x_{t, 2}")
     
     df1 = data.frame(x = dta[1:(nrow(dta) - 1),1], y = dta[2:nrow(dta),3])
-    temp = data.frame(x = na_lag_pairs(spl[,1], which(is.na(x_obs[,1])))[,1],
-                      y = na_lag_pairs(spl[,3], which(is.na(x_obs[,1])))[,2])
+    temp = data.frame(x = na_lag_pairs(SSA[,1], which(is.na(x_obs[,1])))[,1],
+                      y = na_lag_pairs(SSA[,3], which(is.na(x_obs[,1])))[,2])
     p5 = ggplot() +
       geom_point(data = df1, aes(x = x, y = y), color = col_gt, size = 1) + 
       geom_point(data = temp, aes(x = x, y = y), color = col_imp, size = 1, shape = 17) +
@@ -322,13 +326,13 @@ for (sim in 1:1000) {
       coord_cartesian(xlim = range1, 
                       ylim = range3) +
       theme_minimal() +
-      labs(title = "Ground truth vs spline",
+      labs(title = "Ground truth vs iSSA",
            x = "x_{t-1, 1}",
            y = "x_{t, 3}")
     
     df1 = data.frame(x = dta[1:(nrow(dta) - 1),2], y = dta[2:nrow(dta),3])
-    temp = data.frame(x = na_lag_pairs(spl[,2], which(is.na(x_obs[,1])))[,1],
-                      y = na_lag_pairs(spl[,3], which(is.na(x_obs[,1])))[,2])
+    temp = data.frame(x = na_lag_pairs(SSA[,2], which(is.na(x_obs[,1])))[,1],
+                      y = na_lag_pairs(SSA[,3], which(is.na(x_obs[,1])))[,2])
     p6 = ggplot() +
       geom_point(data = df1, aes(x = x, y = y), color = col_gt, size = 1) + 
       geom_point(data = temp, aes(x = x, y = y), color = col_imp, size = 1, shape = 17) +
@@ -337,7 +341,7 @@ for (sim in 1:1000) {
       coord_cartesian(xlim = range2, 
                       ylim = range3) +
       theme_minimal() +
-      labs(title = "Ground truth vs spline",
+      labs(title = "Ground truth vs iSSA",
            x = "x_{t-1, 2}",
            y = "x_{t, 3}")
     
@@ -637,10 +641,10 @@ benchmarks = as.matrix(read.csv(paste0(base_dir, "benchmarks_miss2.csv")))
 WI_lin = as.matrix(read.csv(paste0(base_dir, model_name, "_WI_lin_miss2.csv"), header = F))
 WI_Kalman = as.matrix(read.csv(paste0(base_dir, model_name, "_WI_Kalman_miss2.csv"), header = F))
 
-wass_d = matrix(0, nrow = 1000, ncol = 8)
+wass_d = matrix(0, nrow = 1000, ncol = 9)
 ccf_gt = array(0, dim = c(3, 3, 5))
-ccfs = array(0, dim = c(3, 3, 5, 8))
-ccf_loss = matrix(0, nrow = 5, ncol = 8)
+ccfs = array(0, dim = c(3, 3, 5, 9))
+ccf_loss = matrix(0, nrow = 5, ncol = 9)
 
 for (sim in 1:1000) {
   dta = truth[,((sim - 1) * 3 + 1):(sim * 3)]
@@ -654,6 +658,7 @@ for (sim in 1:1000) {
   spl = benchmarks[,3000 + ((sim - 1) * 3 + 1):(sim * 3)]
   Kalman = benchmarks[,6000 + ((sim - 1) * 3 + 1):(sim * 3)]
   PT = benchmarks[,9000 + ((sim - 1) * 3 + 1):(sim * 3)]
+  SSA = benchmarks[,12000 + ((sim - 1) * 3 + 1):(sim * 3)]
   wass = WI_lin[,((sim - 1) * 3 + 1):(sim * 3)]
   kwass = WI_lin[,3000 + ((sim - 1) * 3 + 1):(sim * 3)]
   wass_Kalman = WI_Kalman[,((sim - 1) * 3 + 1):(sim * 3)]
@@ -663,407 +668,410 @@ for (sim in 1:1000) {
   wass_d[sim, 2] = wasserstein(pp(embed(dta, 3)), pp(embed(spl, 3)), p = 2)
   wass_d[sim, 3] = wasserstein(pp(embed(dta, 3)), pp(embed(Kalman, 3)), p = 2)
   wass_d[sim, 4] = wasserstein(pp(embed(dta, 3)), pp(embed(PT, 3)), p = 2)
-  wass_d[sim, 5] = wasserstein(pp(embed(dta, 3)), pp(embed(wass, 3)), p = 2)
-  wass_d[sim, 6] = wasserstein(pp(embed(dta, 3)), pp(embed(kwass, 3)), p = 2)
-  wass_d[sim, 7] = wasserstein(pp(embed(dta, 3)), pp(embed(wass_Kalman, 3)), p = 2)
-  wass_d[sim, 8] = wasserstein(pp(embed(dta, 3)), pp(embed(kwass_Kalman, 3)), p = 2)
+  wass_d[sim, 5] = wasserstein(pp(embed(dta, 3)), pp(embed(SSA, 3)), p = 2) 
+  wass_d[sim, 6] = wasserstein(pp(embed(dta, 3)), pp(embed(wass, 3)), p = 2)
+  wass_d[sim, 7] = wasserstein(pp(embed(dta, 3)), pp(embed(kwass, 3)), p = 2)
+  wass_d[sim, 8] = wasserstein(pp(embed(dta, 3)), pp(embed(wass_Kalman, 3)), p = 2)
+  wass_d[sim, 9] = wasserstein(pp(embed(dta, 3)), pp(embed(kwass_Kalman, 3)), p = 2)
   
   ccfs[,,,1] = ccfs[,,,1] + ccf_summary(lin) / 1000
   ccfs[,,,2] = ccfs[,,,2] + ccf_summary(spl) / 1000
   ccfs[,,,3] = ccfs[,,,3] + ccf_summary(Kalman) / 1000
   ccfs[,,,4] = ccfs[,,,4] + ccf_summary(PT) / 1000
-  ccfs[,,,5] = ccfs[,,,5] + ccf_summary(wass) / 1000
-  ccfs[,,,6] = ccfs[,,,6] + ccf_summary(kwass) / 1000
-  ccfs[,,,7] = ccfs[,,,7] + ccf_summary(wass_Kalman) / 1000
-  ccfs[,,,8] = ccfs[,,,8] + ccf_summary(kwass_Kalman) / 1000
+  ccfs[,,,5] = ccfs[,,,5] + ccf_summary(SSA) / 1000
+  ccfs[,,,6] = ccfs[,,,6] + ccf_summary(wass) / 1000
+  ccfs[,,,7] = ccfs[,,,7] + ccf_summary(kwass) / 1000
+  ccfs[,,,8] = ccfs[,,,8] + ccf_summary(wass_Kalman) / 1000
+  ccfs[,,,9] = ccfs[,,,9] + ccf_summary(kwass_Kalman) / 1000
   
   ccf_loss[,1] = ccf_loss[,1] + apply((ccf_summary(lin) - ccf_gt)^2, MARGIN = 3, FUN = sum)
   ccf_loss[,2] = ccf_loss[,2] + apply((ccf_summary(spl) - ccf_gt)^2, MARGIN = 3, FUN = sum)
   ccf_loss[,3] = ccf_loss[,3] + apply((ccf_summary(Kalman) - ccf_gt)^2, MARGIN = 3, FUN = sum)
   ccf_loss[,4] = ccf_loss[,4] + apply((ccf_summary(PT) - ccf_gt)^2, MARGIN = 3, FUN = sum)
-  ccf_loss[,5] = ccf_loss[,5] + apply((ccf_summary(wass) - ccf_gt)^2, MARGIN = 3, FUN = sum)
-  ccf_loss[,6] = ccf_loss[,6] + apply((ccf_summary(kwass) - ccf_gt)^2, MARGIN = 3, FUN = sum)
-  ccf_loss[,7] = ccf_loss[,7] + apply((ccf_summary(wass_Kalman) - ccf_gt)^2, MARGIN = 3, FUN = sum)
-  ccf_loss[,8] = ccf_loss[,8] + apply((ccf_summary(kwass_Kalman) - ccf_gt)^2, MARGIN = 3, FUN = sum)
+  ccf_loss[,5] = ccf_loss[,5] + apply((ccf_summary(SSA) - ccf_gt)^2, MARGIN = 3, FUN = sum)
+  ccf_loss[,6] = ccf_loss[,6] + apply((ccf_summary(wass) - ccf_gt)^2, MARGIN = 3, FUN = sum)
+  ccf_loss[,7] = ccf_loss[,7] + apply((ccf_summary(kwass) - ccf_gt)^2, MARGIN = 3, FUN = sum)
+  ccf_loss[,8] = ccf_loss[,8] + apply((ccf_summary(wass_Kalman) - ccf_gt)^2, MARGIN = 3, FUN = sum)
+  ccf_loss[,9] = ccf_loss[,9] + apply((ccf_summary(kwass_Kalman) - ccf_gt)^2, MARGIN = 3, FUN = sum)
   
   if (sim == 1) {
     col_gt = "steelblue"
-    col_imp = "red3"
-    range1 = enlarge(range(c(dta[,1], lin[,1], Kalman[,1], PT[,1], wass[,1], kwass[,1],
-                             wass_Kalman[,1], kwass_Kalman[,1])))
-    range2 = enlarge(range(c(dta[,2], lin[,2], Kalman[,2], PT[,2], wass[,2], kwass[,2],
-                             wass_Kalman[,2], kwass_Kalman[,2])))
-    range3 = enlarge(range(c(dta[,3], lin[,3], Kalman[,3], PT[,3], wass[,3], kwass[,3],
-                             wass_Kalman[,3], kwass_Kalman[,3])))
+      col_imp = "red3"
+        range1 = enlarge(range(c(dta[,1], lin[,1], wass[,1], kwass[,1],
+                                 wass_Kalman[,1], kwass_Kalman[,1])))
+        range2 = enlarge(range(c(dta[,2], lin[,2], wass[,2], kwass[,2],
+                                 wass_Kalman[,2], kwass_Kalman[,2])))
+        range3 = enlarge(range(c(dta[,3], lin[,3], wass[,3], kwass[,3],
+                                 wass_Kalman[,3], kwass_Kalman[,3])))
         
-    df1 = data.frame(x = dta[1:(nrow(dta) - 1),1], y = dta[2:nrow(dta),2])
-    temp = data.frame(x = na_lag_pairs(lin[,1], which(is.na(x_obs[,1])))[,1],
-                      y = na_lag_pairs(lin[,2], which(is.na(x_obs[,1])))[,2])
-    p1 = ggplot() +
-      geom_point(data = df1, aes(x = x, y = y), color = col_gt, size = 1) + 
-      geom_point(data = temp, aes(x = x, y = y), color = col_imp, size = 1, shape = 17) +
-      # coord_cartesian(xlim = range(c(dta[,1], lin[,1])), 
-      #                 ylim = range(c(dta[,2], lin[,2]))) +
-      coord_cartesian(xlim = range1, 
-                      ylim = range2) +
-      theme_minimal() +
-      labs(title = "Ground truth vs linear",
-           x = "x_{t-1, 1}",
-           y = "x_{t, 2}")
-    
-    df1 = data.frame(x = dta[1:(nrow(dta) - 1),1], y = dta[2:nrow(dta),3])
-    temp = data.frame(x = na_lag_pairs(lin[,1], which(is.na(x_obs[,1])))[,1],
-                      y = na_lag_pairs(lin[,3], which(is.na(x_obs[,1])))[,2])
-    p2 = ggplot() +
-      geom_point(data = df1, aes(x = x, y = y), color = col_gt, size = 1) + 
-      geom_point(data = temp, aes(x = x, y = y), color = col_imp, size = 1, shape = 17) +
-      # coord_cartesian(xlim = range(c(dta[,1], lin[,1])), 
-      #                 ylim = range(c(dta[,3], lin[,3]))) +
-      coord_cartesian(xlim = range1, 
-                      ylim = range3) +
-      theme_minimal() +
-      labs(title = "Ground truth vs linear",
-           x = "x_{t-1, 1}",
-           y = "x_{t, 3}")
-    
-    df1 = data.frame(x = dta[1:(nrow(dta) - 1),2], y = dta[2:nrow(dta),3])
-    temp = data.frame(x = na_lag_pairs(lin[,2], which(is.na(x_obs[,1])))[,1],
-                      y = na_lag_pairs(lin[,3], which(is.na(x_obs[,1])))[,2])
-    p3 = ggplot() +
-      geom_point(data = df1, aes(x = x, y = y), color = col_gt, size = 1) + 
-      geom_point(data = temp, aes(x = x, y = y), color = col_imp, size = 1, shape = 17) +
-      # coord_cartesian(xlim = range(c(dta[,2], lin[,2])), 
-      #                 ylim = range(c(dta[,3], lin[,3]))) +
-      coord_cartesian(xlim = range2, 
-                      ylim = range3) +
-      theme_minimal() +
-      labs(title = "Ground truth vs linear",
-           x = "x_{t-1, 2}",
-           y = "x_{t, 3}")
-    
-    df1 = data.frame(x = dta[1:(nrow(dta) - 1),1], y = dta[2:nrow(dta),2])
-    temp = data.frame(x = na_lag_pairs(spl[,1], which(is.na(x_obs[,1])))[,1],
-                      y = na_lag_pairs(spl[,2], which(is.na(x_obs[,1])))[,2])
-    p4 = ggplot() +
-      geom_point(data = df1, aes(x = x, y = y), color = col_gt, size = 1) + 
-      geom_point(data = temp, aes(x = x, y = y), color = col_imp, size = 1, shape = 17) +
-      # coord_cartesian(xlim = range(c(dta[,1], spl[,1])),
-      #                 ylim = range(c(dta[,2], spl[,2]))) +
-      coord_cartesian(xlim = range1,
-                      ylim = range2) +
-      theme_minimal() +
-      labs(title = "Ground truth vs spline",
-           x = "x_{t-1, 1}",
-           y = "x_{t, 2}")
-    
-    df1 = data.frame(x = dta[1:(nrow(dta) - 1),1], y = dta[2:nrow(dta),3])
-    temp = data.frame(x = na_lag_pairs(spl[,1], which(is.na(x_obs[,1])))[,1],
-                      y = na_lag_pairs(spl[,3], which(is.na(x_obs[,1])))[,2])
-    p5 = ggplot() +
-      geom_point(data = df1, aes(x = x, y = y), color = col_gt, size = 1) + 
-      geom_point(data = temp, aes(x = x, y = y), color = col_imp, size = 1, shape = 17) +
-      # coord_cartesian(xlim = range(c(dta[,1], spl[,1])), 
-      #                 ylim = range(c(dta[,3], spl[,3]))) +
-      coord_cartesian(xlim = range1, 
-                      ylim = range3) +
-      theme_minimal() +
-      labs(title = "Ground truth vs spline",
-           x = "x_{t-1, 1}",
-           y = "x_{t, 3}")
-    
-    df1 = data.frame(x = dta[1:(nrow(dta) - 1),2], y = dta[2:nrow(dta),3])
-    temp = data.frame(x = na_lag_pairs(spl[,2], which(is.na(x_obs[,1])))[,1],
-                      y = na_lag_pairs(spl[,3], which(is.na(x_obs[,1])))[,2])
-    p6 = ggplot() +
-      geom_point(data = df1, aes(x = x, y = y), color = col_gt, size = 1) + 
-      geom_point(data = temp, aes(x = x, y = y), color = col_imp, size = 1, shape = 17) +
-      # coord_cartesian(xlim = range(c(dta[,2], spl[,2])), 
-      #                 ylim = range(c(dta[,3], spl[,3]))) +
-      coord_cartesian(xlim = range2, 
-                      ylim = range3) +
-      theme_minimal() +
-      labs(title = "Ground truth vs spline",
-           x = "x_{t-1, 2}",
-           y = "x_{t, 3}")
-    
-    df1 = data.frame(x = dta[1:(nrow(dta) - 1),1], y = dta[2:nrow(dta),2])
-    temp = data.frame(x = na_lag_pairs(Kalman[,1], which(is.na(x_obs[,1])))[,1],
-                      y = na_lag_pairs(Kalman[,2], which(is.na(x_obs[,1])))[,2])
-    p7 = ggplot() +
-      geom_point(data = df1, aes(x = x, y = y), color = col_gt, size = 1) + 
-      geom_point(data = temp, aes(x = x, y = y), color = col_imp, size = 1, shape = 17) +
-      # coord_cartesian(xlim = range(c(dta[,1], Kalman[,1])), 
-      #                 ylim = range(c(dta[,2], Kalman[,2]))) +
-      coord_cartesian(xlim = range1, 
-                      ylim = range2) +
-      theme_minimal() +
-      labs(title = "Ground truth vs Kalman",
-           x = "x_{t-1, 1}",
-           y = "x_{t, 2}")
-    
-    df1 = data.frame(x = dta[1:(nrow(dta) - 1),1], y = dta[2:nrow(dta),3])
-    temp = data.frame(x = na_lag_pairs(Kalman[,1], which(is.na(x_obs[,1])))[,1],
-                      y = na_lag_pairs(Kalman[,3], which(is.na(x_obs[,1])))[,2])
-    p8 = ggplot() +
-      geom_point(data = df1, aes(x = x, y = y), color = col_gt, size = 1) + 
-      geom_point(data = temp, aes(x = x, y = y), color = col_imp, size = 1, shape = 17) +
-      # coord_cartesian(xlim = range(c(dta[,1], Kalman[,1])), 
-      #                 ylim = range(c(dta[,3], Kalman[,3]))) +
-      coord_cartesian(xlim = range1, 
-                      ylim = range3) +
-      theme_minimal() +
-      labs(title = "Ground truth vs Kalman",
-           x = "x_{t-1, 1}",
-           y = "x_{t, 3}")
-    
-    df1 = data.frame(x = dta[1:(nrow(dta) - 1),2], y = dta[2:nrow(dta),3])
-    temp = data.frame(x = na_lag_pairs(Kalman[,2], which(is.na(x_obs[,1])))[,1],
-                      y = na_lag_pairs(Kalman[,3], which(is.na(x_obs[,1])))[,2])
-    p9 = ggplot() +
-      geom_point(data = df1, aes(x = x, y = y), color = col_gt, size = 1) + 
-      geom_point(data = temp, aes(x = x, y = y), color = col_imp, size = 1, shape = 17) +
-      # coord_cartesian(xlim = range(c(dta[,2], Kalman[,2])), 
-      #                 ylim = range(c(dta[,3], Kalman[,3]))) +
-      coord_cartesian(xlim = range2, 
-                      ylim = range3) +
-      theme_minimal() +
-      labs(title = "Ground truth vs Kalman",
-           x = "x_{t-1, 2}",
-           y = "x_{t, 3}")
-    
-    df1 = data.frame(x = dta[1:(nrow(dta) - 1),1], y = dta[2:nrow(dta),2])
-    temp = data.frame(x = na_lag_pairs(PT[,1], which(is.na(x_obs[,1])))[,1],
-                      y = na_lag_pairs(PT[,2], which(is.na(x_obs[,1])))[,2])
-    p10 = ggplot() +
-      geom_point(data = df1, aes(x = x, y = y), color = col_gt, size = 1) + 
-      geom_point(data = temp, aes(x = x, y = y), color = col_imp, size = 1, shape = 17) +
-      # coord_cartesian(xlim = range(c(dta[,1], PT[,1])), 
-      #                 ylim = range(c(dta[,2], PT[,2]))) +
-      coord_cartesian(xlim = range1, 
-                      ylim = range2) +
-      theme_minimal() +
-      labs(title = "Ground truth vs ScalarF",
-           x = "x_{t-1, 1}",
-           y = "x_{t, 2}")
-    
-    df1 = data.frame(x = dta[1:(nrow(dta) - 1),1], y = dta[2:nrow(dta),3])
-    temp = data.frame(x = na_lag_pairs(PT[,1], which(is.na(x_obs[,1])))[,1],
-                      y = na_lag_pairs(PT[,3], which(is.na(x_obs[,1])))[,2])
-    p11 = ggplot() +
-      geom_point(data = df1, aes(x = x, y = y), color = col_gt, size = 1) + 
-      geom_point(data = temp, aes(x = x, y = y), color = col_imp, size = 1, shape = 17) +
-      # coord_cartesian(xlim = range(c(dta[,1], PT[,1])), 
-      #                 ylim = range(c(dta[,3], PT[,3]))) +
-      coord_cartesian(xlim = range1, 
-                      ylim = range3) +
-      theme_minimal() +
-      labs(title = "Ground truth vs ScalarF",
-           x = "x_{t-1, 1}",
-           y = "x_{t, 3}")
-    
-    df1 = data.frame(x = dta[1:(nrow(dta) - 1),2], y = dta[2:nrow(dta),3])
-    temp = data.frame(x = na_lag_pairs(PT[,2], which(is.na(x_obs[,1])))[,1],
-                      y = na_lag_pairs(PT[,3], which(is.na(x_obs[,1])))[,2])
-    p12 = ggplot() +
-      geom_point(data = df1, aes(x = x, y = y), color = col_gt, size = 1) + 
-      geom_point(data = temp, aes(x = x, y = y), color = col_imp, size = 1, shape = 17) +
-      # coord_cartesian(xlim = range(c(dta[,2], PT[,2])), 
-      #                 ylim = range(c(dta[,3], PT[,3]))) +
-      coord_cartesian(xlim = range2, 
-                      ylim = range3) +
-      theme_minimal() +
-      labs(title = "Ground truth vs ScalarF",
-           x = "x_{t-1, 2}",
-           y = "x_{t, 3}")
-    
-    df1 = data.frame(x = dta[1:(nrow(dta) - 1),1], y = dta[2:nrow(dta),2])
-    temp = data.frame(x = na_lag_pairs(wass[,1], which(is.na(x_obs[,1])))[,1],
-                      y = na_lag_pairs(wass[,2], which(is.na(x_obs[,1])))[,2])
-    p13 = ggplot() +
-      geom_point(data = df1, aes(x = x, y = y), color = col_gt, size = 1) + 
-      geom_point(data = temp, aes(x = x, y = y), color = col_imp, size = 1, shape = 17) +
-      # coord_cartesian(xlim = range(c(dta[,1], wass[,1])), 
-      #                 ylim = range(c(dta[,2], wass[,2]))) +
-      coord_cartesian(xlim = range1, 
-                      ylim = range2) +
-      theme_minimal() +
-      labs(title = "Ground truth vs WI (linear)",
-           x = "x_{t-1, 1}",
-           y = "x_{t, 2}")
-    
-    df1 = data.frame(x = dta[1:(nrow(dta) - 1),1], y = dta[2:nrow(dta),3])
-    temp = data.frame(x = na_lag_pairs(wass[,1], which(is.na(x_obs[,1])))[,1],
-                      y = na_lag_pairs(wass[,3], which(is.na(x_obs[,1])))[,2])
-    p14 = ggplot() +
-      geom_point(data = df1, aes(x = x, y = y), color = col_gt, size = 1) + 
-      geom_point(data = temp, aes(x = x, y = y), color = col_imp, size = 1, shape = 17) +
-      # coord_cartesian(xlim = range(c(dta[,1], wass[,1])), 
-      #                 ylim = range(c(dta[,3], wass[,3]))) +
-      coord_cartesian(xlim = range1, 
-                      ylim = range3) +
-      theme_minimal() +
-      labs(title = "Ground truth vs WI (linear)",
-           x = "x_{t-1, 1}",
-           y = "x_{t, 3}")
-    
-    df1 = data.frame(x = dta[1:(nrow(dta) - 1),2], y = dta[2:nrow(dta),3])
-    temp = data.frame(x = na_lag_pairs(wass[,2], which(is.na(x_obs[,1])))[,1],
-                      y = na_lag_pairs(wass[,3], which(is.na(x_obs[,1])))[,2])
-    p15 = ggplot() +
-      geom_point(data = df1, aes(x = x, y = y), color = col_gt, size = 1) + 
-      geom_point(data = temp, aes(x = x, y = y), color = col_imp, size = 1, shape = 17) +
-      # coord_cartesian(xlim = range(c(dta[,2], wass[,2])), 
-      #                 ylim = range(c(dta[,3], wass[,3]))) +
-      coord_cartesian(xlim = range2, 
-                      ylim = range3) +
-      theme_minimal() +
-      labs(title = "Ground truth vs WI (linear)",
-           x = "x_{t-1, 2}",
-           y = "x_{t, 3}")
-    
-    df1 = data.frame(x = dta[1:(nrow(dta) - 1),1], y = dta[2:nrow(dta),2])
-    temp = data.frame(x = na_lag_pairs(kwass[,1], which(is.na(x_obs[,1])))[,1],
-                      y = na_lag_pairs(kwass[,2], which(is.na(x_obs[,1])))[,2])
-    p16 = ggplot() +
-      geom_point(data = df1, aes(x = x, y = y), color = col_gt, size = 1) + 
-      geom_point(data = temp, aes(x = x, y = y), color = col_imp, size = 1, shape = 17) +
-      # coord_cartesian(xlim = range(c(dta[,1], kwass[,1])), 
-      #                 ylim = range(c(dta[,2], kwass[,2]))) +
-      coord_cartesian(xlim = range1, 
-                      ylim = range2) +
-      theme_minimal() +
-      labs(title = "Ground truth vs kWI (linear)",
-           x = "x_{t-1, 1}",
-           y = "x_{t, 2}")
-    
-    df1 = data.frame(x = dta[1:(nrow(dta) - 1),1], y = dta[2:nrow(dta),3])
-    temp = data.frame(x = na_lag_pairs(kwass[,1], which(is.na(x_obs[,1])))[,1],
-                      y = na_lag_pairs(kwass[,3], which(is.na(x_obs[,1])))[,2])
-    p17 = ggplot() +
-      geom_point(data = df1, aes(x = x, y = y), color = col_gt, size = 1) + 
-      geom_point(data = temp, aes(x = x, y = y), color = col_imp, size = 1, shape = 17) +
-      # coord_cartesian(xlim = range(c(dta[,1], kwass[,1])), 
-      #                 ylim = range(c(dta[,3], kwass[,3]))) +
-      coord_cartesian(xlim = range1, 
-                      ylim = range3) +
-      theme_minimal() +
-      labs(title = "Ground truth vs kWI (linear)",
-           x = "x_{t-1, 1}",
-           y = "x_{t, 3}")
-    
-    df1 = data.frame(x = dta[1:(nrow(dta) - 1),2], y = dta[2:nrow(dta),3])
-    temp = data.frame(x = na_lag_pairs(kwass[,2], which(is.na(x_obs[,1])))[,1],
-                      y = na_lag_pairs(kwass[,3], which(is.na(x_obs[,1])))[,2])
-    p18 = ggplot() +
-      geom_point(data = df1, aes(x = x, y = y), color = col_gt, size = 1) + 
-      geom_point(data = temp, aes(x = x, y = y), color = col_imp, size = 1, shape = 17) +
-      # coord_cartesian(xlim = range(c(dta[,2], kwass[,2])), 
-      #                 ylim = range(c(dta[,3], kwass[,3]))) +
-      coord_cartesian(xlim = range2, 
-                      ylim = range3) +
-      theme_minimal() +
-      labs(title = "Ground truth vs kWI (linear)",
-           x = "x_{t-1, 2}",
-           y = "x_{t, 3}")
-    
-    df1 = data.frame(x = dta[1:(nrow(dta) - 1),1], y = dta[2:nrow(dta),2])
-    temp = data.frame(x = na_lag_pairs(wass_Kalman[,1], which(is.na(x_obs[,1])))[,1],
-                      y = na_lag_pairs(wass_Kalman[,2], which(is.na(x_obs[,1])))[,2])
-    p19 = ggplot() +
-      geom_point(data = df1, aes(x = x, y = y), color = col_gt, size = 1) + 
-      geom_point(data = temp, aes(x = x, y = y), color = col_imp, size = 1, shape = 17) +
-      # coord_cartesian(xlim = range(c(dta[,1], wass_Kalman[,1])), 
-      #                 ylim = range(c(dta[,2], wass_Kalman[,2]))) +
-      coord_cartesian(xlim = range1, 
-                      ylim = range2) +
-      theme_minimal() +
-      labs(title = "Ground truth vs WI (Kalman)",
-           x = "x_{t-1, 1}",
-           y = "x_{t, 2}")
-    
-    df1 = data.frame(x = dta[1:(nrow(dta) - 1),1], y = dta[2:nrow(dta),3])
-    temp = data.frame(x = na_lag_pairs(wass_Kalman[,1], which(is.na(x_obs[,1])))[,1],
-                      y = na_lag_pairs(wass_Kalman[,3], which(is.na(x_obs[,1])))[,2])
-    p20 = ggplot() +
-      geom_point(data = df1, aes(x = x, y = y), color = col_gt, size = 1) + 
-      geom_point(data = temp, aes(x = x, y = y), color = col_imp, size = 1, shape = 17) +
-      # coord_cartesian(xlim = range(c(dta[,1], wass_Kalman[,1])), 
-      #                 ylim = range(c(dta[,3], wass_Kalman[,3]))) +
-      coord_cartesian(xlim = range1, 
-                      ylim = range3) +
-      theme_minimal() +
-      labs(title = "Ground truth vs WI (Kalman)",
-           x = "x_{t-1, 1}",
-           y = "x_{t, 3}")
-    
-    df1 = data.frame(x = dta[1:(nrow(dta) - 1),2], y = dta[2:nrow(dta),3])
-    temp = data.frame(x = na_lag_pairs(wass_Kalman[,2], which(is.na(x_obs[,1])))[,1],
-                      y = na_lag_pairs(wass_Kalman[,3], which(is.na(x_obs[,1])))[,2])
-    p21 = ggplot() +
-      geom_point(data = df1, aes(x = x, y = y), color = col_gt, size = 1) + 
-      geom_point(data = temp, aes(x = x, y = y), color = col_imp, size = 1, shape = 17) +
-      # coord_cartesian(xlim = range(c(dta[,2], wass_Kalman[,2])), 
-      #                 ylim = range(c(dta[,3], wass_Kalman[,3]))) +
-      coord_cartesian(xlim = range2, 
-                      ylim = range3) +
-      theme_minimal() +
-      labs(title = "Ground truth vs WI (Kalman)",
-           x = "x_{t-1, 2}",
-           y = "x_{t, 3}")
-    
-    df1 = data.frame(x = dta[1:(nrow(dta) - 1),1], y = dta[2:nrow(dta),2])
-    temp = data.frame(x = na_lag_pairs(kwass_Kalman[,1], which(is.na(x_obs[,1])))[,1],
-                      y = na_lag_pairs(kwass_Kalman[,2], which(is.na(x_obs[,1])))[,2])
-    p22 = ggplot() +
-      geom_point(data = df1, aes(x = x, y = y), color = col_gt, size = 1) + 
-      geom_point(data = temp, aes(x = x, y = y), color = col_imp, size = 1, shape = 17) +
-      # coord_cartesian(xlim = range(c(dta[,1], kwass_Kalman[,1])), 
-      #                 ylim = range(c(dta[,2], kwass_Kalman[,2]))) +
-      coord_cartesian(xlim = range1, 
-                      ylim = range2) +
-      theme_minimal() +
-      labs(title = "Ground truth vs kWI (Kalman)",
-           x = "x_{t-1, 1}",
-           y = "x_{t, 2}")
-    
-    df1 = data.frame(x = dta[1:(nrow(dta) - 1),1], y = dta[2:nrow(dta),3])
-    temp = data.frame(x = na_lag_pairs(kwass_Kalman[,1], which(is.na(x_obs[,1])))[,1],
-                      y = na_lag_pairs(kwass_Kalman[,3], which(is.na(x_obs[,1])))[,2])
-    p23 = ggplot() +
-      geom_point(data = df1, aes(x = x, y = y), color = col_gt, size = 1) + 
-      geom_point(data = temp, aes(x = x, y = y), color = col_imp, size = 1, shape = 17) +
-      # coord_cartesian(xlim = range(c(dta[,1], kwass_Kalman[,1])), 
-      #                 ylim = range(c(dta[,3], kwass_Kalman[,3]))) +
-      coord_cartesian(xlim = range1, 
-                      ylim = range3) +
-      theme_minimal() +
-      labs(title = "Ground truth vs kWI (Kalman)",
-           x = "x_{t-1, 1}",
-           y = "x_{t, 3}")
-    
-    df1 = data.frame(x = dta[1:(nrow(dta) - 1),2], y = dta[2:nrow(dta),3])
-    temp = data.frame(x = na_lag_pairs(kwass_Kalman[,2], which(is.na(x_obs[,1])))[,1],
-                      y = na_lag_pairs(kwass_Kalman[,3], which(is.na(x_obs[,1])))[,2])
-    p24 = ggplot() +
-      geom_point(data = df1, aes(x = x, y = y), color = col_gt, size = 1) + 
-      geom_point(data = temp, aes(x = x, y = y), color = col_imp, size = 1, shape = 17) +
-      # coord_cartesian(xlim = range(c(dta[,2], kwass_Kalman[,2])), 
-      #                 ylim = range(c(dta[,3], kwass_Kalman[,3]))) +
-      coord_cartesian(xlim = range2, 
-                      ylim = range3) +
-      theme_minimal() +
-      labs(title = "Ground truth vs kWI (Kalman)",
-           x = "x_{t-1, 2}",
-           y = "x_{t, 3}")
-    
-    grid.arrange(p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12,
-                 nrow = 4, ncol = 3)
-    grid.arrange(p13, p14, p15, p16, p17, p18, p19, p20, p21, p22, p23, p24,
-                 nrow = 4, ncol = 3)
+        df1 = data.frame(x = dta[1:(nrow(dta) - 1),1], y = dta[2:nrow(dta),2])
+        temp = data.frame(x = na_lag_pairs(lin[,1], which(is.na(x_obs[,1])))[,1],
+                          y = na_lag_pairs(lin[,2], which(is.na(x_obs[,1])))[,2])
+        p1 = ggplot() +
+          geom_point(data = df1, aes(x = x, y = y), color = col_gt, size = 1) + 
+          geom_point(data = temp, aes(x = x, y = y), color = col_imp, size = 1, shape = 17) +
+          # coord_cartesian(xlim = range(c(dta[,1], lin[,1])), 
+          #                 ylim = range(c(dta[,2], lin[,2]))) +
+          coord_cartesian(xlim = range1, 
+                          ylim = range2) +
+          theme_minimal() +
+          labs(title = "Ground truth vs linear",
+               x = "x_{t-1, 1}",
+               y = "x_{t, 2}")
+        
+        df1 = data.frame(x = dta[1:(nrow(dta) - 1),1], y = dta[2:nrow(dta),3])
+        temp = data.frame(x = na_lag_pairs(lin[,1], which(is.na(x_obs[,1])))[,1],
+                          y = na_lag_pairs(lin[,3], which(is.na(x_obs[,1])))[,2])
+        p2 = ggplot() +
+          geom_point(data = df1, aes(x = x, y = y), color = col_gt, size = 1) + 
+          geom_point(data = temp, aes(x = x, y = y), color = col_imp, size = 1, shape = 17) +
+          # coord_cartesian(xlim = range(c(dta[,1], lin[,1])), 
+          #                 ylim = range(c(dta[,3], lin[,3]))) +
+          coord_cartesian(xlim = range1, 
+                          ylim = range3) +
+          theme_minimal() +
+          labs(title = "Ground truth vs linear",
+               x = "x_{t-1, 1}",
+               y = "x_{t, 3}")
+        
+        df1 = data.frame(x = dta[1:(nrow(dta) - 1),2], y = dta[2:nrow(dta),3])
+        temp = data.frame(x = na_lag_pairs(lin[,2], which(is.na(x_obs[,1])))[,1],
+                          y = na_lag_pairs(lin[,3], which(is.na(x_obs[,1])))[,2])
+        p3 = ggplot() +
+          geom_point(data = df1, aes(x = x, y = y), color = col_gt, size = 1) + 
+          geom_point(data = temp, aes(x = x, y = y), color = col_imp, size = 1, shape = 17) +
+          # coord_cartesian(xlim = range(c(dta[,2], lin[,2])), 
+          #                 ylim = range(c(dta[,3], lin[,3]))) +
+          coord_cartesian(xlim = range2, 
+                          ylim = range3) +
+          theme_minimal() +
+          labs(title = "Ground truth vs linear",
+               x = "x_{t-1, 2}",
+               y = "x_{t, 3}")
+        
+        df1 = data.frame(x = dta[1:(nrow(dta) - 1),1], y = dta[2:nrow(dta),2])
+        temp = data.frame(x = na_lag_pairs(SSA[,1], which(is.na(x_obs[,1])))[,1],
+                          y = na_lag_pairs(SSA[,2], which(is.na(x_obs[,1])))[,2])
+        p4 = ggplot() +
+          geom_point(data = df1, aes(x = x, y = y), color = col_gt, size = 1) + 
+          geom_point(data = temp, aes(x = x, y = y), color = col_imp, size = 1, shape = 17) +
+          # coord_cartesian(xlim = range(c(dta[,1], spl[,1])),
+          #                 ylim = range(c(dta[,2], spl[,2]))) +
+          coord_cartesian(xlim = range1,
+                          ylim = range2) +
+          theme_minimal() +
+          labs(title = "Ground truth vs iSSA",
+               x = "x_{t-1, 1}",
+               y = "x_{t, 2}")
+        
+        df1 = data.frame(x = dta[1:(nrow(dta) - 1),1], y = dta[2:nrow(dta),3])
+        temp = data.frame(x = na_lag_pairs(SSA[,1], which(is.na(x_obs[,1])))[,1],
+                          y = na_lag_pairs(SSA[,3], which(is.na(x_obs[,1])))[,2])
+        p5 = ggplot() +
+          geom_point(data = df1, aes(x = x, y = y), color = col_gt, size = 1) + 
+          geom_point(data = temp, aes(x = x, y = y), color = col_imp, size = 1, shape = 17) +
+          # coord_cartesian(xlim = range(c(dta[,1], spl[,1])), 
+          #                 ylim = range(c(dta[,3], spl[,3]))) +
+          coord_cartesian(xlim = range1, 
+                          ylim = range3) +
+          theme_minimal() +
+          labs(title = "Ground truth vs iSSA",
+               x = "x_{t-1, 1}",
+               y = "x_{t, 3}")
+        
+        df1 = data.frame(x = dta[1:(nrow(dta) - 1),2], y = dta[2:nrow(dta),3])
+        temp = data.frame(x = na_lag_pairs(SSA[,2], which(is.na(x_obs[,1])))[,1],
+                          y = na_lag_pairs(SSA[,3], which(is.na(x_obs[,1])))[,2])
+        p6 = ggplot() +
+          geom_point(data = df1, aes(x = x, y = y), color = col_gt, size = 1) + 
+          geom_point(data = temp, aes(x = x, y = y), color = col_imp, size = 1, shape = 17) +
+          # coord_cartesian(xlim = range(c(dta[,2], spl[,2])), 
+          #                 ylim = range(c(dta[,3], spl[,3]))) +
+          coord_cartesian(xlim = range2, 
+                          ylim = range3) +
+          theme_minimal() +
+          labs(title = "Ground truth vs iSSA",
+               x = "x_{t-1, 2}",
+               y = "x_{t, 3}")
+        
+        df1 = data.frame(x = dta[1:(nrow(dta) - 1),1], y = dta[2:nrow(dta),2])
+        temp = data.frame(x = na_lag_pairs(Kalman[,1], which(is.na(x_obs[,1])))[,1],
+                          y = na_lag_pairs(Kalman[,2], which(is.na(x_obs[,1])))[,2])
+        p7 = ggplot() +
+          geom_point(data = df1, aes(x = x, y = y), color = col_gt, size = 1) + 
+          geom_point(data = temp, aes(x = x, y = y), color = col_imp, size = 1, shape = 17) +
+          coord_cartesian(xlim = range(c(dta[,1], Kalman[,1])),
+                          ylim = range(c(dta[,2], Kalman[,2]))) +
+          # coord_cartesian(xlim = range1, 
+          #                 ylim = range2) +
+          theme_minimal() +
+          labs(title = "Ground truth vs Kalman",
+               x = "x_{t-1, 1}",
+               y = "x_{t, 2}")
+        
+        df1 = data.frame(x = dta[1:(nrow(dta) - 1),1], y = dta[2:nrow(dta),3])
+        temp = data.frame(x = na_lag_pairs(Kalman[,1], which(is.na(x_obs[,1])))[,1],
+                          y = na_lag_pairs(Kalman[,3], which(is.na(x_obs[,1])))[,2])
+        p8 = ggplot() +
+          geom_point(data = df1, aes(x = x, y = y), color = col_gt, size = 1) + 
+          geom_point(data = temp, aes(x = x, y = y), color = col_imp, size = 1, shape = 17) +
+          coord_cartesian(xlim = range(c(dta[,1], Kalman[,1])),
+                          ylim = range(c(dta[,3], Kalman[,3]))) +
+          # coord_cartesian(xlim = range1, 
+          #                 ylim = range3) +
+          theme_minimal() +
+          labs(title = "Ground truth vs Kalman",
+               x = "x_{t-1, 1}",
+               y = "x_{t, 3}")
+        
+        df1 = data.frame(x = dta[1:(nrow(dta) - 1),2], y = dta[2:nrow(dta),3])
+        temp = data.frame(x = na_lag_pairs(Kalman[,2], which(is.na(x_obs[,1])))[,1],
+                          y = na_lag_pairs(Kalman[,3], which(is.na(x_obs[,1])))[,2])
+        p9 = ggplot() +
+          geom_point(data = df1, aes(x = x, y = y), color = col_gt, size = 1) + 
+          geom_point(data = temp, aes(x = x, y = y), color = col_imp, size = 1, shape = 17) +
+          coord_cartesian(xlim = range(c(dta[,2], Kalman[,2])),
+                          ylim = range(c(dta[,3], Kalman[,3]))) +
+          # coord_cartesian(xlim = range2, 
+          #                 ylim = range3) +
+          theme_minimal() +
+          labs(title = "Ground truth vs Kalman",
+               x = "x_{t-1, 2}",
+               y = "x_{t, 3}")
+        
+        df1 = data.frame(x = dta[1:(nrow(dta) - 1),1], y = dta[2:nrow(dta),2])
+        temp = data.frame(x = na_lag_pairs(PT[,1], which(is.na(x_obs[,1])))[,1],
+                          y = na_lag_pairs(PT[,2], which(is.na(x_obs[,1])))[,2])
+        p10 = ggplot() +
+          geom_point(data = df1, aes(x = x, y = y), color = col_gt, size = 1) + 
+          geom_point(data = temp, aes(x = x, y = y), color = col_imp, size = 1, shape = 17) +
+          coord_cartesian(xlim = range(c(dta[,1], PT[,1])),
+                          ylim = range(c(dta[,2], PT[,2]))) +
+          # coord_cartesian(xlim = range1, 
+          #                 ylim = range2) +
+          theme_minimal() +
+          labs(title = "Ground truth vs ScalarF",
+               x = "x_{t-1, 1}",
+               y = "x_{t, 2}")
+        
+        df1 = data.frame(x = dta[1:(nrow(dta) - 1),1], y = dta[2:nrow(dta),3])
+        temp = data.frame(x = na_lag_pairs(PT[,1], which(is.na(x_obs[,1])))[,1],
+                          y = na_lag_pairs(PT[,3], which(is.na(x_obs[,1])))[,2])
+        p11 = ggplot() +
+          geom_point(data = df1, aes(x = x, y = y), color = col_gt, size = 1) + 
+          geom_point(data = temp, aes(x = x, y = y), color = col_imp, size = 1, shape = 17) +
+          coord_cartesian(xlim = range(c(dta[,1], PT[,1])),
+                          ylim = range(c(dta[,3], PT[,3]))) +
+          # coord_cartesian(xlim = range1, 
+          #                 ylim = range3) +
+          theme_minimal() +
+          labs(title = "Ground truth vs ScalarF",
+               x = "x_{t-1, 1}",
+               y = "x_{t, 3}")
+        
+        df1 = data.frame(x = dta[1:(nrow(dta) - 1),2], y = dta[2:nrow(dta),3])
+        temp = data.frame(x = na_lag_pairs(PT[,2], which(is.na(x_obs[,1])))[,1],
+                          y = na_lag_pairs(PT[,3], which(is.na(x_obs[,1])))[,2])
+        p12 = ggplot() +
+          geom_point(data = df1, aes(x = x, y = y), color = col_gt, size = 1) + 
+          geom_point(data = temp, aes(x = x, y = y), color = col_imp, size = 1, shape = 17) +
+          coord_cartesian(xlim = range(c(dta[,2], PT[,2])),
+                          ylim = range(c(dta[,3], PT[,3]))) +
+          # coord_cartesian(xlim = range2, 
+          #                 ylim = range3) +
+          theme_minimal() +
+          labs(title = "Ground truth vs ScalarF",
+               x = "x_{t-1, 2}",
+               y = "x_{t, 3}")
+        
+        df1 = data.frame(x = dta[1:(nrow(dta) - 1),1], y = dta[2:nrow(dta),2])
+        temp = data.frame(x = na_lag_pairs(wass[,1], which(is.na(x_obs[,1])))[,1],
+                          y = na_lag_pairs(wass[,2], which(is.na(x_obs[,1])))[,2])
+        p13 = ggplot() +
+          geom_point(data = df1, aes(x = x, y = y), color = col_gt, size = 1) + 
+          geom_point(data = temp, aes(x = x, y = y), color = col_imp, size = 1, shape = 17) +
+          # coord_cartesian(xlim = range(c(dta[,1], wass[,1])), 
+          #                 ylim = range(c(dta[,2], wass[,2]))) +
+          coord_cartesian(xlim = range1, 
+                          ylim = range2) +
+          theme_minimal() +
+          labs(title = "Ground truth vs TWI (linear)",
+               x = "x_{t-1, 1}",
+               y = "x_{t, 2}")
+        
+        df1 = data.frame(x = dta[1:(nrow(dta) - 1),1], y = dta[2:nrow(dta),3])
+        temp = data.frame(x = na_lag_pairs(wass[,1], which(is.na(x_obs[,1])))[,1],
+                          y = na_lag_pairs(wass[,3], which(is.na(x_obs[,1])))[,2])
+        p14 = ggplot() +
+          geom_point(data = df1, aes(x = x, y = y), color = col_gt, size = 1) + 
+          geom_point(data = temp, aes(x = x, y = y), color = col_imp, size = 1, shape = 17) +
+          # coord_cartesian(xlim = range(c(dta[,1], wass[,1])), 
+          #                 ylim = range(c(dta[,3], wass[,3]))) +
+          coord_cartesian(xlim = range1, 
+                          ylim = range3) +
+          theme_minimal() +
+          labs(title = "Ground truth vs TWI (linear)",
+               x = "x_{t-1, 1}",
+               y = "x_{t, 3}")
+        
+        df1 = data.frame(x = dta[1:(nrow(dta) - 1),2], y = dta[2:nrow(dta),3])
+        temp = data.frame(x = na_lag_pairs(wass[,2], which(is.na(x_obs[,1])))[,1],
+                          y = na_lag_pairs(wass[,3], which(is.na(x_obs[,1])))[,2])
+        p15 = ggplot() +
+          geom_point(data = df1, aes(x = x, y = y), color = col_gt, size = 1) + 
+          geom_point(data = temp, aes(x = x, y = y), color = col_imp, size = 1, shape = 17) +
+          # coord_cartesian(xlim = range(c(dta[,2], wass[,2])), 
+          #                 ylim = range(c(dta[,3], wass[,3]))) +
+          coord_cartesian(xlim = range2, 
+                          ylim = range3) +
+          theme_minimal() +
+          labs(title = "Ground truth vs TWI (linear)",
+               x = "x_{t-1, 2}",
+               y = "x_{t, 3}")
+        
+        df1 = data.frame(x = dta[1:(nrow(dta) - 1),1], y = dta[2:nrow(dta),2])
+        temp = data.frame(x = na_lag_pairs(kwass[,1], which(is.na(x_obs[,1])))[,1],
+                          y = na_lag_pairs(kwass[,2], which(is.na(x_obs[,1])))[,2])
+        p16 = ggplot() +
+          geom_point(data = df1, aes(x = x, y = y), color = col_gt, size = 1) + 
+          geom_point(data = temp, aes(x = x, y = y), color = col_imp, size = 1, shape = 17) +
+          # coord_cartesian(xlim = range(c(dta[,1], kwass[,1])), 
+          #                 ylim = range(c(dta[,2], kwass[,2]))) +
+          coord_cartesian(xlim = range1, 
+                          ylim = range2) +
+          theme_minimal() +
+          labs(title = "Ground truth vs k-TWI (linear)",
+               x = "x_{t-1, 1}",
+               y = "x_{t, 2}")
+        
+        df1 = data.frame(x = dta[1:(nrow(dta) - 1),1], y = dta[2:nrow(dta),3])
+        temp = data.frame(x = na_lag_pairs(kwass[,1], which(is.na(x_obs[,1])))[,1],
+                          y = na_lag_pairs(kwass[,3], which(is.na(x_obs[,1])))[,2])
+        p17 = ggplot() +
+          geom_point(data = df1, aes(x = x, y = y), color = col_gt, size = 1) + 
+          geom_point(data = temp, aes(x = x, y = y), color = col_imp, size = 1, shape = 17) +
+          # coord_cartesian(xlim = range(c(dta[,1], kwass[,1])), 
+          #                 ylim = range(c(dta[,3], kwass[,3]))) +
+          coord_cartesian(xlim = range1, 
+                          ylim = range3) +
+          theme_minimal() +
+          labs(title = "Ground truth vs k-TWI (linear)",
+               x = "x_{t-1, 1}",
+               y = "x_{t, 3}")
+        
+        df1 = data.frame(x = dta[1:(nrow(dta) - 1),2], y = dta[2:nrow(dta),3])
+        temp = data.frame(x = na_lag_pairs(kwass[,2], which(is.na(x_obs[,1])))[,1],
+                          y = na_lag_pairs(kwass[,3], which(is.na(x_obs[,1])))[,2])
+        p18 = ggplot() +
+          geom_point(data = df1, aes(x = x, y = y), color = col_gt, size = 1) + 
+          geom_point(data = temp, aes(x = x, y = y), color = col_imp, size = 1, shape = 17) +
+          # coord_cartesian(xlim = range(c(dta[,2], kwass[,2])), 
+          #                 ylim = range(c(dta[,3], kwass[,3]))) +
+          coord_cartesian(xlim = range2, 
+                          ylim = range3) +
+          theme_minimal() +
+          labs(title = "Ground truth vs k-TWI (linear)",
+               x = "x_{t-1, 2}",
+               y = "x_{t, 3}")
+        
+        df1 = data.frame(x = dta[1:(nrow(dta) - 1),1], y = dta[2:nrow(dta),2])
+        temp = data.frame(x = na_lag_pairs(wass_Kalman[,1], which(is.na(x_obs[,1])))[,1],
+                          y = na_lag_pairs(wass_Kalman[,2], which(is.na(x_obs[,1])))[,2])
+        p19 = ggplot() +
+          geom_point(data = df1, aes(x = x, y = y), color = col_gt, size = 1) + 
+          geom_point(data = temp, aes(x = x, y = y), color = col_imp, size = 1, shape = 17) +
+          # coord_cartesian(xlim = range(c(dta[,1], wass_Kalman[,1])), 
+          #                 ylim = range(c(dta[,2], wass_Kalman[,2]))) +
+          coord_cartesian(xlim = range1, 
+                          ylim = range2) +
+          theme_minimal() +
+          labs(title = "Ground truth vs TWI (Kalman)",
+               x = "x_{t-1, 1}",
+               y = "x_{t, 2}")
+        
+        df1 = data.frame(x = dta[1:(nrow(dta) - 1),1], y = dta[2:nrow(dta),3])
+        temp = data.frame(x = na_lag_pairs(wass_Kalman[,1], which(is.na(x_obs[,1])))[,1],
+                          y = na_lag_pairs(wass_Kalman[,3], which(is.na(x_obs[,1])))[,2])
+        p20 = ggplot() +
+          geom_point(data = df1, aes(x = x, y = y), color = col_gt, size = 1) + 
+          geom_point(data = temp, aes(x = x, y = y), color = col_imp, size = 1, shape = 17) +
+          # coord_cartesian(xlim = range(c(dta[,1], wass_Kalman[,1])), 
+          #                 ylim = range(c(dta[,3], wass_Kalman[,3]))) +
+          coord_cartesian(xlim = range1, 
+                          ylim = range3) +
+          theme_minimal() +
+          labs(title = "Ground truth vs TWI (Kalman)",
+               x = "x_{t-1, 1}",
+               y = "x_{t, 3}")
+        
+        df1 = data.frame(x = dta[1:(nrow(dta) - 1),2], y = dta[2:nrow(dta),3])
+        temp = data.frame(x = na_lag_pairs(wass_Kalman[,2], which(is.na(x_obs[,1])))[,1],
+                          y = na_lag_pairs(wass_Kalman[,3], which(is.na(x_obs[,1])))[,2])
+        p21 = ggplot() +
+          geom_point(data = df1, aes(x = x, y = y), color = col_gt, size = 1) + 
+          geom_point(data = temp, aes(x = x, y = y), color = col_imp, size = 1, shape = 17) +
+          # coord_cartesian(xlim = range(c(dta[,2], wass_Kalman[,2])), 
+          #                 ylim = range(c(dta[,3], wass_Kalman[,3]))) +
+          coord_cartesian(xlim = range2, 
+                          ylim = range3) +
+          theme_minimal() +
+          labs(title = "Ground truth vs TWI (Kalman)",
+               x = "x_{t-1, 2}",
+               y = "x_{t, 3}")
+        
+        df1 = data.frame(x = dta[1:(nrow(dta) - 1),1], y = dta[2:nrow(dta),2])
+        temp = data.frame(x = na_lag_pairs(kwass_Kalman[,1], which(is.na(x_obs[,1])))[,1],
+                          y = na_lag_pairs(kwass_Kalman[,2], which(is.na(x_obs[,1])))[,2])
+        p22 = ggplot() +
+          geom_point(data = df1, aes(x = x, y = y), color = col_gt, size = 1) + 
+          geom_point(data = temp, aes(x = x, y = y), color = col_imp, size = 1, shape = 17) +
+          # coord_cartesian(xlim = range(c(dta[,1], kwass_Kalman[,1])), 
+          #                 ylim = range(c(dta[,2], kwass_Kalman[,2]))) +
+          coord_cartesian(xlim = range1, 
+                          ylim = range2) +
+          theme_minimal() +
+          labs(title = "Ground truth vs k-TWI (Kalman)",
+               x = "x_{t-1, 1}",
+               y = "x_{t, 2}")
+        
+        df1 = data.frame(x = dta[1:(nrow(dta) - 1),1], y = dta[2:nrow(dta),3])
+        temp = data.frame(x = na_lag_pairs(kwass_Kalman[,1], which(is.na(x_obs[,1])))[,1],
+                          y = na_lag_pairs(kwass_Kalman[,3], which(is.na(x_obs[,1])))[,2])
+        p23 = ggplot() +
+          geom_point(data = df1, aes(x = x, y = y), color = col_gt, size = 1) + 
+          geom_point(data = temp, aes(x = x, y = y), color = col_imp, size = 1, shape = 17) +
+          # coord_cartesian(xlim = range(c(dta[,1], kwass_Kalman[,1])), 
+          #                 ylim = range(c(dta[,3], kwass_Kalman[,3]))) +
+          coord_cartesian(xlim = range1, 
+                          ylim = range3) +
+          theme_minimal() +
+          labs(title = "Ground truth vs k-TWI (Kalman)",
+               x = "x_{t-1, 1}",
+               y = "x_{t, 3}")
+        
+        df1 = data.frame(x = dta[1:(nrow(dta) - 1),2], y = dta[2:nrow(dta),3])
+        temp = data.frame(x = na_lag_pairs(kwass_Kalman[,2], which(is.na(x_obs[,1])))[,1],
+                          y = na_lag_pairs(kwass_Kalman[,3], which(is.na(x_obs[,1])))[,2])
+        p24 = ggplot() +
+          geom_point(data = df1, aes(x = x, y = y), color = col_gt, size = 1) + 
+          geom_point(data = temp, aes(x = x, y = y), color = col_imp, size = 1, shape = 17) +
+          # coord_cartesian(xlim = range(c(dta[,2], kwass_Kalman[,2])), 
+          #                 ylim = range(c(dta[,3], kwass_Kalman[,3]))) +
+          coord_cartesian(xlim = range2, 
+                          ylim = range3) +
+          theme_minimal() +
+          labs(title = "Ground truth vs k-TWI (Kalman)",
+               x = "x_{t-1, 2}",
+               y = "x_{t, 3}")
+        
+        grid.arrange(p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12,
+                     nrow = 4, ncol = 3)
+        grid.arrange(p13, p14, p15, p16, p17, p18, p19, p20, p21, p22, p23, p24,
+                     nrow = 4, ncol = 3)
   }
   cat("iteration", sim, "\n")
 }
 
+
 print(round(colMeans(wass_d), 4))
 print(round(sqrt(ccf_loss / 1000), 4))
-
