@@ -1,5 +1,6 @@
 library(glmnet)
 library(imputeTS)
+library(Rssa)
 
 s_filter = function (x, ar_order = 2, lambda = 0.001) {
   x = as.matrix(x)
@@ -45,6 +46,21 @@ s_filter = function (x, ar_order = 2, lambda = 0.001) {
   
   
   return (xmis)
+}
+
+issa = function (x, d) {
+  if (d > 1) {
+    x = as.matrix(x)
+    model = ssa(x, L = 6, kind = "mssa")
+  } else {
+    x = as.vector(x)
+    model = ssa(x, L = 6)
+  }
+  
+  res = igapfill(model, groups = list(c(1:3)), maxiter = 100,
+                 fill = na_interpolation(x, "linear"))
+  
+  return (res)
 }
 
 dta = unname(as.matrix(read.csv("./real_data/GW_select.csv", header = F)))

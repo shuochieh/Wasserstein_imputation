@@ -2,6 +2,7 @@ library(rmatio)
 library(lubridate)
 library(gridExtra)
 library(maps)
+library(ggplot2)
 
 dta = read.mat("./real_data/gw_temp/groundwater/gw_2020_67.mat")
 dta = dta[[1]]
