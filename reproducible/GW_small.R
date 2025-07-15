@@ -2,6 +2,7 @@
 library(glmnet)
 library(imputeTS)
 library(Rssa)
+library(locfit)
 
 s_filter = function (x, ar_order = 2, lambda = 0.001) {
   x = as.matrix(x)
@@ -132,13 +133,9 @@ for (j in 1:nrow(dta)) {
 subset_idx = which(rowSums(is.na(dta[,28:ncol(dta)])) < 10)
 dta = dta[subset_idx, 28:ncol(dta)]
 
-#subset_idx = which(rowSums(is.na(dta)) < 30) # stations with less than < 30 missing data;
-# New data dimension: (19, 308)
-#dta = dta[subset_idx, 28:ncol(dta)]
-
 par(mfrow = c(3,5))
 dates = seq(from = as.Date("1995-01-01"), to = as.Date("2020-08-01"), by = "month")
-for (i in 1:15) {
+for (i in 1:nrow(dta)) {
   plot(x = dates, y = dta[i,], type = "l", col = "steelblue", lwd = 1.5,
        xaxt = "n", yaxt = "n",
        main = paste("Series", i), xlab = "", ylab = "")
@@ -151,7 +148,7 @@ for (i in 1:15) {
 
 ### Artificially create missing data
 set.seed(1)
-missing_pct = c(0.2, 0.3, 0.4, 0.5)
+missing_pct = c(0.1, 0.2, 0.3, 0.4, 0.5, 0.6)
 
 for (pct in missing_pct) {
   dta_artificial = dta
@@ -160,15 +157,34 @@ for (pct in missing_pct) {
   SF_imp = array(NA, dim = dim(dta))
   SSA_imp = array(NA, dim = dim(dta))
   mean_imp = array(NA, dim = dim(dta))
+  lp_trend = array(NA, dim = dim(dta))
+  lp_resd = array(NA, dim = dim(dta))
+  lp_linimp = array(NA, dim = dim(dta))
   
-  for (i in 1:15) {
+  for (i in 1:nrow(dta)) {
     cat("Imputing...missing percentage", 100 * pct, "%. Series", i, "\n")
-    dta_artificial[i,sample(ncol(dta) - 36, floor(pct * ncol(dta)))] = NA
+    
+    # n_patches = floor(pct * ncol(dta) / 3)
+    # temp = floor(seq(from = 2, to = ncol(dta) - 36, length.out = n_patches))
+    # for (k in 1:n_patches) {
+    #   dta_artificial[i, temp[k]:(temp[k] + 2)] = NA
+    # }
+    dta_artificial[i, sample(ncol(dta) - 36, floor(pct * ncol(dta)))] = NA
+    
     lin_imp[i,] = na_interpolation(dta_artificial[i,], "linear")
     KS_imp[i,] = na_kalman(dta_artificial[i,], "auto.arima")
     SF_imp[i,] = s_filter(dta_artificial[i,], 6)
     SSA_imp[i,] = ssa_cv(dta_artificial[i,], 6, 6, 0.1, 10, ncol(dta) - 35)$x_filled
     mean_imp[i,] = na_mean(dta_artificial[i,], "mean")
+    
+    # Remove local polynomial
+    da = dta_artificial[i,]
+    model = locfit(da[which(!is.na(da))] ~ lp(which(!is.na(da)), deg = 0, h = 12))
+    res = c(da - predict(model, newdata = 1:length(da)))
+    
+    lp_trend[i,] = predict(model, newdata = 1:length(da))
+    lp_resd[i,] = res
+    lp_linimp[i,] = na_interpolation(res, "linear")
   }
   
   write.table(dta, paste0("./real_data/small_series", pct * 10, ".csv"), 
@@ -184,5 +200,11 @@ for (pct in missing_pct) {
   write.table(SSA_imp, paste0("./real_data/small_series", pct * 10, "_SSA.csv"), 
               row.names = F, col.names = F, sep = ",")
   write.table(mean_imp, paste0("./real_data/small_series", pct * 10, "_mean.csv"), 
+              row.names = F, col.names = F, sep = ",")
+  write.table(lp_trend, paste0("./real_data/small_series", pct * 10, "_LPfit.csv"),
+              row.names = F, col.names = F, sep = ",")
+  write.table(lp_resd, paste0("./real_data/small_series", pct * 10, "_LPresd.csv"),
+              row.names = F, col.names = F, sep = ",")
+  write.table(lp_linimp, paste0("./real_data/small_series", pct * 10, "_LPlinimp.csv"),
               row.names = F, col.names = F, sep = ",")
 }
