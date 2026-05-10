@@ -12,50 +12,59 @@ Created on Sat Oct 19 12:05:16 2024
 import WI_util as WI
 import numpy as np
 
-#%%
-
 p = 6
 
 #%%
 
-for pct in [2, 3, 4, 5]:
-    Kalman = np.loadtxt("./real_data/small_series" + str(pct) + "_KS.csv", delimiter = ",", skiprows = 0)
-    Kalman = Kalman.T
+for pct in [1, 2, 3, 4, 5, 6]:
 
-    n = Kalman.shape[0]
-    d = Kalman.shape[1]
+    init = np.loadtxt("./real_data/small_series" + str(pct) + "_LPlinimp.csv", delimiter = ",", skiprows = 0)
+    init = init.T
 
-    raw = np.genfromtxt("./real_data/small_series" + str(pct) + "_masked.csv", delimiter = ",")
+    n = init.shape[0]
+    d = init.shape[1]
+
+    n1 = int(np.floor(n / 3))
+    n2 = int(np.floor(2 * n / 3))
+
+    raw = np.genfromtxt("./real_data/small_series" + str(pct) + "_LPresd.csv", delimiter = ",")
     raw = raw.T
 
-    res_Kalman = np.zeros(shape = (n, d))
-    kres_Kalman = np.zeros(shape = (n, d))
+    res = np.zeros(shape = (n, d))
+    kres = np.zeros(shape = (n, d))
 
-    alpha = n / (4 * p)
+    alpha = n / (4 * 3 * p)
 
     for j in range(d):
-        if j == 0:
-            idx_obs = [[i for i in range(n) if ~np.isnan(raw[i, j])]]
-        else:
-            idx_obs.append([i for i in range(n) if ~np.isnan(raw[i, j])])
+        print("\n\n Series" + str(j))
 
-    res_Kalman = WI.WI_core_ordinary(np.copy(Kalman), 123, p, idx_obs, WI.solver_ordinary,
-                                     alpha = alpha, WI_max_iter = 100)
-    kres_Kalman = WI.kWI(np.copy(Kalman), WI.WI_core_ordinary, [231, 154, 77],
-                         idx_obs = idx_obs, p = p, solver = WI.solver_ordinary, alpha = alpha,
-                         WI_max_iter = 30, verbose = False)
-    
-    np.savetxt("./real_data/WI_Kalman_small" + str(pct) + ".csv", res_Kalman, delimiter = ",")
-    np.savetxt("./real_data/kWI_Kalman_small" + str(pct) + ".csv", kres_Kalman, delimiter = ",")
+        #idx_obs = [[i for i in range(n) if ~np.isnan(raw[i, j])]]
 
+        idx_obs = [[i for i in range(n) if ~np.isnan(raw[i, j])]]
 
+        # Impute by three sections
+        # temp1 = WI.WI_core_ordinary(np.copy(init[:n1,j]).reshape(-1, 1), int(np.floor(0.4 * n1)), p, idx_obs1, WI.solver_ordinary,
+        #                             alpha = alpha, WI_max_iter = 100, verbose = False)
+        # temp2 = WI.WI_core_ordinary(np.copy(init[n1:n2,j]).reshape(-1, 1), int(np.floor(0.4 * n1)), p, idx_obs2, WI.solver_ordinary,
+        #                             alpha = alpha, WI_max_iter = 100, verbose = False)
+        # temp3 = WI.WI_core_ordinary(np.copy(init[n2:,j]).reshape(-1, 1), int(np.floor(0.4 * n1)), p, idx_obs3, WI.solver_ordinary,
+        #                             alpha = alpha, WI_max_iter = 100, verbose = False)
+        # res[:,j] = np.concatenate([temp1.reshape(-1), temp2.reshape(-1), temp3.reshape(-1)])
+        temp = WI.WI_core_ordinary(np.copy(init[:,j]).reshape(-1, 1), int(np.floor(0.4 * n)), p, idx_obs, WI.solver_ordinary,
+                                   alpha = alpha, WI_max_iter = 100, verbose = False)
+        res[:,j] = temp.reshape(-1)
 
+        temp = WI.kWI(np.copy(init[:,j]).reshape(-1, 1), WI.WI_core_ordinary, [92, 215, 154],
+                      idx_obs = idx_obs, p = p, solver = WI.solver_ordinary,
+                      alpha = alpha, WI_max_iter = 30, verbose = True)
+        kres[:,j] = temp.reshape(-1)
 
+        # Codes below have not been finished
+        #temp1 = WI.kWI(np.copy(init[:n1,j]).reshape(-1,1), WI.WI_core_ordinary, [92, 215, 154],
+        #              idx_obs = idx_obs, p = p, solver = WI.solver_ordinary,
+        #              alpha = alpha, WI_max_iter = 30, verbose = False)
+        #kres[:,j] = temp.reshape(-1)
 
+    np.savetxt("./real_data/WI_small" + str(pct) + ".csv", res, delimiter = ",")
+    np.savetxt("./real_data/kWI_small" + str(pct) + ".csv", kres, delimiter = ",")
 
-
-
-
-
-
-    
